@@ -1,7 +1,7 @@
 <mat-card appearance="outlined" class="login-card">
   <mat-card-header class="login-header">
     <mat-card-title class="login-title">Iniciar Sesión</mat-card-title>
-    <mat-card-subtitle class="login-subtitle">Bienvenido a UNSIS</mat-card-subtitle>
+    <mat-card-subtitle class="login-subtitle">Ingresa tu usuario y contraseña</mat-card-subtitle>
   </mat-card-header>
   
   <mat-card-content>
@@ -10,14 +10,14 @@
       <mat-form-field appearance="outline" class="login-input">
         <mat-label>Usuario</mat-label>
         <input matInput placeholder="Ej: usuario@unsis.edu.mx" required>
-       
+        <mat-icon matPrefix class="input-icon">person</mat-icon>
       </mat-form-field>
 
       <!-- Contraseña -->
       <mat-form-field appearance="outline" class="login-input">
         <mat-label>Contraseña</mat-label>
         <input matInput type="password" placeholder="Ingresa tu contraseña" required>
-        
+        <mat-icon matPrefix class="input-icon">lock</mat-icon>
       </mat-form-field>
 
       <!-- Botón -->
@@ -30,6 +30,5 @@
   <!-- Enlaces -->
   <mat-card-actions class="login-actions">
     <a mat-button class="forgot-password">¿Olvidaste tu contraseña?</a>
-    <a mat-button class="register-link">Registrarse</a>
   </mat-card-actions>
 </mat-card>

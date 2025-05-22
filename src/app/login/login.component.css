@@ -7,6 +7,7 @@
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
   background: white;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* --- Encabezado (Vino oscuro) --- */
@@ -43,6 +44,7 @@
 
 .input-icon {
   color: #6a1b1b;  /* Íconos en vino */
+    font-family: 'Material Icons' !important;
 }
 
 /* --- Botón (Vino con hover más claro) --- */
