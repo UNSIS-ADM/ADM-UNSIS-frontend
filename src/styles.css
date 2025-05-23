@@ -1,1 +1,77 @@
-/* You can add global styles to this file, and also import other style files */
+
+
+
+
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+@include mat.all-component-themes($unsis-theme);
+
+
+/* Estructura principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ocupa al menos el 100% del viewport */
+}
+
+/* Header */
+/* Reset de márgenes globales */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Previene scroll horizontal */
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Header 100% ancho */
+.header {
+  background: #6a1b1b;
+  padding: 0 !important; /* Override de Angular Material */
+  min-height: 64px;
+  width: 100vw; /* Ocupa el ancho completo del viewport */
+  margin: 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 16px; /* Padding solo interno (opcional) */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Elimina sombras/espacios predeterminados de Angular Material */
+.mat-toolbar {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* Contenido (crece para empujar el footer abajo) */
+.content {
+  flex: 1; /* Ocupa el espacio disponible */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0;
+  background: #f5e8e0;
+  width: 100%;
+}
+
+/* Footer (siempre abajo) */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}

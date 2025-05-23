@@ -1,0 +1,48 @@
+/* Elimina márgenes predeterminados del body */
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Header (ocupa todo el ancho) */
+.header {
+  background: #6a1b1b;
+  color: white;
+  padding: 0 16px; /* Padding reducido solo para contenido interno */
+  width: 100%;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: none; /* Elimina el límite de ancho */
+  margin: 0 auto;
+}
+
+/* Contenido (fondo beige full width) */
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 0; /* Padding solo vertical */
+  background: #f5e8e0;
+  width: 100%;
+}
+
+/* Footer (full width con degradado) */
+.footer {
+  background: linear-gradient(to right, #6a1b1b, #9e3e3e);
+  color: white;
+  padding: 12px 16px; /* Padding reducido */
+  width: 100%;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0 auto;
+}
