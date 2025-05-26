@@ -1,2 +1,27 @@
 <app-nav></app-nav>
 
+<div class="resultado-container">
+    <mat-card class="resultado-card">
+        <mat-card-header>
+            <mat-card-title>Resultado del Alumno</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div>
+                <strong>Nombre:</strong> Juan Pérez
+            </div>
+            <div>
+                <strong>Matrícula:</strong> 20231234
+            </div>
+            <div>
+                <strong>Carrera:</strong> Ingeniería en Sistemas
+            </div>
+            <div>
+                <!-- Si está aprobado -->
+                <strong>Resultado:</strong> <span class="resultado-aprobado">Aprobado</span>
+                <br>
+                <!-- Si no está aprobado -->
+                <strong>Resultado:</strong> <span class="resultado-no-aprobado">No aprobado</span>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
