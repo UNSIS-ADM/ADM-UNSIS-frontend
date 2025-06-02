@@ -1,12 +1,20 @@
 /* Navbar principal */
 .navbar {
-  position: sticky;
+ 
+  color: white;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  padding: 0 2rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mat-toolbar {
+  min-height: 64px;
+}
+
+.spacer {
+  flex: 1 1 auto;
 }
 
 .navbar-brand {

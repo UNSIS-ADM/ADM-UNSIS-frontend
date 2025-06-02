@@ -1,0 +1,20 @@
+.resultado-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.resultado-card {
+  width: 100%;
+  max-width: 400px;
+}
+.resultado-aprobado {
+  color: #388e3c; /* Verde Material */
+  font-weight: bold;
+}
+
+.resultado-no-aprobado {
+  color: #d32f2f; /* Rojo Material */
+  font-weight: bold;
+}
