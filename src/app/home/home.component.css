@@ -1,87 +1,9 @@
-/* --- Estructura --- */
-.login-card {
-  max-width: 420px;
-  margin: 2rem auto;
-  padding: 0;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  background: white;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* --- Encabezado (Vino oscuro) --- */
-.login-header {
-  background: #6a1b1b;  /* Color vino principal */
-  color: white !important;
-  padding: 1.5rem;
+.container {
+  padding: 20px;
   text-align: center;
-}
-
-.login-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin: 0;
-}
-
-.login-subtitle {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-}
-
-/* --- Campos de entrada --- */
-.login-form {
-  padding: 1.5rem;
-}
-
-.login-input .mat-form-field-outline {
-  color: #e0c8c8 !important;  /* Borde claro */
-}
-
-.login-input .mat-form-field-outline-thick {
-  color: #9e3e3e !important;  /* Borde activo (vino claro) */
-}
-
-.input-icon {
-  color: #6a1b1b;  /* Íconos en vino */
-    font-family: 'Material Icons' !important;
-}
-
-/* --- Botón (Vino con hover más claro) --- */
-.login-button {
-  width: 100%;
-  padding: 12px;
-  background: #6a1b1b;
-  color: white !important;
-  font-weight: 500;
-  border-radius: 6px;
-  margin-top: 0.5rem;
-  transition: all 0.3s;
-}
-
-.login-button:hover {
-  background: #9e3e3e;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* --- Enlaces --- */
-.login-actions {
+  height: calc(100vh - 64px); /* Ajusta 64px según la altura de tu navbar */
   display: flex;
-  justify-content: space-between;
-  padding: 0 1.5rem 1.5rem 1.5rem;
-}
-
-.forgot-password {
-  color: #6a1b1b !important;
-  font-weight: 500;
-}
-
-.register-link {
-  color: #9e3e3e !important;
-  font-weight: 500;
-}
-
-.forgot-password:hover, .register-link:hover {
-  text-decoration: underline;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 10%;
 }
