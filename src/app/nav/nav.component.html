@@ -8,16 +8,16 @@
   <!-- Elementos de navegación (visible en desktop) -->
   <nav class="nav-links" *ngIf="!isMobile">
     <a mat-button routerLink="/inicio">Inicio</a>
-    <a mat-button routerLink="/acerca">Acerca</a>
-    
+    <a mat-button routerLink="/acerca">Alumnos</a>
+    <a mat-button routerLink="/acerca">Resultados</a>
     <!-- Menú desplegable -->
-    <button mat-button [matMenuTriggerFor]="menu">Servicios <mat-icon>arrow_drop_down</mat-icon></button>
+    <button mat-button [matMenuTriggerFor]="menu">Carga de datos <mat-icon>arrow_drop_down</mat-icon></button>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item routerLink="/servicios/consulta">Consulta</button>
-      <button mat-menu-item routerLink="/servicios/citas">Citas</button>
+      <button mat-menu-item routerLink="/servicios/consulta">Carga de resultados</button>
+      <button mat-menu-item routerLink="/servicios/citas">Carga de alumnos</button>
     </mat-menu>
 
-    <a mat-button routerLink="/contacto">Contacto</a>
+    <a mat-button routerLink="/login">Salir</a>
   </nav>
 
   <!-- Menú hamburguesa (solo en móvil) -->
@@ -31,17 +31,19 @@
   <mat-sidenav #sidenav mode="over" position="end" class="mobile-sidenav">
     <div class="sidenav-content">
       <a mat-button routerLink="/inicio" (click)="sidenav.close()">Inicio</a>
-      <a mat-button routerLink="/acerca" (click)="sidenav.close()">Acerca</a>
+      <a mat-button routerLink="/acerca" (click)="sidenav.close()">Alumnos</a>
+      <a mat-button routerLink="/acerca" (click)="sidenav.close()">Resultados</a>
+
       
       <mat-divider></mat-divider>
       
-      <button mat-button [matMenuTriggerFor]="mobileMenu">Servicios</button>
+      <button mat-button [matMenuTriggerFor]="mobileMenu">Carga de datos</button>
       <mat-menu #mobileMenu="matMenu">
-        <button mat-menu-item routerLink="/servicios/consulta" (click)="sidenav.close()">Consulta</button>
-        <button mat-menu-item routerLink="/servicios/citas" (click)="sidenav.close()">Citas</button>
+        <button mat-menu-item routerLink="/servicios/consulta" (click)="sidenav.close()">Cargar alumnos</button>
+        <button mat-menu-item routerLink="/servicios/citas" (click)="sidenav.close()">Cargar Resultados</button>
       </mat-menu>
 
-      <a mat-button routerLink="/contacto" (click)="sidenav.close()">Contacto</a>
+      <a mat-button routerLink="/login" (click)="sidenav.close()">Salir</a>
     </div>
   </mat-sidenav>
 </mat-sidenav-container>
