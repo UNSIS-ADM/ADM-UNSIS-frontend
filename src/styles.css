@@ -7,6 +7,7 @@
 @include mat.core();
 
 @include mat.all-component-themes($unsis-theme);
+@import "tailwindcss";
 
 .main-content {
   margin-top:  0px; /* Ajusta si tu toolbar es más alta */

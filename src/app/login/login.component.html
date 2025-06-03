@@ -1,33 +1,46 @@
-<mat-card appearance="outlined" class="login-card">
-  <mat-card-header class="login-header">
-    <mat-card-title class="login-title">Iniciar Sesión</mat-card-title>
-    <mat-card-subtitle class="login-subtitle">Ingresa tu usuario y contraseña</mat-card-subtitle>
-  </mat-card-header>
-  
-  <mat-card-content>
-    <form class="login-form">
-      <!-- Usuario -->
-      <mat-form-field appearance="outline" class="login-input">
-        <mat-label>Usuario</mat-label>
-        <input matInput placeholder="Ej: usuario@unsis.edu.mx" required>
-        <mat-icon matPrefix class="input-icon">person</mat-icon>
-      </mat-form-field>
+<div class="flex flex-col min-h-screen">
+  <div class="flex-grow flex items-center justify-center bg-gray-100">
+    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <div class="mb-6 text-center">
+        <h1 class="text-2xl font-bold text-gray-800">Iniciar Sesión</h1>
+        <p class="text-gray-600">Ingresa tu usuario y contraseña</p>
+      </div>
+      <form class="space-y-4">
+        <!-- Usuario -->
+        <div>
+          <label for="usuario" class="block text-gray-700 mb-1">Usuario</label>
+          <div class="flex items-center border rounded-md p-2">
+            <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A4 4 0 0112 15a4 4 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <input id="usuario" type="text" placeholder="Ej: usuario@unsis.edu.mx" required class="w-full focus:outline-none" />
+          </div>
+        </div>
+        <!-- Contraseña -->
+        <div>
+          <label for="password" class="block text-gray-700 mb-1">Contraseña</label>
+          <div class="flex items-center border rounded-md p-2">
+            <svg class="w-5 h-5 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c.884 0 1.679-.66 1.949-1.5H10.05A1.995 1.995 0 0112 11zM7.222 8A3.222 3.222 0 1110.444 11.222 3.222 3.222 0 017.222 8zM6 11v4a6 6 0 1112 0v-4"></path>
+            </svg>
+            <input id="password" type="password" placeholder="Ingresa tu contraseña" required class="w-full focus:outline-none" />
+          </div>
+        </div>
+        <!-- Botón -->
+        <button type="submit" 
+                class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+                onclick="location.href='/home'">
+          Ingresar
+        </button>
+      </form>
+      <!-- Enlaces (opcional) -->
+      <div class="mt-4 text-center">
+        <!-- Agrega enlaces si fuera necesario -->
+      </div>
+    </div>
+  </div>
 
-      <!-- Contraseña -->
-      <mat-form-field appearance="outline" class="login-input">
-        <mat-label>Contraseña</mat-label>
-        <input matInput type="password" placeholder="Ingresa tu contraseña" required>
-        <mat-icon matPrefix class="input-icon">lock</mat-icon>
-      </mat-form-field>
-
-      <!-- Botón -->
-      <button mat-raised-button  routerLink="/home" type="submit" class="login-button">
-        Ingresar
-      </button>
-    </form>
-  </mat-card-content>
-
-  <!-- Enlaces -->
-  <mat-card-actions class="login-actions">
-  </mat-card-actions>
-</mat-card>
+  <footer class="bg-white dark:bg-gray-900">
+    <!-- ...existing footer code... -->
+  </footer>
+</div>

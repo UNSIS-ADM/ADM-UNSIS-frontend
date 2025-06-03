@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterModule,MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule, MatLabel],
+  imports: [RouterModule,MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
