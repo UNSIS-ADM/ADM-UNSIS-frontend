@@ -46,3 +46,15 @@ body {
   width: 100%;
   margin: 0 auto;
 }
+
+.logo {
+  width: 60px;      /* Tamaño más grande */
+  height: auto;     /* Mantener proporción cuadrada */
+  margin-right: 12px; /* Espacio proporcional a la derecha */
+  align-self: flex-start; /* Alinea la imagen arriba si el header es alto */
+}
+
+/* Si quieres que esté pegada a la esquina izquierda */
+.header-content {
+  justify-content: flex-start; /* Alinea el contenido a la izquierda */
+}

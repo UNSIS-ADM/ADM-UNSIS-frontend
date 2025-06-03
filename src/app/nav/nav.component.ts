@@ -9,9 +9,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'app-nav',
-  imports: [CommonModule, MatToolbarModule, MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule,MatMenuModule, MatSidenavModule, MatDividerModule, MatButtonModule],
+  imports:[RouterModule, CommonModule, MatToolbarModule, MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule, MatMenuModule, MatSidenavModule, MatDividerModule, MatButtonModule],
   standalone: true,
   templateUrl: './nav.component.html',
   styleUrl: './nav.component.css'
