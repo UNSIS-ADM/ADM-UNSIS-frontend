@@ -1,0 +1,47 @@
+<mat-toolbar color="primary" class="navbar">
+  <!-- Logo y nombre (izquierda) -->
+
+
+  <!-- Espacio flexible para empujar elementos a la derecha -->
+  <span class="spacer"></span>
+
+  <!-- Elementos de navegación (visible en desktop) -->
+  <nav class="nav-links" *ngIf="!isMobile">
+    <a mat-button routerLink="/inicio">Inicio</a>
+    <a mat-button routerLink="/acerca">Acerca</a>
+    
+    <!-- Menú desplegable -->
+    <button mat-button [matMenuTriggerFor]="menu">Servicios <mat-icon>arrow_drop_down</mat-icon></button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item routerLink="/servicios/consulta">Consulta</button>
+      <button mat-menu-item routerLink="/servicios/citas">Citas</button>
+    </mat-menu>
+
+    <a mat-button routerLink="/contacto">Contacto</a>
+  </nav>
+
+  <!-- Menú hamburguesa (solo en móvil) -->
+  <button mat-icon-button (click)="sidenav.toggle()" *ngIf="isMobile" class="mobile-menu-button">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
+
+<!-- Menú lateral para móvil -->
+<mat-sidenav-container>
+  <mat-sidenav #sidenav mode="over" position="end" class="mobile-sidenav">
+    <div class="sidenav-content">
+      <a mat-button routerLink="/inicio" (click)="sidenav.close()">Inicio</a>
+      <a mat-button routerLink="/acerca" (click)="sidenav.close()">Acerca</a>
+      
+      <mat-divider></mat-divider>
+      
+      <button mat-button [matMenuTriggerFor]="mobileMenu">Servicios</button>
+      <mat-menu #mobileMenu="matMenu">
+        <button mat-menu-item routerLink="/servicios/consulta" (click)="sidenav.close()">Consulta</button>
+        <button mat-menu-item routerLink="/servicios/citas" (click)="sidenav.close()">Citas</button>
+      </mat-menu>
+
+      <a mat-button routerLink="/contacto" (click)="sidenav.close()">Contacto</a>
+    </div>
+  </mat-sidenav>
+</mat-sidenav-container>

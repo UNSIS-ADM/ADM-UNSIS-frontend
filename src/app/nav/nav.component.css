@@ -1,0 +1,92 @@
+/* Navbar principal */
+.navbar {
+ 
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.mat-toolbar {
+  min-height: 64px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  border-radius: 4px;
+}
+
+.app-name {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* Links de navegación */
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-links a.mat-button {
+  font-weight: 500;
+}
+
+/* Menú móvil */
+.mobile-menu-button {
+  display: none;
+}
+
+.mobile-sidenav {
+  width: 250px;
+  padding: 1rem;
+}
+
+.sidenav-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  
+  .mobile-menu-button {
+    display: block;
+  }
+}
+/* Estructura flexible */
+.navbar-unsis {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.user-section {
+  margin-left: auto;
+}
