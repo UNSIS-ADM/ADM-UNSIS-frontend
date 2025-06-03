@@ -44,7 +44,7 @@
 
 .input-icon {
   color: #6a1b1b;  /* Íconos en vino */
-    font-family: 'Material Icons' !important;
+  font-family: 'Material Icons', sans-serif !important;
 }
 
 /* --- Botón (Vino con hover más claro) --- */
