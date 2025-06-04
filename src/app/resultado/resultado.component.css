@@ -3,6 +3,8 @@
   justify-content: center;
   align-items: center;
   min-height: 70vh;
+  padding: 20px;
+  margin-top: 64px; /* Ajusta según la altura de tu navbar */
 }
 
 .resultado-card {

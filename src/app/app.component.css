@@ -31,13 +31,8 @@ body {
   width: 100%;
 }
 
-/* Footer (full width con degradado) */
-.footer {
-  background: linear-gradient(to right, #6a1b1b, #9e3e3e);
-  color: white;
-  padding: 12px 16px; /* Padding reducido */
-  width: 100%;
-}
+
+
 
 .footer-content {
   display: flex;
