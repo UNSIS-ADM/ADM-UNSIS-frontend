@@ -1,0 +1,81 @@
+<app-nav></app-nav>
+
+<div class="sm:ml-64 mt-16 p-8">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+    <!-- Encabezado -->
+    <div class="p-6 bg-[#6a1b1b] text-white">
+      <h2 class="text-2xl font-semibold">Carga de Datos</h2>
+      <p class="mt-1 text-sm text-gray-200">Gestiona la carga de datos de alumnos</p>
+    </div>
+
+    <!-- Botones y Búsqueda -->
+    <div class="p-4 border-b flex justify-between items-center flex-wrap gap-4">
+      <div class="flex gap-2">
+        <button class="px-4 py-2 bg-[#6a1b1b] text-white rounded hover:bg-[#8b2424] transition-colors">
+          Nueva Carga
+        </button>
+        <button class="px-4 py-2 border border-[#6a1b1b] text-[#6a1b1b] rounded hover:bg-[#fff3f3] transition-colors">
+          Exportar Excel
+        </button>
+      </div>
+      <div class="flex-1 max-w-md ml-4">
+        <input type="search" 
+               placeholder="Buscar por nombre o matrícula..." 
+               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matrícula</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carrera</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let dato of datos">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.id}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.nombre}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.matricula}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.carrera}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.fecha}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [ngClass]="dato.estado === 'Cargado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{dato.estado}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <button class="text-[#6a1b1b] hover:text-[#8b2424] mr-2">Editar</button>
+              <button class="text-red-600 hover:text-red-800">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="px-4 py-3 border-t">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-500">
+          Mostrando 1 a 3 de 3 resultados
+        </div>
+        <div class="flex gap-2">
+          <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Anterior</button>
+          <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Siguiente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sm:ml-64">
+  <app-footer></app-footer>
+</div>
