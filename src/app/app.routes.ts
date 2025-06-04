@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { UsuarioComponent } from './usuario/usuario.component';
 
 export const routes: Routes = [
 
@@ -18,5 +19,5 @@ export const routes: Routes = [
         path: 'resultado',
         loadComponent: () => import('./resultado/resultado.component').then(m => m.ResultadoComponent)
     },
-    
+    { path: 'usuario', component: UsuarioComponent }
 ];

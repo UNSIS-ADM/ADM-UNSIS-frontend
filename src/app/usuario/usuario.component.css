@@ -1,0 +1,13 @@
+.grid {
+  display: grid;
+}
+
+@media (max-width: 768px) {
+  .md\:flex {
+    flex-direction: column;
+  }
+  
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
