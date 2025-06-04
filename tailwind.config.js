@@ -1,13 +1,12 @@
 module.exports = {
+  content: [
+    "./src/**/*.{html,ts}",
+    "./node_modules/flowbite/**/*.js"
+  ],
+  plugins: [
+    require('flowbite/plugin')
+  ],
   theme: {
-    extend: {
-      colors: {
-        'unsis': {
-          primary: '#6a1b1b',
-          secondary: '#8b2424',
-        },
-      },
-    },
+    extend: {},
   },
-  // ...resto de la configuración
 }

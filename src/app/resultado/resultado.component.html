@@ -1,27 +1,40 @@
 <app-nav></app-nav>
 
-<div class="resultado-container">
-    <mat-card class="resultado-card">
-        <mat-card-header>
-            <mat-card-title>Resultado del Alumno</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <div>
-                <strong>Nombre:</strong> Juan Pérez
+<div class="flex justify-center items-center min-h-screen bg-gray-100 sm:ml-64">
+    <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4 text-[#6a1b1b]">Resultado del Alumno</h2>
+        
+        <div class="space-y-4">
+            <div class="border-b pb-2">
+                <strong class="text-gray-700">Nombre:</strong> 
+                <span>{{ alumno.nombre }}</span>
             </div>
-            <div>
-                <strong>Matrícula:</strong> 20231234
+            
+            <div class="border-b pb-2">
+                <strong class="text-gray-700">Matrícula:</strong> 
+                <span>{{ alumno.matricula }}</span>
             </div>
-            <div>
-                <strong>Carrera:</strong> Ingeniería en Sistemas
+            
+            <div class="border-b pb-2">
+                <strong class="text-gray-700">Carrera:</strong> 
+                <span>{{ alumno.carrera }}</span>
             </div>
-            <div>
-                <!-- Si está aprobado -->
-                <strong>Resultado:</strong> <span class="resultado-aprobado">Aprobado</span>
-                <br>
-                <!-- Si no está aprobado -->
-                <strong>Resultado:</strong> <span class="resultado-no-aprobado">No aprobado</span>
+            
+            <div class="mt-4">
+                <strong class="text-gray-700">Resultado:</strong>
+                <span *ngIf="alumno.aprobado" 
+                      class="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                    Aprobado
+                </span>
+                <span *ngIf="!alumno.aprobado" 
+                      class="ml-2 px-3 py-1 bg-red-100 text-red-800 rounded-full">
+                    No aprobado
+                </span>
             </div>
-        </mat-card-content>
-    </mat-card>
+        </div>
+    </div>
+</div>
+
+<div class="sm:ml-64">
+    <app-footer></app-footer>
 </div>
