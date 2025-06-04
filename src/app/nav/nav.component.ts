@@ -23,6 +23,7 @@ export class NavComponent implements OnInit {
   isMobile: boolean | undefined;
   isUserMenuOpen = false;
   isSidebarOpen = false;
+  isSubmenuOpen = false;
 
   @HostListener('window:resize', [])
   onResize() {
@@ -45,9 +46,19 @@ export class NavComponent implements OnInit {
     this.isSidebarOpen = !this.isSidebarOpen;
   }
 
-  // Opcional: cerrar menús al hacer clic fuera
-  closeMenus() {
-    this.isUserMenuOpen = false;
+  toggleSubmenu(): void {
+    this.isSubmenuOpen = !this.isSubmenuOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const userMenuButton = document.getElementById('dropdownUserButton');
+    const userMenu = document.getElementById('dropdown-user');
+    
+    if (!userMenuButton?.contains(event.target as Node) && 
+        !userMenu?.contains(event.target as Node)) {
+      this.isUserMenuOpen = false;
+    }
   }
 }
 
