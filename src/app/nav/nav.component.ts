@@ -24,6 +24,7 @@ export class NavComponent implements OnInit {
   isUserMenuOpen = false;
   isSidebarOpen = false;
   isSubmenuOpen = false;
+  isCargaMenuOpen = false;
 
   @HostListener('window:resize', [])
   onResize() {
@@ -48,6 +49,10 @@ export class NavComponent implements OnInit {
 
   toggleSubmenu(): void {
     this.isSubmenuOpen = !this.isSubmenuOpen;
+  }
+
+  toggleCargaMenu(): void {
+    this.isCargaMenuOpen = !this.isCargaMenuOpen;
   }
 
   @HostListener('document:click', ['$event'])

@@ -21,8 +21,8 @@ export const routes: Routes = [
     },
     { path: 'usuario', component: UsuarioComponent },
     {
-        path: 'cargar-datos',
+        path: 'cargar',
         loadComponent: () => import('./carga-datos/carga-datos.component')
-          .then(m => m.CargaDatosComponent)
-      }
+            .then(m => m.CargaDatosComponent)
+    }
 ];
