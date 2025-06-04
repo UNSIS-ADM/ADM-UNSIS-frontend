@@ -67,10 +67,10 @@
     <ul class="space-y-2 font-medium">
       <!-- Inicio -->
       <li>
-        <a href="/home" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
+        <a routerLink="/home" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
           <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"/>
+            <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"/>
           </svg>
           <span class="ms-3">Inicio</span>
         </a>
@@ -79,14 +79,14 @@
       <!-- Menú desplegable de Carga -->
       <li>
         <button type="button" 
-                (click)="toggleSubmenu()"
+                (click)="toggleCargaMenu()"
                 class="flex items-center w-full p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
           <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
             <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
           </svg>
           <span class="flex-1 ms-3 text-left">Carga de Datos</span>
           <svg class="w-3 h-3 transition-transform" 
-               [ngClass]="{'rotate-180': isSubmenuOpen}"
+               [ngClass]="{'rotate-180': isCargaMenuOpen}"
                aria-hidden="true" 
                xmlns="http://www.w3.org/2000/svg" 
                fill="none" 
@@ -95,17 +95,23 @@
           </svg>
         </button>
         <!-- Submenú -->
-        <ul [ngClass]="{'hidden': !isSubmenuOpen}"
+        <ul [ngClass]="{'hidden': !isCargaMenuOpen}"
             class="py-2 space-y-2">
           <li>
-            <a href="/cargar-alumnos" 
+            <a [routerLink]="['/cargar']" [queryParams]="{tipo: 'alumnos'}"
                class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
+              <svg class="w-4 h-4 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
+              </svg>
               Cargar Alumnos
             </a>
           </li>
           <li>
-            <a href="/cargar-resultados" 
+            <a [routerLink]="['/cargar']" [queryParams]="{tipo: 'resultados'}"
                class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
+              <svg class="w-4 h-4 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm0 9h-11v-1l3-3 4 4 5-5v5z"/>
+              </svg>
               Cargar Resultados
             </a>
           </li>
@@ -155,14 +161,14 @@
         <!-- Menú desplegable de Carga -->
         <li>
           <button type="button" 
-                  (click)="toggleSubmenu()"
+                  (click)="toggleCargaMenu()"
                   class="flex items-center w-full p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
             <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
             </svg>
             <span class="flex-1 ms-3 text-left">Carga de Datos</span>
             <svg class="w-3 h-3 transition-transform" 
-                 [ngClass]="{'rotate-180': isSubmenuOpen}"
+                 [ngClass]="{'rotate-180': isCargaMenuOpen}"
                  aria-hidden="true" 
                  xmlns="http://www.w3.org/2000/svg" 
                  fill="none" 
@@ -171,17 +177,23 @@
             </svg>
           </button>
           <!-- Submenú -->
-          <ul [ngClass]="{'hidden': !isSubmenuOpen}"
+          <ul [ngClass]="{'hidden': !isCargaMenuOpen}"
               class="py-2 space-y-2">
             <li>
-              <a href="/cargar-alumnos" 
+              <a [routerLink]="['/cargar']" [queryParams]="{tipo: 'alumnos'}"
                  class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
+                <svg class="w-4 h-4 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                  <path d="M14 2a3.963 3.963 0 0 0-1.4.267 6.439 6.439 0 0 1-1.331 6.638A4 4 0 1 0 14 2Zm1 9h-1.264A6.957 6.957 0 0 1 15 15v2a2.97 2.97 0 0 1-.184 1H19a1 1 0 0 0 1-1v-1a5.006 5.006 0 0 0-5-5ZM6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Z"/>
+                </svg>
                 Cargar Alumnos
               </a>
             </li>
             <li>
-              <a href="/cargar-resultados" 
+              <a [routerLink]="['/cargar']" [queryParams]="{tipo: 'resultados'}"
                  class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
+                <svg class="w-4 h-4 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                  <path d="M18 0H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm-5.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zm0 9h-11v-1l3-3 4 4 5-5v5z"/>
+                </svg>
                 Cargar Resultados
               </a>
             </li>
