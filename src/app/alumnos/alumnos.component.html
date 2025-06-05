@@ -8,16 +8,8 @@
       <p class="mt-1 text-sm text-gray-100">Gestión de alumnos registrados</p>
     </div>
 
-    <!-- Botones y Búsqueda -->
-    <div class="p-4 border-b flex justify-between items-center flex-wrap gap-4">
-      <div class="flex gap-2">
-        <button class="px-4 py-2 bg-[#14645c] text-white rounded hover:bg-[#0f4c46] transition-colors">
-          Nuevo Alumno
-        </button>
-        <button class="px-4 py-2 border border-[#14645c] text-[#14645c] rounded hover:bg-[#f3f4f6] transition-colors">
-          Exportar Excel
-        </button>
-      </div>
+    <!-- Búsqueda -->
+    <div class="p-4 border-b flex justify-end items-center flex-wrap gap-4">
       <div class="flex-1 max-w-md ml-4">
         <input type="search" 
                placeholder="Buscar alumno..." 
@@ -47,8 +39,9 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.carrera}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.promedio}}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                {{alumno.estado}}
+              <span [ngClass]="{'bg-green-100 text-green-800': alumno.estado === 'Aprobado', 'bg-red-100 text-red-800': alumno.estado === 'Reprobado'}"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{ alumno.estado }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
