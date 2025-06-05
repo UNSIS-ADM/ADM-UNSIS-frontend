@@ -13,7 +13,7 @@ export class ResultadoComponent implements OnInit {
   alumno = {
     nombre: 'Juan Pérez',
     matricula: '20231234',
-    carrera: 'Ingeniería en Sistemas',
+    carrera: 'INFORMÁTICA', 
     aprobado: true // puedes cambiar esto según la lógica de tu aplicación
   };
 
