@@ -12,9 +12,9 @@ import { FooterComponent } from '../footer/footer.component';
 })
 export class AlumnosComponent {
   alumnos = [
-    { id: 1, nombre: 'Juan Pérez', matricula: '20241001', carrera: 'Informática', promedio: 8.5, estado: 'Reprobado' },
+    { id: 1, nombre: 'Juan Pérez', matricula: '20241001', carrera: 'Informática', promedio: 5.5, estado: 'Reprobado' },
     { id: 2, nombre: 'María García', matricula: '20241002', carrera: 'Sistemas', promedio: 9.0, estado: 'Aprobado' },
-    { id: 3, nombre: 'Carlos López', matricula: '20241003', carrera: 'Informática', promedio: 8.7, estado: 'Reprobado' },
+    { id: 3, nombre: 'Carlos López', matricula: '20241003', carrera: 'Informática', promedio: 5.7, estado: 'Reprobado' },
     { id: 4, nombre: 'Jose perez', matricula: '20241004', carrera: 'Informática', promedio: 8.7, estado: 'Aprobado' },
   ];
 }
