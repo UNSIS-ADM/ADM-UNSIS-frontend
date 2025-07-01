@@ -1,6 +1,6 @@
 <app-nav></app-nav>
 
-<div class="flex justify-center items-center min-h-screen bg-gray-100 sm:ml-64">
+<div class="flex justify-center items-center min-h-screen sm:ml-64">
     <div class="w-full max-w-md p-6 bg-white rounded-lg shadow-lg">
         <h2 class="text-2xl font-bold mb-4 text-[#6a1b1b]">Resultado del Alumno</h2>
         
@@ -22,13 +22,11 @@
             
             <div class="mt-4">
                 <strong class="text-gray-700">Resultado:</strong>
-                <span  
-                      class="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full">
-                    Aprobado
+                <span *ngIf="alumno.aprobado === 'Aprobado'" class="ml-2 px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                  Aprobado
                 </span>
-                <span  
-                      class="ml-2 px-3 py-1 bg-red-100 text-red-800 rounded-full">
-                    No aprobado
+                <span *ngIf="alumno.aprobado !== 'Aprobado'" class="ml-2 px-3 py-1 bg-red-100 text-red-800 rounded-full">
+                  Reprobado
                 </span>
             </div>
         </div>
