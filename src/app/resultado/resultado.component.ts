@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NavComponent } from "../nav/nav.component";
 import { MatCardModule } from '@angular/material/card';
-import { FooterComponent } from "../footer/footer.component";
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-resultado',
-  imports: [NavComponent, MatCardModule, FooterComponent, CommonModule],
+  imports: [NavComponent, MatCardModule, CommonModule],
   templateUrl: './resultado.component.html',
   styleUrls: ['./resultado.component.css']
 })

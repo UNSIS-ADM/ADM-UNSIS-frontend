@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, OnInit, Inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
+import { AlumnosService } from '../services/alumnos.service'; // Asegúrate de que la ruta sea correcta
 
 @Component({
   selector: 'app-alumnos',
@@ -10,11 +11,22 @@ import { FooterComponent } from '../footer/footer.component';
   templateUrl: './alumnos.component.html',
   styleUrls: ['./alumnos.component.css']
 })
-export class AlumnosComponent {
-  alumnos = [
-    { id: 1, nombre: 'Juan Pérez', matricula: '20241001', career: 'Informática', curp: 'SSAD090804SJNCJJSKAKS', location:'Miahuatlan',exam_room:'Sala 3',exam_date:'Viernes 9 de julio', phone:9511030404,status: 'Reprobado' },
-    { id: 2, nombre: 'María García', matricula: '20241002', career: 'Sistemas', curp:'SSAD090804SJNCJJSKAKS', location: 'Miahuatlan',exam_room:'Sala 3',exam_date:'viernes 9 de julio',phone:9511030404, status: 'Aprobado' },
-    { id: 3, nombre: 'Carlos López', matricula: '20241003', career: 'Informática', curp:'SSAD090804SJNCJJSKAKS', location: 'Miahuatlan',exam_room:'Sala 4',exam_date:'Viernes 9 de julio',phone:9511030404, status: 'Reprobado' },
-    { id: 4, nombre: 'Jose perez', matricula: '20241004', career: 'Informática', curp: 'SSAD090804SJNCJJSKAKS', location: 'Miahuatlan', exam_room:'Sala 5',exam_date:'Viernes 9 de julio',phone:9511030404,status: 'Aprobado' },
-  ];
+export class AlumnosComponent implements OnInit {
+  alumnos: any[] = [];
+
+  constructor(@Inject(AlumnosService) private readonly alumnosService: AlumnosService) {}
+
+  ngOnInit(): void {
+    this.alumnosService.getAlumnos().subscribe({
+      next: (data) => {
+        this.alumnos = data;
+        if (this.alumnos.length > 0) {
+          console.log('Primer alumno:', this.alumnos[0]);
+        } else {
+          console.log('No se recibieron alumnos');
+        }
+      },
+      error: (err) => console.error('Error al cargar alumnos', err)
+    });
+  }
 }

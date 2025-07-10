@@ -22,37 +22,32 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nuemero de ficha</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre completo</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Lugar</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Aula</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Fecha de examen</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Telefono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ubicación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Teléfono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Sala Examen</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Fecha Examen</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let alumno of alumnos">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.nombre}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_room}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_date}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'Aprobado', 'bg-red-100 text-red-800': alumno.status === 'Reprobado'}"
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ alumno.status }}
               </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="text-[#14645c] hover:text-[#0f4c46] mr-2">Editar</button>
-              <button class="text-red-600 hover:text-red-800">Eliminar</button>
             </td>
           </tr>
         </tbody>
@@ -63,7 +58,6 @@
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Mostrando 1 a 3 de 3 resultados
         </div>
         <div class="flex gap-2">
           <button class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">Anterior</button>

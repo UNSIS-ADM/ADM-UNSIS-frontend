@@ -23,9 +23,10 @@ export class AuthService {
     const headers = new HttpHeaders()
       .set('Content-Type', 'application/json');
 
-    console.log('Intentando login en:', `${this.apiUrl}/login`);
+    const url = environment.apiUrl + environment.loginEndpoint;
+    console.log('Intentando login en:', url);
     
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, {
+    return this.http.post<LoginResponse>(url, {
       username: credentials.username,
       password: credentials.password
     }, { headers }).pipe(
