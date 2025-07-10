@@ -22,12 +22,15 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Matrícula</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nuemero de ficha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre completo</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Lugar</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Aula</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Fecha de examen</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Telefono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
@@ -35,13 +38,16 @@
           <tr *ngFor="let alumno of alumnos">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.nombre}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.matricula}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.carrera}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.promedio}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_room}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_date}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span [ngClass]="{'bg-green-100 text-green-800': alumno.estado === 'Aprobado', 'bg-red-100 text-red-800': alumno.estado === 'Reprobado'}"
+              <span [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'Aprobado', 'bg-red-100 text-red-800': alumno.status === 'Reprobado'}"
                     class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{ alumno.estado }}
+                {{ alumno.status }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
