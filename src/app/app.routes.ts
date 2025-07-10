@@ -15,31 +15,31 @@ export const routes: Routes = [
     path: 'home',
     loadComponent: () => import('./home/home.component').then(m => m.HomeComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['Admin', 'Secretaria', 'Aspirante'] }
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_APPLICANT'] }
   },
   {
     path: 'resultado',
     loadComponent: () => import('./resultado/resultado.component').then(m => m.ResultadoComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['Admin', 'Aspirante'] }
+    data: { roles: ['ROLE_ADMIN', 'ROLE_APPLICANT'] }
   },
   { 
     path: 'usuario', 
     component: UsuarioComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['Admin'] }
+    data: { roles: ['ROLE_ADMIN'] }
   },
   {
     path: 'cargar',
     loadComponent: () => import('./carga-datos/carga-datos.component')
       .then(m => m.CargaDatosComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['Admin'] }
+    data: { roles: ['ROLE_ADMIN'] }
   },
   {
     path: 'alumnos',
     loadComponent: () => import('./alumnos/alumnos.component').then(m => m.AlumnosComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['Admin', 'Secretaria'] }
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] }
   }
 ];
