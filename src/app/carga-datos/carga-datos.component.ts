@@ -14,7 +14,7 @@ import { NgClass } from '@angular/common';
   templateUrl: './carga-datos.component.html',
   styleUrls: ['./carga-datos.component.css'],
 })
-export class AlumnosComponent {
+export class CargaDatosComponentl {
   selectedFile: File | null = null;
   uploadResult: ExcelUploadResponse | null = null;
   token = localStorage.getItem('token') || ''; // o como guardes tu token
