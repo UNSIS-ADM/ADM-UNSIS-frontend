@@ -25,6 +25,12 @@ export class NavComponent implements OnInit {
   isSidebarOpen = false;
   isSubmenuOpen = false;
   isCargaMenuOpen = false;
+  roles: string[] = [];
+
+  constructor() {
+    const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+    this.roles = user.roles || [];
+  }
 
   @HostListener('window:resize', [])
   onResize() {
@@ -64,6 +70,10 @@ export class NavComponent implements OnInit {
         !userMenu?.contains(event.target as Node)) {
       this.isUserMenuOpen = false;
     }
+  }
+
+  hasRole(role: string): boolean {
+    return this.roles.includes(role);
   }
 }
 

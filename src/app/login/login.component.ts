@@ -30,11 +30,21 @@ export class LoginComponent {
 
   onSubmit(): void {
     console.log('Intentando login con:', this.credentials);
-    
+
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         console.log('Login exitoso:', response);
-        this.authService.saveToken(response.token);
+        // Guarda el token si lo necesitas
+        if (response.token) {
+          this.authService.saveToken(response.token);
+        }
+        // Guarda los roles y el usuario en localStorage para el guard
+        const userInfo = {
+          username: response.username,
+          roles: response.roles // <-- aquí se guardan los roles
+        };
+        localStorage.setItem('user_info', JSON.stringify(userInfo));
+        console.log('Información del usuario guardada:', JSON.stringify(userInfo));
         this.router.navigate(['/home']);
       },
       error: (error) => {
