@@ -25,6 +25,27 @@
       </div>
     </div>
 
+    <!-- Zona de carga de Excel -->
+    <div class="mt-8 p-4 bg-white rounded shadow">
+      <h3 class="font-semibold mb-2">Carga masiva de aspirantes</h3>
+      <input type="file" accept=".xlsx" (change)="onFileSelected($event)" class="block mb-2" />
+      <button (click)="uploadExcel()" class="px-4 py-2 bg-[#14645c] text-white rounded hover:bg-[#0f4c46]">
+        Subir Excel
+      </button>
+    
+      <div *ngIf="uploadResult" class="mt-4">
+        <p [class.text-green-600]="uploadResult?.success" [class.text-red-600]="!uploadResult?.success">
+          {{ uploadResult?.message }}
+        </p>
+        <ul *ngIf="uploadResult.errors?.length">
+          <li *ngFor="let err of uploadResult.errors">
+            Fila {{ err.row }}: {{ err.error }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+
     <!-- Tabla -->
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
