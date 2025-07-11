@@ -1,15 +1,14 @@
-import { Component } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
-import { ExcelService, ExcelUploadResponse} from '../services/excel.service';
+import { Component, OnInit } from '@angular/core';
+import { ExcelService, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule, NgClass } from '@angular/common';
+import { AlumnosService } from '../services/alumnos.service'; // Importar el servicio
 
 @Component({
   selector: 'app-carga-datos',
   standalone: true,
   imports: [
-    HttpClientModule,
     NavComponent,
     FooterComponent,
     NgClass,
@@ -18,20 +17,38 @@ import { CommonModule, NgClass } from '@angular/common';
   templateUrl: './carga-datos.component.html',
   styleUrls: ['./carga-datos.component.css'],
 })
-export class CargaDatosComponent {
+export class CargaDatosComponent implements OnInit {
   selectedFile: File | null = null;
   uploadResult: ExcelUploadResponse | null = null;
   datos: any[] = [];
-  token = localStorage.getItem('token') || ''; // o como guardes tu token
+  token = localStorage.getItem('token') || '';
 
-  constructor(private excelService: ExcelService) {}
+  constructor(
+    private excelService: ExcelService,
+    private alumnosService: AlumnosService // Inyectar el servicio
+  ) {}
+
+  ngOnInit() {
+    this.loadAlumnos(); // Cargar los datos al inicializar el componente
+  }
+
+  loadAlumnos() {
+    this.alumnosService.getAlumnos().subscribe({
+      next: (alumnos) => {
+        this.datos = alumnos;
+      },
+      error: (err) => {
+        console.error('Error al cargar alumnos:', err);
+        alert('Error al cargar los datos de alumnos');
+      }
+    });
+  }
 
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
       const file = input.files[0];
 
-      // Mostrar confirmación antes de subir
       const confirmed = window.confirm(
         `¿Estás seguro de subir el archivo "${file.name}"?`
       );
@@ -40,7 +57,6 @@ export class CargaDatosComponent {
         this.selectedFile = file;
         this.uploadExcel();
       } else {
-        // Limpiar la selección para que pueda elegir otro archivo
         input.value = '';
         this.selectedFile = null;
       }
@@ -58,7 +74,11 @@ export class CargaDatosComponent {
       .subscribe({
         next: (res) => {
           this.uploadResult = res;
-          //this.datos = res.data || []; Descomentar despues de implementar el servicio para obtener los datos        setTimeout(() => (this.uploadResult = null), 5000); // Oculta después de 5s
+          // Recargar los datos después de una carga exitosa
+          if (res.success) {
+            this.loadAlumnos();
+          }
+          setTimeout(() => (this.uploadResult = null), 5000);
         },
         error: (err) => {
           console.error(err);
@@ -72,4 +92,3 @@ export class CargaDatosComponent {
       });
   }
 }
-

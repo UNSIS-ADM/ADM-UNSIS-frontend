@@ -80,34 +80,41 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+           <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Matrícula</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Fecha</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ubicación</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Teléfono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Sala Examen</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Fecha Examen</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let dato of datos">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.id}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.nombre}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.matricula}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.carrera}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{dato.fecha}}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span [ngClass]="dato.estado === 'Cargado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{dato.estado}}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="text-[#24645c] hover:text-[#8b2424] mr-2">Editar</button>
-              <button class="text-red-600 hover:text-red-800">Eliminar</button>
-            </td>
-          </tr>
-        </tbody>
+<!-- ... (código anterior se mantiene igual) ... -->
+<tbody class="bg-white divide-y divide-gray-200">
+  <tr *ngFor="let alumno of datos">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.nombre}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_room}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_date}}</td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <span [ngClass]="alumno.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+        {{alumno.estado || 'Cargado'}}
+      </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+      <button class="text-[#24645c] hover:text-[#8b2424] mr-2">Editar</button>
+    </td>
+  </tr>
+</tbody>
+<!-- ... (código posterior se mantiene igual) ... -->
       </table>
     </div>
 
