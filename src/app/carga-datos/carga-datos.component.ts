@@ -1,22 +1,27 @@
-
-// src/app/components/alumnos/alumnos.component.ts
 import { Component } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { ExcelService, ExcelUploadResponse} from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
-import { NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 
 @Component({
-  selector: 'app-alumnos',
+  selector: 'app-carga-datos',
   standalone: true,
-  imports: [HttpClientModule, NavComponent, FooterComponent, NgClass],
+  imports: [
+    HttpClientModule,
+    NavComponent,
+    FooterComponent,
+    NgClass,
+    CommonModule,
+  ],
   templateUrl: './carga-datos.component.html',
   styleUrls: ['./carga-datos.component.css'],
 })
-export class CargaDatosComponentl {
+export class CargaDatosComponent {
   selectedFile: File | null = null;
   uploadResult: ExcelUploadResponse | null = null;
+  datos: any[] = [];
   token = localStorage.getItem('token') || ''; // o como guardes tu token
 
   constructor(private excelService: ExcelService) {}
@@ -24,7 +29,21 @@ export class CargaDatosComponentl {
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      this.selectedFile = input.files[0];
+      const file = input.files[0];
+
+      // Mostrar confirmación antes de subir
+      const confirmed = window.confirm(
+        `¿Estás seguro de subir el archivo "${file.name}"?`
+      );
+
+      if (confirmed) {
+        this.selectedFile = file;
+        this.uploadExcel();
+      } else {
+        // Limpiar la selección para que pueda elegir otro archivo
+        input.value = '';
+        this.selectedFile = null;
+      }
     }
   }
 
@@ -33,44 +52,24 @@ export class CargaDatosComponentl {
       alert('Selecciona primero un archivo .xlsx');
       return;
     }
+
     this.excelService
       .uploadApplicants(this.selectedFile, this.token)
       .subscribe({
-        next: (res) => (this.uploadResult = res),
+        next: (res) => {
+          this.uploadResult = res;
+          //this.datos = res.data || []; Descomentar despues de implementar el servicio para obtener los datos        setTimeout(() => (this.uploadResult = null), 5000); // Oculta después de 5s
+        },
         error: (err) => {
           console.error(err);
           alert('Error al subir el Excel');
+          this.uploadResult = {
+            success: false,
+            message: 'No se pudo subir el archivo. Intenta de nuevo.',
+            errors: [],
+          };
         },
       });
   }
 }
-/*import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NavComponent } from '../nav/nav.component';
-import { FooterComponent } from '../footer/footer.component';
-import { ActivatedRoute } from '@angular/router';
 
-@Component({
-  selector: 'app-carga-datos',
-  standalone: true,
-  imports: [CommonModule, NavComponent, FooterComponent],
-  templateUrl: './carga-datos.component.html',
-  styleUrls: ['./carga-datos.component.css']
-})
-export class CargaDatosComponent implements OnInit {
-  datos = [
-    { id: 1, nombre: 'Juan Pérez', matricula: '2024001', carrera: 'Informática', fecha: '2024-06-04', estado: 'Cargado' },
-    { id: 2, nombre: 'María López', matricula: '2024002', carrera: 'Sistemas', fecha: '2024-06-04', estado: 'Pendiente' },
-    { id: 3, nombre: 'Carlos García', matricula: '2024003', carrera: 'Informática', fecha: '2024-06-04', estado: 'Cargado' },
-  ];
-  tipoCarga: string = '';
-
-  constructor(private route: ActivatedRoute) {}
-
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.tipoCarga = params['tipo'];
-    });
-  }
-}
-*/
