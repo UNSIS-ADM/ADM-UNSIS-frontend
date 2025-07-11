@@ -1,6 +1,38 @@
-<app-nav></app-nav>
-<div class="container" >
-  <h1>Bienvenido al sistema de resultados de la UNSIS</h1>
+<div class="flex">
+  <!-- Navbar (se mantiene a la izquierda) -->
+  <app-nav></app-nav>
+
+  <!-- Contenido principal centrado -->
+  <div class="flex-1 flex flex-col items-center justify-center min-h-screen pl-[1cm] pr-[1cm] pt-[2cm] pb-[1cm]">
+    <div class="w-full max-w-4xl mx-auto">
+      <!-- Tarjeta de bienvenida -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <!-- Encabezado con gradiente -->
+        <div class="bg-white p-4 text-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-black">Sistema de Resultados Académicos</h1>
+        </div>
+        
+        <!-- Contenido -->
+        <div class="p-6 flex flex-col md:flex-row items-center gap-6">
+          <!-- Logo -->
+          <div class="w-32 md:w-40 shrink-0">
+            <img src="/assets/images/unsis-logo.png" 
+                 alt="Logo UNSIS" 
+                >
+          </div>
+          
+          <!-- Texto -->
+          <div class="text-center md:text-left">
+            <h2 class="text-xl font-semibold text-[#6a1b1b] mb-2">Bienvenido <span class="text-[#14645c] font-bold">{{ nombreUsuario || 'Estudiante' }}</span></h2>
+            <p class="text-gray-700">
+              Consulta los resultados de los exámenes de admisión de la
+              <span class="font-semibold text-[#14645c]">Universidad de la Sierra Sur</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="sm:ml-64"> <!-- Agrega margen izquierdo igual al ancho del sidebar -->
   <app-footer></app-footer>
