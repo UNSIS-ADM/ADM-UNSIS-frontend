@@ -1,23 +1,26 @@
-<app-nav></app-nav>
-
-<!-- <div class="max-w-xl mx-auto mt-10 mb-10">
-  <div class="bg-white rounded-lg shadow-lg p-8">
-    <div class="text-center mb-6">
-      <img src="/assets/img/Logo.png" class="inline-block w-20 mb-2" alt="Logo UNSIS">
-      <h3 class="text-2xl font-bold text-[#6a1b1b]">UNIVERSIDAD DE LA SIERRA SUR</h3>
-    </div>
-   <!--- <ng-container *ngIf="!vacio">
+<div class="flex">
+  <app-nav></app-nav>
+  
+  <!-- Contenedor principal con márgenes precisos -->
+  <div class="flex-1  mt-[2cm] mx-[1cm] my-[1cm]">
+    <div class="bg-white rounded-lg shadow-lg p-8 w-full h-full">
+      <!-- Contenido -->
+      <div class="text-center mb-6">
+        <img src="/assets/images/unsis-logo.png" class="inline-block w-20 mb-2" alt="Logo UNSIS">
+        <h3 class="text-2xl font-bold text-[#6a1b1b]">UNIVERSIDAD DE LA SIERRA SUR</h3>
+      </div>
+    <ng-container *ngIf="!vacio">
       <p class="text-sm font-semibold text-gray-700 text-center">NOMBRE:</p>
-      <p class="text-lg text-[#14645c] font-bold text-center">{{resultado.nombre}}</p>
+      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.nombre}}</p>
 
       <p class="text-sm font-semibold text-gray-700 text-center mt-4">NÚMERO DE FICHA:</p>
-      <p class="text-lg text-[#14645c] font-bold text-center">{{resultado.ficha}}</p>
+      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.matricula}}</p>
 
       <p class="text-sm font-semibold text-gray-700 text-center mt-4">LICENCIATURA:</p>
-      <p class="text-lg text-[#14645c] font-bold text-center">{{resultado.carrera}}</p>
+      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.carrera}}</p>
 
       <p class="text-sm font-semibold text-gray-700 text-center mt-4">RESULTADO:</p>
-      <p class="text-lg text-[#14645c] font-bold text-center">{{resultado.resultado}}</p>
+      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.aprobado}}</p>
 
       <ng-container *ngIf="esMedicina">
         <p class="text-sm font-semibold text-gray-700 text-center mt-4">Puntaje:</p>
@@ -53,15 +56,15 @@
         </p>
         <p>
           En caso de dudas llamar al teléfono <span class="font-semibold">9515724100 EXt. 1203, 1204</span>, también puede mandar correo a 
-          <a href="mailto:admision.unsis@gmail.com" class="text-blue-700 underline">admision.unsis@gmail.com</a>.
+          <a href="mailto:admision.unsis@gmail.com" class="text-blue-700 underline">{{emailContacto}}</a>.
         </p>
       </div>
     </ng-container>
 
-    <ng-container *ngIf="rechazado">
+    <ng-container *ngIf="esReprobado">
       <div class="mt-6 text-justify text-gray-800 space-y-3">
         <p class="text-center font-semibold text-[#6a1b1b]">Oportunidad de continuar</p>
-        <p>Estimado aspirante, desafortunadamente no puedes inscribirte a la Licenciatura en Medicina, pero queremos que seas parte de nuestra Comunidad UNSIS, para lo cual te ofrecemos la posibilidad de elegir alguna de la siguientes opciones, para continuar con tus estudios:</p>
+        <p>Estimado aspirante, desafortunadamente no puedes inscribirte a la Licenciatura en {{alumno.carrera}}, pero queremos que seas parte de nuestra Comunidad UNSIS, para lo cual te ofrecemos la posibilidad de elegir alguna de la siguientes opciones, para continuar con tus estudios:</p>
         <ul class="list-disc list-inside ml-4">
           <li>Licenciatura en Administración Municipal</li>
           <li>Licenciatura en Ciencias Empresariales</li>
@@ -80,7 +83,7 @@
         </ul>
         <p>
           Si te interesa formar parte de alguno de nuestros programas envía un correo electrónico a 
-          <a href="mailto:admision.unsis@gmail.com" class="text-blue-700 underline">admision.unsis@gmail.com</a> 
+          <a href="mailto:admision.unsis@gmail.com" class="text-blue-700 underline">{{emailContacto}}</a> 
           o llama al <span class="font-semibold">9515724100 Ext. 1203, 1204</span> indicando en asunto: “Solicitud de otra carrera” y en el cuerpo del correo describe el nombre de la carrera que eliges, tu nombre completo y el número de ficha para que se te agregue a la licenciatura solicitada.
           <br>
           <span class="text-red-700 font-semibold">Tienes hasta las 19:00 horas del 12 de julio de 2024, para realizar esta solicitud, ya que el cupo de los cursos es limitado.</span>
@@ -92,4 +95,10 @@
       <h5 class="text-center mt-10 mb-10 text-xl font-bold text-[#6a1b1b]">NO TIENES RESULTADOS CARGADOS</h5>
     </ng-container>
   </div>
-</div> -->
+</div>  
+</div>
+<div class="sm:ml-64">
+  <app-footer></app-footer>
+</div>
+
+
