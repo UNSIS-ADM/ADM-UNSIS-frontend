@@ -21,7 +21,7 @@ export const routes: Routes = [
     path: 'resultado',
     loadComponent: () => import('./resultado/resultado.component').then(m => m.ResultadoComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN', 'ROLE_APPLICANT'] }
+    data: { roles: [ 'ROLE_APPLICANT'] }
   },
   { 
     path: 'usuario', 
@@ -33,6 +33,13 @@ export const routes: Routes = [
     path: 'cargar',
     loadComponent: () => import('./carga-datos/carga-datos.component')
       .then(m => m.CargaDatosComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN'] }
+  },
+  {
+    path: 'cargarresultados',
+    loadComponent: () => import('./carga-datos-resultados/carga-datos-resultados.component')
+      .then(m => m.CargaDatosResultadosComponent),
     canActivate: [RoleGuard],
     data: { roles: ['ROLE_ADMIN'] }
   },
