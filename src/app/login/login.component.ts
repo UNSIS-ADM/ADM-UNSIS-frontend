@@ -49,7 +49,7 @@ export class LoginComponent {
       },
       error: (error) => {
         console.error('Error detallado:', error);
-        this.error = 'Error al iniciar sesión: ' + (error.error?.message || error.message || 'Usuario o contraseña incorrectos');
+        this.error = 'Error al iniciar sesión: ' + ('Usuario o contraseña incorrectos');
       }
     });
   }
