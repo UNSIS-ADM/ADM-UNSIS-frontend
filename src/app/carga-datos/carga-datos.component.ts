@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ExcelService, ExcelUploadResponse } from '../services/excel.service';
+import { ExcelServiceApplicants, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule, NgClass } from '@angular/common';
@@ -24,7 +24,7 @@ export class CargaDatosComponent implements OnInit {
   token = localStorage.getItem('token') || '';
 
   constructor(
-    private excelService: ExcelService,
+    private excelService: ExcelServiceApplicants,
     private alumnosService: AlumnosService // Inyectar el servicio
   ) {}
 
