@@ -19,7 +19,7 @@ export class ResultadoComponent implements OnInit {
     nombre: 'Juan Pérez',
     matricula: '20231234',
     carrera: 'informatica', // Cambiar entre 'medicina' y otras carreras para probar
-    aprobado: 'Reprobado', // Cambiar entre 'Aprobado' y 'Reprobado'
+    aprobado: 'Aprobado', // Cambiar entre 'Aprobado' y 'Reprobado'
     promedio: 75 // Solo para medicina
   };
 
