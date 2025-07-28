@@ -36,16 +36,10 @@
                [ngClass]="{'hidden': !isUserMenuOpen}"
                class="absolute right-0 mt-2 bg-[#fff3f3] divide-y divide-[#6a1b1b] rounded-lg shadow-lg w-44 z-50">
             <div class="px-4 py-3">
-              <p class="text-sm text-[#6a1b1b] font-semibold">Usuario UNSIS</p>
-              <p class="text-sm text-[#8b2424] truncate">usuario.edu.mx</p>
+              <p class="text-sm text-[#6a1b1b] font-semibold">{{username}}</p> 
             </div>
             <ul class="py-2">
-              <li>
-                <a routerLink="/usuario" 
-                   class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
-                  Mi Perfil
-                </a>
-              </li>
+             
               <li>
                 <a routerLink="/login" 
                    class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">

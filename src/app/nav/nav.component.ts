@@ -14,7 +14,7 @@ import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-nav',
-  imports:[RouterModule, CommonModule, MatToolbarModule, MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule, MatMenuModule, MatSidenavModule, MatDividerModule, MatButtonModule],
+  imports: [RouterModule, CommonModule, MatToolbarModule, MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule, MatMenuModule, MatSidenavModule, MatDividerModule, MatButtonModule],
   standalone: true,
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
@@ -26,10 +26,13 @@ export class NavComponent implements OnInit {
   isSubmenuOpen = false;
   isCargaMenuOpen = false;
   roles: string[] = [];
+  username: string = ''; // Nueva propiedad para el nombre del usuario
 
   constructor() {
     const user = JSON.parse(localStorage.getItem('user_info') || '{}');
     this.roles = user.roles || [];
+   this.username = user?.full_name || 'Invitado';
+   console.log('nombre del usuario:', this.username);
   }
 
   @HostListener('window:resize', [])
@@ -76,4 +79,3 @@ export class NavComponent implements OnInit {
     return this.roles.includes(role);
   }
 }
-

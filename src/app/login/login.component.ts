@@ -41,7 +41,9 @@ export class LoginComponent {
         // Guarda los roles y el usuario en localStorage para el guard
         const userInfo = {
           username: response.username,
-          roles: response.roles // <-- aquí se guardan los roles
+          roles: response.roles,
+          full_name: response.fullName,  // ← Aquí usamos fullName (del backend)
+ // <-- aquí se guardan los roles
         };
         localStorage.setItem('user_info', JSON.stringify(userInfo));
         console.log('Información del usuario guardada:', JSON.stringify(userInfo));

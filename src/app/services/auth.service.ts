@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
-
 interface LoginResponse {
   token: string;
   type: string;
   id: number;
   username: string;
   roles: string[];
+  fullName: string;  // ← Cambiado de full_name a fullName
+  curp?: string;    // ← Campo adicional que aparece en la respuesta
 }
 
 @Injectable({
@@ -37,6 +38,9 @@ export class AuthService {
           this.saveToken(`Bearer ${response.token}`);
           // Guarda información adicional del usuario si es necesario
           this.saveUserInfo(response);
+          tap(response => {
+  console.log('Respuesta del servidor:', response); // ← Verifica que full_name esté aquí
+})
         }
       }),
       catchError(error => {
@@ -50,7 +54,8 @@ export class AuthService {
     localStorage.setItem('user_info', JSON.stringify({
       id: response.id,
       username: response.username,
-      roles: response.roles
+      roles: response.roles,
+      full_name: response.fullName
     }));
   }
 
@@ -77,5 +82,6 @@ export class AuthService {
   getUserInfo(): any {
     const userInfo = localStorage.getItem('user_info');
     return userInfo ? JSON.parse(userInfo) : null;
+
   }
 }
