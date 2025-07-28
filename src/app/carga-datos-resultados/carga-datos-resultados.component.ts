@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { ExcelService, ExcelUploadResponse } from '../services/excel.service';
+import { Component, OnInit, Inject } from '@angular/core';
+import {ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule, NgClass } from '@angular/common';
-import { AlumnosService } from '../services/alumnos.service'; // Importar el servicio
+import { ResultadosService } from '../services/resultados.service';
 
 @Component({
-  selector: 'app-carga-datos',
+  selector: 'app-carga-datos-resultados',
   standalone: true,
   imports: [
     NavComponent,
@@ -24,22 +24,22 @@ export class CargaDatosResultadosComponent implements OnInit {
   token = localStorage.getItem('token') || '';
 
   constructor(
-    private excelService: ExcelService,
-    private alumnosService: AlumnosService // Inyectar el servicio
+    private excelService: ExcelServiceResultados,
+    private resultadosService: ResultadosService // Inyectar el servicio
   ) {}
 
   ngOnInit() {
-    this.loadAlumnos(); // Cargar los datos al inicializar el componente
+    this.loadResultados(); // Cargar los datos al inicializar el componente
   }
 
-  loadAlumnos() {
-    this.alumnosService.getAlumnos().subscribe({
-      next: (alumnos) => {
-        this.datos = alumnos;
+  loadResultados() {
+    this.resultadosService.getResultados().subscribe({
+      next: (resultados: any[]) => {
+        this.datos = resultados;
       },
-      error: (err) => {
-        console.error('Error al cargar alumnos:', err);
-        alert('Error al cargar los datos de alumnos');
+      error: (err: any) => {
+        console.error('Error al cargar los resultados:', err);
+        alert('Error al cargar los datos de resultados');
       }
     });
   }
@@ -76,7 +76,7 @@ export class CargaDatosResultadosComponent implements OnInit {
           this.uploadResult = res;
           // Recargar los datos después de una carga exitosa
           if (res.success) {
-            this.loadAlumnos();
+            this.loadResultados();
           }
           setTimeout(() => (this.uploadResult = null), 5000);
         },

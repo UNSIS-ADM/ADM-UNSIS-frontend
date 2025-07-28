@@ -14,8 +14,26 @@ export interface ExcelUploadResponse {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ExcelService {
+export class ExcelServiceApplicants {
   private apiUrl = 'http://localhost:1200/api/admin/upload-applicants';
+
+  constructor(private http: HttpClient) {}
+
+  uploadApplicants(file: File, token: string): Observable<ExcelUploadResponse> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+    // No ponemos Content-Type, el navegador lo pondrá automáticamente
+    return this.http.post<ExcelUploadResponse>(this.apiUrl, form, { headers });
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class ExcelServiceResultados {
+  private apiUrl = 'http://localhost:1200/api/admin/upload-results';
 
   constructor(private http: HttpClient) {}
 
