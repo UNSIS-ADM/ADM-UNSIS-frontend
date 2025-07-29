@@ -4,5 +4,5 @@ export const environment = {
   getalumnosEndpoint: '/api/applicants',
   loginEndpoint: '/auth/login',
   getresultadosEndpoint: '/api/admin/results',
-  getresultmostrarEndpoint: '/api/applicants/me',
+  getresultmostrarEndpoint: '/api/applicant/me',
 };

@@ -12,6 +12,12 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
   },
   {   
+    path: 'registrar',
+    loadComponent: () => import('./registrar-usuario/registrar-usuario.component').then(m => m.RegistrarUsuarioComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN'] }
+  },
+  {   
     path: 'home',
     loadComponent: () => import('./home/home.component').then(m => m.HomeComponent),
     canActivate: [RoleGuard],

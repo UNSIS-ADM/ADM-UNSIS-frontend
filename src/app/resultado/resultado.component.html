@@ -9,9 +9,9 @@
         <img src="/assets/images/unsis-logo.png" class="inline-block w-20 mb-2" alt="Logo UNSIS">
         <h3 class="text-2xl font-bold text-[#6a1b1b]">UNIVERSIDAD DE LA SIERRA SUR</h3>
       </div>
-    <ng-container *ngIf="!vacio">
+    <ng-container *ngIf="!vacio && alumno">
       <p class="text-sm font-semibold text-gray-700 text-center">NOMBRE:</p>
-      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.nombre}}</p>
+      <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.fullName}}</p>
 
       <p class="text-sm font-semibold text-gray-700 text-center mt-4">NÚMERO DE FICHA:</p>
       <p class="text-lg text-[#14645c] font-bold text-center">{{alumno.matricula}}</p>
@@ -28,7 +28,7 @@
       </ng-container>
     </ng-container>
 
-    <ng-container *ngIf="esAceptado">
+    <ng-container *ngIf="esAceptado && alumno">
       <div class="mt-6 text-justify text-gray-800 space-y-3">
         <p class="text-center font-semibold text-[#14645c]">¡Felicidades!</p>
         <p>Estimado aspirante, le damos la bienvenida al curso propedéutico 2025.</p>
@@ -61,7 +61,7 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="esReprobado">
+    <ng-container *ngIf="esReprobado && alumno">
       <div class="mt-6 text-justify text-gray-800 space-y-3">
         <p class="text-center font-semibold text-[#6a1b1b]">Oportunidad de continuar</p>
         <p>Estimado aspirante, desafortunadamente no puedes inscribirte a la Licenciatura en {{alumno.carrera}}, pero queremos que seas parte de nuestra Comunidad UNSIS, para lo cual te ofrecemos la posibilidad de elegir alguna de la siguientes opciones, para continuar con tus estudios:</p>

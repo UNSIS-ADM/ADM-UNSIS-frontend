@@ -3,6 +3,7 @@ import { NavComponent } from "../nav/nav.component";
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../footer/footer.component';
+import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // Cambia la importación
 
 @Component({
   selector: 'app-resultado',
@@ -15,36 +16,41 @@ export class ResultadoComponent implements OnInit {
   emailContacto = 'admision.unsis@gmail.com';
   
   // Datos del alumno
-  alumno = {
-    nombre: 'Juan Pérez',
-    matricula: '20231234',
-    carrera: 'informatica', // Cambiar entre 'medicina' y otras carreras para probar
-    aprobado: 'Aprobado', // Cambiar entre 'Aprobado' y 'Reprobado'
-    promedio: 75 // Solo para medicina
-  };
+  alumno: any = null;
 
   // Resultado específico para medicina
   resultado = {
-    promedio: this.alumno.promedio
+    promedio: null
   };
 
   // Flags para controlar la vista
   vacio = false;
-  esMedicina = this.alumno.carrera.toLowerCase() === 'medicina';
-  esAceptado = this.alumno.aprobado === 'Aprobado';
-  esReprobado = this.alumno.aprobado === 'Reprobado';
-  esMedicinaReprobado = this.esMedicina && this.esReprobado;
-  esOtraCarreraReprobado = !this.esMedicina && this.esReprobado;
+  esMedicina = false;
+  esAceptado = false;
+  esReprobado = false;
+  esMedicinaReprobado = false;
+  esOtraCarreraReprobado = false;
 
-  constructor() { }
+  constructor(private resultadosService: ResultadosMostrarService) { } // Cambia el tipo de servicio
 
   ngOnInit(): void {
-    this.actualizarFlags();
+    this.resultadosService.getResultadosUsuario().subscribe({
+      next: (data) => {
+        this.alumno = data;
+        this.actualizarFlags();
+        console.log('Datos del alumno:', this.alumno);
+      },
+      error: (err) => {
+        console.error('Error al cargar resultados:', err);
+        this.vacio = true;
+      }
+    });
   }
 
   // Método para actualizar las banderas cuando cambian los datos
   actualizarFlags() {
-    this.esMedicina = this.alumno.carrera.toLowerCase() === 'medicina';
+    if (!this.alumno) return;
+    this.esMedicina = this.alumno.carrera?.toLowerCase() === 'medicina';
     this.esAceptado = this.alumno.aprobado === 'Aprobado';
     this.esReprobado = this.alumno.aprobado === 'Reprobado';
     this.esMedicinaReprobado = this.esMedicina && this.esReprobado;
@@ -55,21 +61,4 @@ export class ResultadoComponent implements OnInit {
       this.resultado.promedio = this.alumno.promedio;
     }
   }
-
-  // Método de ejemplo para cargar datos desde un servicio
-  /*
-  cargarDatosAlumno() {
-    const matricula = // obtener matrícula de la URL o localStorage
-    this.alumnoService.getResultado(matricula).subscribe({
-      next: (data) => {
-        this.alumno = data;
-        this.actualizarFlags();
-      },
-      error: (err) => {
-        console.error('Error al cargar resultados:', err);
-        this.vacio = true;
-      }
-    });
-  }
-  */
 }
