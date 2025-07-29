@@ -3,5 +3,6 @@ export const environment = {
   apiUrl: 'http://localhost:1200',
   getalumnosEndpoint: '/api/applicants',
   loginEndpoint: '/auth/login',
-  getresultadosEndpoint: '/api/admin/results'
+  getresultadosEndpoint: '/api/admin/results',
+  getresultmostrarEndpoint: '/api/applicants/me',
 };
