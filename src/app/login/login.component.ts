@@ -22,6 +22,7 @@ export class LoginComponent {
     password: ''
   };
   error = '';
+  success = ''; // ← Nueva variable
 
   constructor(
     private authService: AuthService,
@@ -47,11 +48,16 @@ export class LoginComponent {
         };
         localStorage.setItem('user_info', JSON.stringify(userInfo));
         console.log('Información del usuario guardada:', JSON.stringify(userInfo));
-        this.router.navigate(['/home']);
+        this.success = '¡Sesión iniciada con éxito! '; // ← Mensaje de éxito
+        this.error = '';
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 1000); // Espera 2 segundos antes de redirigir
       },
       error: (error) => {
         console.error('Error detallado:', error);
-        this.error = 'Error al iniciar sesión: ' + ('Usuario o contraseña incorrectos');
+        this.error = 'Usuario o contraseña incorrectos';
+        this.success = '';
       }
     });
   }

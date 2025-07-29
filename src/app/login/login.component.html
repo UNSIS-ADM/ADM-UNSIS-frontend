@@ -50,8 +50,21 @@
         </div>
 
         <!-- Mensaje de error -->
-        <div *ngIf="error" class="text-red-500 text-sm">
-          {{ error }}
+        <div *ngIf="error" class="flex items-center bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded mb-2 text-sm">
+          <svg class="w-5 h-5 mr-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12A9 9 0 113 12a9 9 0 0118 0z"/>
+          </svg>
+          <span>
+            {{ error || 'Ocurrió un error al iniciar sesión. Por favor, verifica tus datos e inténtalo de nuevo.' }}
+          </span>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div *ngIf="success" class="flex items-center bg-green-50 border border-green-200 text-green-700 px-4 py-2 rounded mb-2 text-sm animate-fade-in">
+          <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          <span>{{ success }}</span>
         </div>
 
         <!-- Botón -->
