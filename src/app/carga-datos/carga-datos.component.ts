@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ExcelServiceApplicants, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
 import { CommonModule, NgClass } from '@angular/common';
-import { AlumnosService } from '../services/alumnos.service'; // Importar el servicio
+import { AlumnosService } from '../services/alumnos.service';
 
 @Component({
   selector: 'app-carga-datos',
@@ -22,24 +22,33 @@ export class CargaDatosComponent implements OnInit {
   uploadResult: ExcelUploadResponse | null = null;
   datos: any[] = [];
   token = localStorage.getItem('token') || '';
+  isLoading = false;
 
   constructor(
     private excelService: ExcelServiceApplicants,
-    private alumnosService: AlumnosService // Inyectar el servicio
+    private alumnosService: AlumnosService,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    this.loadAlumnos(); // Cargar los datos al inicializar el componente
+    this.loadAlumnos();
   }
 
   loadAlumnos() {
+    this.isLoading = true;
+    this.cdRef.detectChanges(); // Forzar detección de cambios
+    
     this.alumnosService.getAlumnos().subscribe({
       next: (alumnos) => {
         this.datos = alumnos;
+        this.isLoading = false;
+        this.cdRef.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar alumnos:', err);
         alert('Error al cargar los datos de alumnos');
+        this.isLoading = false;
+        this.cdRef.detectChanges();
       }
     });
   }
@@ -55,6 +64,8 @@ export class CargaDatosComponent implements OnInit {
 
       if (confirmed) {
         this.selectedFile = file;
+        this.isLoading = true; // Activar loader antes de subir
+        this.cdRef.detectChanges();
         this.uploadExcel();
       } else {
         input.value = '';
@@ -69,20 +80,23 @@ export class CargaDatosComponent implements OnInit {
       return;
     }
 
-    this.excelService
-      .uploadApplicants(this.selectedFile, this.token)
+    this.excelService.uploadApplicants(this.selectedFile, this.token)
       .subscribe({
         next: (res) => {
           this.uploadResult = res;
-          // Recargar los datos después de una carga exitosa
           if (res.success) {
-            this.loadAlumnos();
+            this.loadAlumnos(); // loadAlumnos ya maneja el isLoading
+          } else {
+            this.isLoading = false;
+            this.cdRef.detectChanges();
           }
           setTimeout(() => (this.uploadResult = null), 5000);
         },
         error: (err) => {
           console.error(err);
           alert('Error al subir el Excel');
+          this.isLoading = false;
+          this.cdRef.detectChanges();
           this.uploadResult = {
             success: false,
             message: 'No se pudo subir el archivo. Intenta de nuevo.',

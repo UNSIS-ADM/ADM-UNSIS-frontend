@@ -1,6 +1,7 @@
 <app-nav></app-nav>
 
-<div class="sm:ml-64 mt-16 p-8">
+<!-- Contenedor principal - Solo visible cuando NO está cargando -->
+<div *ngIf="!isLoading" class="sm:ml-64 mt-16 p-8">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
@@ -8,79 +9,38 @@
       <p class="mt-1 text-sm text-gray-200">Gestiona la carga de datos de alumnos</p>
     </div>
 
-    <!-- Botones y Búsqueda 
+    <!-- Botones y Búsqueda -->
     <div class="p-4 border-b flex justify-between items-center flex-wrap gap-4">
       <div class="flex gap-2">
-        <button class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors">
+        <label for="fileInput"
+          class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
           Nueva Carga
-        </button>
-        <button class="px-4 py-2 border border-[#6a1b1b] text-[#6a1b1b] rounded hover:bg-[#fff3f3] transition-colors">
-          Exportar Excel
-        </button>
+        </label>
       </div>
-      <div class="flex-1 max-w-md ml-4">
-        <input type="search" 
-               placeholder="Buscar por nombre o matrícula..." 
-               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
-      </div>
-    </div>
-  -->
-  <!-- Botones y Búsqueda -->
-  <div class="p-4 border-b flex justify-between items-center flex-wrap gap-4">
-    <div class="flex gap-2">
-      <!-- Botón personalizado para subir archivo -->
-      <label for="fileInput"
-        class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
-        Nueva Carga
-      </label>
-    </div>
-  
-    <div class="flex-1 max-w-md ml-4">
-      <input type="search" placeholder="Buscar por nombre o matrícula..."
-        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
-    </div>
-  </div>
-
-  <!-- ✅ Mensaje de éxito -->
-  <div *ngIf="uploadResult?.success" class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
-    ✅ ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
-  </div>
-  
-  <!-- ❌ Mensaje de error -->
-  <div *ngIf="uploadResult && !uploadResult.success" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
-    ❌ {{ uploadResult.message }}
-  </div>
-  
-  <!-- Input oculto de carga -->
-  <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden" />
-
-    <!-- Zona de carga de Excel 
-    <div class="mt-8 p-4 bg-white rounded shadow">
-      <h3 class="font-semibold mb-2">Carga masiva de aspirantes</h3>
-      <input type="file" accept=".xlsx" (change)="onFileSelected($event)" class="block mb-2" />
-      <button (click)="uploadExcel()" class="px-4 py-2 bg-[#14645c] text-white rounded hover:bg-[#0f4c46]">
-        Subir Excel
-      </button>
     
-      <div *ngIf="uploadResult" class="mt-4">
-        <p [class.text-green-600]="uploadResult?.success" [class.text-red-600]="!uploadResult?.success">
-          {{ uploadResult?.message }}
-        </p>
-        <ul *ngIf="uploadResult.errors?.length">
-          <li *ngFor="let err of uploadResult.errors">
-            Fila {{ err.row }}: {{ err.error }}
-          </li>
-        </ul>
+      <div class="flex-1 max-w-md ml-4">
+        <input type="search" placeholder="Buscar por nombre o matrícula..."
+          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
       </div>
     </div>
-    -->
+
+    <!-- Mensajes de estado -->
+    <div *ngIf="uploadResult?.success" class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
+      ✅ ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
+    </div>
+    
+    <div *ngIf="uploadResult && !uploadResult.success" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
+      ❌ {{ uploadResult.message }}
+    </div>
+    
+    <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden" />
 
     <!-- Tabla -->
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
-           <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
@@ -92,10 +52,9 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
-<!-- ... (código anterior se mantiene igual) ... -->
-<tbody class="bg-white divide-y divide-gray-200">
-  <tr *ngFor="let alumno of datos">
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let alumno of datos">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
@@ -103,18 +62,17 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_room}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.exam_date}}</td>
-    <td class="px-6 py-4 whitespace-nowrap">
-      <span [ngClass]="alumno.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
-            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-        {{alumno.estado || 'Cargado'}}
-      </span>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-      <button class="text-[#24645c] hover:text-[#8b2424] mr-2">Editar</button>
-    </td>
-  </tr>
-</tbody>
-<!-- ... (código posterior se mantiene igual) ... -->
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [ngClass]="alumno.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{alumno.estado || 'Cargado'}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <button class="text-[#24645c] hover:text-[#8b2424] mr-2">Editar</button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -122,7 +80,7 @@
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Mostrando 1 a 3 de 3 resultados
+          Mostrando 1 a {{datos.length}} de {{datos.length}} resultados
         </div>
         <div class="flex gap-2">
           <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Anterior</button>
@@ -132,8 +90,19 @@
     </div>
   </div>
 </div>
-<br>
-<br>
+
+<!-- Footer - Solo visible cuando NO está cargando -->
 <div class="sm:ml-64">
   <app-footer></app-footer>
+</div>
+
+<!-- Loader flotante (sin fondo, sobre contenido) -->
+<div *ngIf="isLoading" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+  <div class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
+    <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>
+    <h3 class="text-lg font-semibold text-gray-800">Cargando datos</h3>
+  </div>
 </div>

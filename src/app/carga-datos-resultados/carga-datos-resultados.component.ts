@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Añade ChangeDetectorRef
 import {ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
@@ -22,24 +22,34 @@ export class CargaDatosResultadosComponent implements OnInit {
   uploadResult: ExcelUploadResponse | null = null;
   datos: any[] = [];
   token = localStorage.getItem('token') || '';
+  isLoading = false;
 
   constructor(
     private excelService: ExcelServiceResultados,
-    private resultadosService: ResultadosService // Inyectar el servicio
+    private resultadosService: ResultadosService,
+    private cdRef: ChangeDetectorRef // Inyecta ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    this.loadResultados(); // Cargar los datos al inicializar el componente
+    this.loadResultados();
   }
 
   loadResultados() {
+    this.isLoading = true;
+    this.cdRef.detectChanges(); // Forza la detección de cambios
+    
     this.resultadosService.getResultados().subscribe({
       next: (resultados: any[]) => {
         this.datos = resultados;
+        console.log('Resultados cargados:', this.datos);
+        this.isLoading = false;
+        this.cdRef.detectChanges(); // Forza la detección de cambios
       },
       error: (err: any) => {
         console.error('Error al cargar los resultados:', err);
         alert('Error al cargar los datos de resultados');
+        this.isLoading = false;
+        this.cdRef.detectChanges(); // Forza la detección de cambios
       }
     });
   }
@@ -55,6 +65,8 @@ export class CargaDatosResultadosComponent implements OnInit {
 
       if (confirmed) {
         this.selectedFile = file;
+        this.isLoading = true; // Añade esto
+        this.cdRef.detectChanges(); // Forza la detección de cambios
         this.uploadExcel();
       } else {
         input.value = '';
@@ -69,26 +81,31 @@ export class CargaDatosResultadosComponent implements OnInit {
       return;
     }
 
-    this.excelService
-      .uploadApplicants(this.selectedFile, this.token)
-      .subscribe({
-        next: (res) => {
-          this.uploadResult = res;
-          // Recargar los datos después de una carga exitosa
-          if (res.success) {
-            this.loadResultados();
-          }
-          setTimeout(() => (this.uploadResult = null), 5000);
-        },
-        error: (err) => {
-          console.error(err);
-          alert('Error al subir el Excel');
-          this.uploadResult = {
-            success: false,
-            message: 'No se pudo subir el archivo. Intenta de nuevo.',
-            errors: [],
-          };
-        },
-      });
+    this.isLoading = true; // Asegúrate de establecer esto
+    this.cdRef.detectChanges(); // Forza la detección de cambios
+
+    this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
+      next: (res) => {
+        this.uploadResult = res;
+        if (res.success) {
+          this.loadResultados();
+        } else {
+          this.isLoading = false;
+          this.cdRef.detectChanges();
+        }
+        setTimeout(() => (this.uploadResult = null), 5000);
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Error al subir el Excel');
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+        this.uploadResult = {
+          success: false,
+          message: 'No se pudo subir el archivo. Intenta de nuevo.',
+          errors: [],
+        };
+      },
+    });
   }
 }
