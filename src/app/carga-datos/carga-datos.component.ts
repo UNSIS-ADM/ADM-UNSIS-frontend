@@ -41,6 +41,7 @@ export class CargaDatosComponent implements OnInit {
     this.alumnosService.getAlumnos().subscribe({
       next: (alumnos) => {
         this.datos = alumnos;
+        console.log('Alumnos cargados:', this.datos);
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
