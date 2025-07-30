@@ -50,15 +50,19 @@ export class ResultadoComponent implements OnInit {
   // Método para actualizar las banderas cuando cambian los datos
   actualizarFlags() {
     if (!this.alumno) return;
-    this.esMedicina = this.alumno.carrera?.toLowerCase() === 'medicina';
-    this.esAceptado = this.alumno.aprobado === 'Aprobado';
-    this.esReprobado = this.alumno.aprobado === 'Reprobado';
+    // Normaliza los valores para evitar problemas de mayúsculas/minúsculas
+    const carrera = (this.alumno.career || '').toLowerCase().trim();
+    const resultado = (this.alumno.result || '').toLowerCase().trim();
+
+    this.esMedicina = carrera === 'licenciatura en medicina';
+    this.esAceptado = resultado === 'aceptado';
+    this.esReprobado = resultado === 'rechazado';
     this.esMedicinaReprobado = this.esMedicina && this.esReprobado;
     this.esOtraCarreraReprobado = !this.esMedicina && this.esReprobado;
 
     // Actualizar resultado para medicina si es necesario
     if (this.esMedicina) {
-      this.resultado.promedio = this.alumno.promedio;
+      this.resultado.promedio = this.alumno.score;
     }
   }
 }
