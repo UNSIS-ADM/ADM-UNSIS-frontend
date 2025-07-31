@@ -1,42 +1,70 @@
 <app-nav></app-nav>
 
-<!-- Contenedor principal - Solo visible cuando NO está cargando -->
-<div *ngIf="!isLoading" class="sm:ml-64 mt-16 p-8">
+<div *ngIf="!isLoading" class="sm:ml-64  p-8">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
-      <h2 class="text-2xl font-semibold">Carga de Datos de los alumnos</h2>
-      <p class="mt-1 text-sm text-gray-200">Gestiona la carga de datos de alumnos</p>
+      <h2 class="text-2xl font-semibold">Resultados de Alumnos</h2>
+      <p class="mt-1 text-sm text-gray-200">Busca y gestiona los resultados</p>
     </div>
 
-    <!-- Botones y Búsqueda -->
-    <div class="p-4 border-b flex justify-between items-center flex-wrap gap-4">
-      <div class="flex gap-2">
+    <!-- Barra de búsqueda única -->
+    <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
           class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
           Nueva Carga
         </label>
+        <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden">
       </div>
-    
-      <div class="flex-1 max-w-md ml-4">
-        <input type="search" placeholder="Buscar por nombre o matrícula..."
-          class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+
+      <div class="flex-1 w-full sm:w-auto max-w-md relative">
+        <div class="relative flex items-center">
+          <input type="search" [(ngModel)]="terminoBusqueda" (input)="buscar()"
+            placeholder="Buscar por ficha, nombre, carrera o CURP..."
+            class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+
+          <div *ngIf="buscando" class="absolute right-2">
+            <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+            </svg>
+          </div>
+
+          <span *ngIf="terminoBusqueda && !buscando"
+            class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
+            (click)="terminoBusqueda = ''; buscar()">
+            ×
+          </span>
+        </div>
+
+        <div *ngIf="errorBusqueda" class="mt-1 text-sm text-red-600">
+          No se encontraron resultados para "{{terminoBusqueda}}"
+        </div>
       </div>
+    </div>
+
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="filteredData.length === 0 && !isLoading && terminoBusqueda" class="p-8 text-center text-gray-500">
+      No se encontraron resultados para "{{terminoBusqueda}}"
+    </div>
+
+    <div *ngIf="filteredData.length === 0 && !isLoading && !terminoBusqueda" class="p-8 text-center text-gray-500">
+      No hay datos disponibles
     </div>
 
     <!-- Mensajes de estado -->
     <div *ngIf="uploadResult?.success" class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
       ✅ ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
     </div>
-    
+
     <div *ngIf="uploadResult && !uploadResult.success" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
       ❌ {{ uploadResult.message }}
     </div>
-    
-    <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden" />
 
     <!-- Tabla -->
-    <div class="overflow-x-auto">
+    <div *ngIf="filteredData.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
@@ -46,12 +74,12 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentarios</th>
-           <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ultimo Acceso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let alumno of datos">
+          <tr *ngFor="let alumno of filteredData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.applicantId}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
@@ -71,7 +99,7 @@
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Mostrando 1 a {{datos.length}} de {{datos.length}} resultados
+          Mostrando 1 a {{filteredData.length}} de {{datos.length}} resultados
         </div>
         <div class="flex gap-2">
           <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Anterior</button>
@@ -83,9 +111,10 @@
 </div>
 
 <!-- Footer - Solo visible cuando NO está cargando -->
-<div class="sm:ml-64">
+<div *ngIf="!isLoading" class="sm:ml-64">
   <app-footer></app-footer>
 </div>
+
 <!-- Loader SOBREPUESTO sin ocultar contenido -->
 <div *ngIf="isLoading" class="fixed z-[100] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
   <div class="bg-white/90 p-4 rounded-lg shadow-xl border border-gray-200 flex items-center gap-3">

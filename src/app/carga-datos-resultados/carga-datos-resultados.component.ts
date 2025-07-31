@@ -1,9 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Añade ChangeDetectorRef
-import {ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
 import { NavComponent } from '../nav/nav.component';
 import { FooterComponent } from '../footer/footer.component';
-import { CommonModule, NgClass } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ResultadosService } from '../services/resultados.service';
+import { FormsModule } from '@angular/forms';
+import { FiltradoService } from '../services/filtrado.service';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -11,8 +13,8 @@ import { ResultadosService } from '../services/resultados.service';
   imports: [
     NavComponent,
     FooterComponent,
-   
     CommonModule,
+    FormsModule
   ],
   templateUrl: './carga-datos-resultados.component.html',
   styleUrls: ['./carga-datos-resultados.component.css'],
@@ -21,13 +23,18 @@ export class CargaDatosResultadosComponent implements OnInit {
   selectedFile: File | null = null;
   uploadResult: ExcelUploadResponse | null = null;
   datos: any[] = [];
+  filteredData: any[] = [];
   token = localStorage.getItem('token') || '';
   isLoading = false;
+  terminoBusqueda = '';
+    buscando = false;
+  errorBusqueda = false;
 
   constructor(
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
-    private cdRef: ChangeDetectorRef // Inyecta ChangeDetectorRef
+    private filtradoService: FiltradoService,
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -36,23 +43,66 @@ export class CargaDatosResultadosComponent implements OnInit {
 
   loadResultados() {
     this.isLoading = true;
-    this.cdRef.detectChanges(); // Forza la detección de cambios
-    
     this.resultadosService.getResultados().subscribe({
-      next: (resultados: any[]) => {
+      next: (resultados) => {
         this.datos = resultados;
-        console.log('Resultados cargados:', this.datos);
+        this.filteredData = [...this.datos];
         this.isLoading = false;
-        this.cdRef.detectChanges(); // Forza la detección de cambios
+        this.cdRef.detectChanges();
       },
-      error: (err: any) => {
-        console.error('Error al cargar los resultados:', err);
-        alert('Error al cargar los datos de resultados');
+      error: (err) => {
+        console.error('Error:', err);
         this.isLoading = false;
-        this.cdRef.detectChanges(); // Forza la detección de cambios
+        this.cdRef.detectChanges();
       }
     });
   }
+
+
+buscar() {
+  if (!this.terminoBusqueda.trim()) {
+    this.filteredData = [...this.datos];
+    this.errorBusqueda = false;
+    return;
+  }
+
+  this.buscando = true;
+  this.errorBusqueda = false;
+
+  setTimeout(() => {
+    this.filtradoService.buscar(this.terminoBusqueda).subscribe({
+      next: (resultados) => {
+        // Si el backend responde con resultados, úsalos; 
+        // si no, cae al filtrado local
+        if (resultados.length > 0) {
+          this.filteredData = resultados;
+          this.errorBusqueda = false;
+        } else {
+          this.filtrarLocalmente();
+        }
+        this.buscando = false;
+      },
+      error: () => {
+        this.filtrarLocalmente();
+        this.buscando = false;
+      }
+    });
+  }, 300);
+}
+
+private filtrarLocalmente() {
+  const termino = this.terminoBusqueda.toLowerCase();
+  this.filteredData = this.datos.filter(alumno => {
+    return (
+      alumno.applicantId?.toString().toLowerCase().includes(termino) ||
+      alumno.fullName?.toLowerCase().includes(termino) ||
+      alumno.career?.toLowerCase().includes(termino) ||
+      alumno.curp?.toLowerCase().includes(termino)  // Asegúrate de que la propiedad coincida con tu modelo
+    );
+  });
+  this.errorBusqueda = this.filteredData.length === 0;
+}
+
 
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
@@ -65,8 +115,8 @@ export class CargaDatosResultadosComponent implements OnInit {
 
       if (confirmed) {
         this.selectedFile = file;
-        this.isLoading = true; // Añade esto
-        this.cdRef.detectChanges(); // Forza la detección de cambios
+        this.isLoading = true;
+        this.cdRef.detectChanges();
         this.uploadExcel();
       } else {
         input.value = '';
@@ -81,8 +131,8 @@ export class CargaDatosResultadosComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true; // Asegúrate de establecer esto
-    this.cdRef.detectChanges(); // Forza la detección de cambios
+    this.isLoading = true;
+    this.cdRef.detectChanges();
 
     this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
       next: (res) => {
