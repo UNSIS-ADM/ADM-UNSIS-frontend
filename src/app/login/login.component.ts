@@ -22,7 +22,7 @@ export class LoginComponent {
     password: ''
   };
   error = '';
-  success = ''; // ← Nueva variable
+  success = '';
 
   constructor(
     private authService: AuthService,

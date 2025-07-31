@@ -11,7 +11,7 @@ import { ResultadosService } from '../services/resultados.service';
   imports: [
     NavComponent,
     FooterComponent,
-    NgClass,
+   
     CommonModule,
   ],
   templateUrl: './carga-datos-resultados.component.html',
