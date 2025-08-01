@@ -27,15 +27,18 @@ export class CargaDatosResultadosComponent implements OnInit {
   token = localStorage.getItem('token') || '';
   isLoading = false;
   terminoBusqueda = '';
-    buscando = false;
+  buscando = false;
   errorBusqueda = false;
+  currentPage = 1;
+  itemsPerPage = 5;
+  Math = Math;
 
   constructor(
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadResultados();
@@ -59,49 +62,52 @@ export class CargaDatosResultadosComponent implements OnInit {
   }
 
 
-buscar() {
-  if (!this.terminoBusqueda.trim()) {
-    this.filteredData = [...this.datos];
+  buscar() {
+    if (!this.terminoBusqueda.trim()) {
+      this.filteredData = [...this.datos];
+      this.errorBusqueda = false;
+      this.currentPage = 1;
+      return;
+    }
+
+    this.buscando = true;
     this.errorBusqueda = false;
-    return;
+
+    setTimeout(() => {
+      this.filtradoService.buscar(this.terminoBusqueda).subscribe({
+        next: (resultados) => {
+          // Si el backend responde con resultados, úsalos; 
+          // si no, cae al filtrado local
+          if (resultados.length > 0) {
+            this.filteredData = resultados;
+            this.errorBusqueda = false;
+            
+          } else {
+            this.filtrarLocalmente();
+          }
+           this.currentPage = 1;
+          this.buscando = false;
+        },
+        error: () => {
+          this.filtrarLocalmente();
+          this.buscando = false;
+        }
+      });
+    }, 300);
   }
 
-  this.buscando = true;
-  this.errorBusqueda = false;
-
-  setTimeout(() => {
-    this.filtradoService.buscar(this.terminoBusqueda).subscribe({
-      next: (resultados) => {
-        // Si el backend responde con resultados, úsalos; 
-        // si no, cae al filtrado local
-        if (resultados.length > 0) {
-          this.filteredData = resultados;
-          this.errorBusqueda = false;
-        } else {
-          this.filtrarLocalmente();
-        }
-        this.buscando = false;
-      },
-      error: () => {
-        this.filtrarLocalmente();
-        this.buscando = false;
-      }
+  private filtrarLocalmente() {
+    const termino = this.terminoBusqueda.toLowerCase();
+    this.filteredData = this.datos.filter(alumno => {
+      return (
+        alumno.applicantId?.toString().toLowerCase().includes(termino) ||
+        alumno.fullName?.toLowerCase().includes(termino) ||
+        alumno.career?.toLowerCase().includes(termino) ||
+        alumno.curp?.toLowerCase().includes(termino)  // Asegúrate de que la propiedad coincida con tu modelo
+      );
     });
-  }, 300);
-}
-
-private filtrarLocalmente() {
-  const termino = this.terminoBusqueda.toLowerCase();
-  this.filteredData = this.datos.filter(alumno => {
-    return (
-      alumno.applicantId?.toString().toLowerCase().includes(termino) ||
-      alumno.fullName?.toLowerCase().includes(termino) ||
-      alumno.career?.toLowerCase().includes(termino) ||
-      alumno.curp?.toLowerCase().includes(termino)  // Asegúrate de que la propiedad coincida con tu modelo
-    );
-  });
-  this.errorBusqueda = this.filteredData.length === 0;
-}
+    this.errorBusqueda = this.filteredData.length === 0;
+  }
 
 
   onFileSelected(evt: Event) {
@@ -158,4 +164,22 @@ private filtrarLocalmente() {
       },
     });
   }
+  //paginación 
+  get paginatedData() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.filteredData.slice(start, end);
+  }
+  siguientePagina() {
+    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
+      this.currentPage++;
+    }
+  }
+
+  paginaAnterior() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
 }

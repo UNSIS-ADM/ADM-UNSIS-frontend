@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [
     NavComponent,
-    FooterComponent,  
+    FooterComponent,
     CommonModule,
     FormsModule
   ],
@@ -28,6 +28,9 @@ export class CargaDatosComponent implements OnInit {
   terminoBusqueda = '';
   buscando = false;
   errorBusqueda = false;
+  currentPage = 1;
+  itemsPerPage = 5;
+  Math = Math;
 
   constructor(
     private excelService: ExcelServiceApplicants,
@@ -40,7 +43,7 @@ export class CargaDatosComponent implements OnInit {
     this.loadAlumnos();
   }
 
-   loadAlumnos() {
+  loadAlumnos() {
     this.isLoading = true;
     this.alumnosService.getAlumnos().subscribe({
       next: (resultados) => {
@@ -61,6 +64,7 @@ export class CargaDatosComponent implements OnInit {
     if (!this.terminoBusqueda.trim()) {
       this.filteredData = [...this.datos];
       this.errorBusqueda = false;
+      this.currentPage = 1;
       return;
     }
 
@@ -75,9 +79,11 @@ export class CargaDatosComponent implements OnInit {
           if (resultados.length > 0) {
             this.filteredData = resultados;
             this.errorBusqueda = false;
+           
           } else {
             this.filtrarLocalmente();
           }
+            this.currentPage = 1;
           this.buscando = false;
         },
         error: () => {
@@ -152,5 +158,23 @@ export class CargaDatosComponent implements OnInit {
           };
         },
       });
+  }
+
+  //paginación 
+  get paginatedData() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.filteredData.slice(start, end);
+  }
+  siguientePagina() {
+    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
+      this.currentPage++;
+    }
+  }
+
+  paginaAnterior() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
   }
 }

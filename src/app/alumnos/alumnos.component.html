@@ -1,18 +1,17 @@
 <app-nav></app-nav>
 
-<div class="sm:ml-64  p-8">
+<div class="sm:ml-64  p-11">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Encabezado -->
     <div class="p-6 bg-[#14645c] text-white">
-      <h2 class="text-2xl font-semibold">Lista de Alumnos</h2>
-      <p class="mt-1 text-sm text-gray-100">Gestión de alumnos registrados</p>
+      <h2 class="text-2xl font-semibold">Lista de aspirantes</h2>
     </div>
 
-      <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      
+    <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
       <div class="flex-1 w-full sm:w-auto max-w-md relative">
         <div class="relative flex items-center">
-          <input type="search" [(ngModel)]="terminoBusqueda" (input)="buscar()"
+          <input [(ngModel)]="terminoBusqueda" (input)="buscar()"
             placeholder="Buscar por ficha, nombre, carrera o CURP..."
             class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
 
@@ -54,7 +53,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let alumno of filteredData">
+          <tr *ngFor="let alumno of paginatedData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
@@ -64,8 +63,9 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.lastLogin}}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+              <span
+                [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ alumno.status }}
               </span>
             </td>
@@ -73,15 +73,25 @@
         </tbody>
       </table>
     </div>
-
     <!-- Paginación -->
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
+          a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
+          de {{ filteredData.length }} resultados
+
         </div>
         <div class="flex gap-2">
-          <button class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">Anterior</button>
-          <button class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">Siguiente</button>
+          <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            Anterior
+          </button>
+          <button (click)="siguientePagina()" [disabled]="currentPage * itemsPerPage >= filteredData.length"
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            Siguiente
+          </button>
+
         </div>
       </div>
     </div>
@@ -89,5 +99,7 @@
 </div>
 
 <div class="sm:ml-64">
+
+  <div *ngIf="paginatedData.length < itemsPerPage" class="h-40"></div>
   <app-footer></app-footer>
 </div>
