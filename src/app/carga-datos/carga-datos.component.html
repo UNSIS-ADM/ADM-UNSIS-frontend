@@ -1,15 +1,14 @@
 <app-nav></app-nav>
 
 <!-- Contenedor principal - Solo visible cuando NO está cargando -->
-<div *ngIf="!isLoading" class="sm:ml-64 mt-16 p-8">
+<div *ngIf="!isLoading" class="sm:ml-64 mt-auto p-9">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
-      <h2 class="text-2xl font-semibold">Carga de Datos de los alumnos</h2>
-      <p class="mt-1 text-sm text-gray-200">Gestiona la carga de datos de alumnos</p>
+      <h2 class="text-2xl font-semibold">Carga de Datos de los aspirantes</h2>
     </div>
 
-  <!-- Barra de búsqueda única -->
+    <!-- Barra de búsqueda única -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
@@ -21,7 +20,7 @@
 
       <div class="flex-1 w-full sm:w-auto max-w-md relative">
         <div class="relative flex items-center">
-          <input type="search" [(ngModel)]="terminoBusqueda" (input)="buscar()"
+          <input [(ngModel)]="terminoBusqueda" (input)="buscar()"
             placeholder="Buscar por ficha, nombre, carrera o CURP..."
             class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
 
@@ -59,11 +58,11 @@
     <div *ngIf="uploadResult?.success" class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
       ✅ ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
     </div>
-    
+
     <div *ngIf="uploadResult && !uploadResult.success" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
       ❌ {{ uploadResult.message }}
     </div>
-    
+
     <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden" />
 
     <!-- Tabla -->
@@ -84,7 +83,7 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let alumno of filteredData">
+          <tr *ngFor="let alumno of paginatedData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
@@ -93,10 +92,11 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.lastLogin}}</td>
-                  
+
             <td class="px-6 py-4 whitespace-nowrap">
-              <span [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
-                    class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+              <span
+                [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{alumno.status || 'Cargado'}}
               </span>
             </td>
@@ -112,11 +112,20 @@
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
-          Mostrando 1 a {{datos.length}} de {{datos.length}} resultados
+          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
+          a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
+          de {{ filteredData.length }} resultados
+
         </div>
         <div class="flex gap-2">
-          <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Anterior</button>
-          <button class="px-3 py-1 border rounded text-[#6a1b1b] hover:bg-[#fff3f3]">Siguiente</button>
+          <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            Anterior
+          </button>
+          <button (click)="siguientePagina()" [disabled]="currentPage * itemsPerPage >= filteredData.length"
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            Siguiente
+          </button>
         </div>
       </div>
     </div>
@@ -124,14 +133,17 @@
 </div>
 
 <!-- Footer - Solo visible cuando NO está cargando -->
-<div class="sm:ml-64">
+<div *ngIf="!isLoading" class="sm:ml-64">
+  <div *ngIf="paginatedData.length < itemsPerPage" class="h-42"></div>
   <app-footer></app-footer>
 </div>
 
 <!-- Loader flotante (sin fondo, sobre contenido) -->
 <div *ngIf="isLoading" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-  <div class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
-    <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+  <div
+    class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
+    <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
     </svg>
