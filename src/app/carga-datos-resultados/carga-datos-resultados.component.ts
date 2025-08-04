@@ -50,6 +50,7 @@ export class CargaDatosResultadosComponent implements OnInit {
       next: (resultados) => {
         this.datos = resultados;
         this.filteredData = [...this.datos];
+        console.log('Resultados cargados:', this.datos);
         this.isLoading = false;
         this.cdRef.detectChanges();
       },

@@ -1,0 +1,32 @@
+<app-nav></app-nav>
+
+<div class="sm:ml-64 mt-6 min-h-screen flex flex-col justify-between">
+    <!-- registrar-fichas.component.html -->
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 text-[#6a1b1b]">
+            Registrar Fichas por Carrera
+        </h2>
+        <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
+            <div class="grid grid-cols-2 gap-x-8 gap-y-4" *ngFor="let carrera of carreras; let i = index"
+                [ngClass]="{ 'col-span-3': carreras.length - i <= 3 }">
+                <label [for]="carrera.key" class="block text-sm font-medium text-gray-700">
+                    {{ carrera.label }}
+                </label>
+                <input type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]"
+                    class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+               focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
+            </div>
+
+            <button type="submit" [disabled]="!fichasForm.form.valid" class="mt-6 bg-[#6a1b1b] text-white px-4 py-2 rounded hover:bg-[#8b2f2f]
+             transition">
+                Registrar Fichas
+            </button>
+        </form>
+
+        <div *ngIf="mensaje" class="mt-4 p-4 bg-green-100 text-green-800 rounded">
+            {{ mensaje }}
+        </div>
+    </div>
+<app-footer></app-footer>
+</div>
+

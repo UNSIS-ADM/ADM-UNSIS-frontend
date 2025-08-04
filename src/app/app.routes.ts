@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { UsuarioComponent } from './usuario/usuario.component';
 import { RoleGuard } from './guards/role.guard';
+import { AspirantesDisponiblesComponent } from './aspirantes-disponibles/aspirantes-disponibles.component';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,12 @@ export const routes: Routes = [
   { 
     path: 'usuario', 
     component: UsuarioComponent,
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN'] }
+  },
+   { 
+    path: 'aspirantes', 
+    loadComponent: () => import('./aspirantes-disponibles/aspirantes-disponibles.component').then(m => m.AspirantesDisponiblesComponent),
     canActivate: [RoleGuard],
     data: { roles: ['ROLE_ADMIN'] }
   },

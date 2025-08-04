@@ -154,6 +154,17 @@
           <span class="ms-3">Registrar Usuarios</span>
         </a>
       </li>
+      <li *ngIf="hasRole('ROLE_ADMIN')">
+        <a href="/aspirantes"
+          class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
+          <!-- Nuevo ícono: lista con check -->
+          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none"
+            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M17 14l2 2 4-4" />
+          </svg>
+          <span class="ms-3">Fichas Disponibles</span>
+        </a>
+      </li>
     </ul>
   </div>
 </aside>
@@ -258,13 +269,24 @@
             <span class="ms-3">Registrar Usuarios</span>
           </a>
         </li>
+        <li *ngIf="hasRole('ROLE_ADMIN')">
+          <a href="/aspirantes"
+            class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
+            <!-- Nuevo ícono: lista con check -->
+            <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none"
+              stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M17 14l2 2 4-4" />
+            </svg>
+            <span class="ms-3">Fichas Disponibles</span>
+          </a>
+        </li>
       </ul>
     </div>
   </aside>
 
   <!-- Contenedor del contenido principal -->
   <div class="flex-1 transition-all duration-200 ease-in-out p-4 mt-14 sm:ml-64">
-    <router-outlet></router-outlet>
+
   </div>
 </div>
 
