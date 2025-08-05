@@ -101,7 +101,7 @@ export class CargaDatosResultadosComponent implements OnInit {
     const termino = this.terminoBusqueda.toLowerCase();
     this.filteredData = this.datos.filter(alumno => {
       return (
-        alumno.applicantId?.toString().toLowerCase().includes(termino) ||
+        alumno.ficha?.toString().toLowerCase().includes(termino) ||
         alumno.fullName?.toLowerCase().includes(termino) ||
         alumno.career?.toLowerCase().includes(termino) ||
         alumno.curp?.toLowerCase().includes(termino)  // Asegúrate de que la propiedad coincida con tu modelo

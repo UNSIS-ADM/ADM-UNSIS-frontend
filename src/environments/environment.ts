@@ -5,5 +5,6 @@ export const environment = {
   loginEndpoint: '/auth/login',
   getresultadosEndpoint: '/api/admin/results',
   getresultmostrarEndpoint: '/api/applicant/me',
-  postsecretariasEndpoint: '/auth/users'
+  postsecretariasEndpoint: '/auth/users',
+  fichasdispiniblesEndpoint: '/admin/vacancies',
 };
