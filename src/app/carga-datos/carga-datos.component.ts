@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AlumnosService } from '../services/alumnos.service';
 import { FiltradoService } from '../services/filtrado.service';
 import { FormsModule } from '@angular/forms';
+import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
 @Component({
   selector: 'app-carga-datos',
   standalone: true,
@@ -13,7 +14,8 @@ import { FormsModule } from '@angular/forms';
     NavComponent,
     FooterComponent,
     CommonModule,
-    FormsModule
+    FormsModule,
+    TiempoRelativoPipe,
   ],
   templateUrl: './carga-datos.component.html',
   styleUrls: ['./carga-datos.component.css'],

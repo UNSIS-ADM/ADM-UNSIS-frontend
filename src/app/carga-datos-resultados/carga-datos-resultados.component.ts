@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ResultadosService } from '../services/resultados.service';
 import { FormsModule } from '@angular/forms';
 import { FiltradoService } from '../services/filtrado.service';
+import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -14,7 +15,8 @@ import { FiltradoService } from '../services/filtrado.service';
     NavComponent,
     FooterComponent,
     CommonModule,
-    FormsModule
+    FormsModule,
+    TiempoRelativoPipe
   ],
   templateUrl: './carga-datos-resultados.component.html',
   styleUrls: ['./carga-datos-resultados.component.css'],
