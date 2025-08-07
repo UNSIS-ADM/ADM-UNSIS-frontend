@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { UsuarioComponent } from './usuario/usuario.component';
 import { RoleGuard } from './guards/role.guard';
-import { AspirantesDisponiblesComponent } from './aspirantes-disponibles/aspirantes-disponibles.component';
 
 export const routes: Routes = [
   {
@@ -61,5 +60,25 @@ export const routes: Routes = [
     loadComponent: () => import('./alumnos/alumnos.component').then(m => m.AlumnosComponent),
     canActivate: [RoleGuard],
     data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] }
+  },
+    {
+    path: 'carrera-applicant',
+    loadComponent: () => import('./nueva-carrera-applicant/nueva-carrera-applicant.component').then(m => m.NuevaCarreraApplicantComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_APPLICANT'] }
+  }
+  ,
+    {
+    path: 'Solcambio',
+    loadComponent: () => import('./solicitudes-nuevas-carreras/solicitudes-nuevas-carreras.component').then(m => m.SolicitudesNuevasCarrerasComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
+  }
+  ,
+    {
+    path: 'Solcambiar',
+    loadComponent: () => import('./solicitud-carrera-estudiante/solicitud-carrera-estudiante.component').then(m => m.SolicitudCarreraEstudianteComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
   }
 ];
