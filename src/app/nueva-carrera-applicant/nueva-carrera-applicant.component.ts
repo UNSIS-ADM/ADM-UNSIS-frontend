@@ -21,7 +21,15 @@ export class NuevaCarreraApplicantComponent implements OnInit {
     comentario: ''
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.carrerasDisponibles.push(
+      { nombre: 'Informática', cupo: 30 },
+      { nombre: 'enfermeria', cupo: 25 },
+      { nombre: 'Odontologia', cupo: 30 },
+      { nombre: 'Nutricion', cupo: 25 },
+    );
+
+  }
 
   ngOnInit(): void {
     this.obtenerCarreras();

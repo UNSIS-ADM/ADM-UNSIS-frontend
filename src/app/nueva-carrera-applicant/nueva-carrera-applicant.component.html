@@ -8,7 +8,7 @@
     <select [(ngModel)]="formData.carrera" name="carrera" id="carrera" required
             class="block w-full p-2.5 border border-gray-300 rounded-lg focus:ring-[#6a1b1b] focus:border-[#6a1b1b]">
       <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera.nombre">
-        {{ carrera.nombre }} ({{ carrera.cupo }} lugares disponibles)
+        {{ carrera.nombre }} 
       </option>
     </select>
   </div>
@@ -28,7 +28,7 @@
   </button>
 </form>
 
-<div  class="h-40">
+<div  class="h-58">
 </div>
 <app-footer></app-footer>
 </div>

@@ -17,10 +17,13 @@ export class SolicitudService {
     });
   }
 
-  responderSolicitud(id: number, payload: { action: string; responceComment: string }): Observable<any> {
+  responderSolicitud(id: number, payload: { action: string; responseComment: string }): Observable<any> {
+    console.log('Solicitud respondida:', id, payload);
     return this.http.put(`${this.baseUrl}/${id}`, payload, {
       headers: this.getHeaders()
+
     });
+
   }
 
   private getHeaders(): HttpHeaders {
