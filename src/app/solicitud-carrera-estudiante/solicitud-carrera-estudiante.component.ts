@@ -23,6 +23,6 @@ export class SolicitudCarreraEstudianteComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
 }

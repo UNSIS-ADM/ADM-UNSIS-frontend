@@ -7,4 +7,5 @@ export const environment = {
   getresultmostrarEndpoint: '/api/applicant/me',
   postsecretariasEndpoint: '/auth/users',
   fichasdispiniblesEndpoint: '/admin/vacancies',
+  cambiodecarreraEndpoint: '/api/applicant',
 };
