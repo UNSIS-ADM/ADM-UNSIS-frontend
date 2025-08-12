@@ -19,7 +19,7 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
 
   solicitudes: {
     id: number;
-    nombre: string;
+    ficha: string;
     nuevaCarrera: string;
     antiguacarrera: string;
     comentario: string;
@@ -41,12 +41,13 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
       next: data => {
         this.solicitudes = data.map(item => ({
           id: item.id,
-          nombre: item.applicantId,
+          ficha: item.ficha,
           nuevaCarrera: item.newCareer,
           antiguacarrera: item.oldCareer,
           comentario: item.requestComment,
           estado: item.estado || 'Pendiente'
         }));
+        console.log(this.solicitudes);
       },
       error: err => {
         console.error('Error al obtener solicitudes:', err);
@@ -72,11 +73,12 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
 
     this.solicitudService.responderSolicitud(this.solicitudSeleccionadaId, {
       action,
-      responceComment: this.comentarioSecretaria
+      responseComment: this.comentarioSecretaria
     }).subscribe({
       next: () => {
         this.cerrarModal();
         this.obtenerSolicitudes(); // Recargar solicitudes
+        
       },
       error: err => {
         console.error('Error al responder solicitud:', err);

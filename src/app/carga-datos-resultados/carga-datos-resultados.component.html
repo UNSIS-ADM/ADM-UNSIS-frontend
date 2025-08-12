@@ -74,7 +74,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentarios</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -87,8 +87,12 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.comment}}</td>
            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
 
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="text-[#24645c] hover:text-[#8b2424] mr-2">Editar</button>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                [ngClass]="{'bg-green-100 text-green-800': alumno.result== 'ACEPTADO', 'bg-red-100 text-red-800': alumno.result === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{alumno.result || 'Cargado'}}
+              </span>
             </td>
           </tr>
         </tbody>
