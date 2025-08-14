@@ -80,5 +80,12 @@ export const routes: Routes = [
     loadComponent: () => import('./solicitud-carrera-estudiante/solicitud-carrera-estudiante.component').then(m => m.SolicitudCarreraEstudianteComponent),
     canActivate: [RoleGuard],
     data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
+  },
+    {
+    path: 'respsolicitud',
+    loadComponent: () => import('./solicitud/solicitud.component').then(m => m.SolicitudComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_APPLICANT'] }
   }
+  ,
 ];
