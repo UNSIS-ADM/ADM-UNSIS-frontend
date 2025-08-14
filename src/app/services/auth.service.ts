@@ -84,4 +84,8 @@ export class AuthService {
     return userInfo ? JSON.parse(userInfo) : null;
 
   }
+  validarApplicant() {
+  return this.http.get('http://localhost:1200/api/applicants');
+}
+
 }

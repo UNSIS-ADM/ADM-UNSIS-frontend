@@ -30,36 +30,61 @@ export class LoginComponent {
   ) { }
 
   onSubmit(): void {
-    console.log('Intentando login con:', this.credentials);
+  console.log('Intentando login con:', this.credentials);
 
-    this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        console.log('Login exitoso:', response);
-        // Guarda el token si lo necesitas
-        if (response.token) {
-          this.authService.saveToken(response.token);
-        }
-        // Guarda los roles y el usuario en localStorage para el guard
-        const userInfo = {
-          username: response.username,
-          roles: response.roles,
-          full_name: response.fullName,  // ← Aquí usamos fullName (del backend)
- // <-- aquí se guardan los roles
-        };
-        localStorage.setItem('user_info', JSON.stringify(userInfo));
-        console.log('Información del usuario guardada:', JSON.stringify(userInfo));
-        this.success = '¡Sesión iniciada con éxito! '; // ← Mensaje de éxito
+  this.authService.login(this.credentials).subscribe({
+    next: (response) => {
+      console.log('Login exitoso:', response);
+
+      if (response.token) {
+        this.authService.saveToken(response.token);
+      }
+
+      const userInfo = {
+        username: response.username,
+        roles: response.roles,
+        full_name: response.fullName,
+      };
+      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      console.log('Información del usuario guardada:', JSON.stringify(userInfo));
+
+      // Si el rol es ROLE_APPLICANT, validamos en el endpoint
+      if (response.roles.includes('ROLE_APPLICANT')) {
+        this.authService.validarApplicant().subscribe({
+          next: () => {
+            // Si pasa la validación, continuamos como siempre
+            this.success = '¡Sesión iniciada con éxito!';
+            this.error = '';
+            setTimeout(() => {
+              this.router.navigate(['/home']);
+            }, 1000);
+          },
+          error: (err) => {
+            if (err.status === 403 && err.error?.error?.includes('Acceso temporalmente restringido')) {
+              this.error = 'Acceso temporalmente restringido para ROLE_APPLICANT';
+              this.success = '';
+              return; // No navega a ninguna parte
+            }
+            // Si es otro error, mostramos genérico
+            this.error = 'Error en validación de acceso';
+            this.success = '';
+          }
+        });
+      } else {
+        // Otros roles siguen el flujo normal
+        this.success = '¡Sesión iniciada con éxito!';
         this.error = '';
         setTimeout(() => {
           this.router.navigate(['/home']);
-        }, 1000); // Espera 2 segundos antes de redirigir
-      },
-      error: (error) => {
-        console.error('Error detallado:', error);
-        this.error = 'Usuario o contraseña incorrectos';
-        this.success = '';  
-        
+        }, 1000);
       }
-    });
-  }
+    },
+    error: (error) => {
+      console.error('Error detallado:', error);
+      this.error = 'Usuario o contraseña incorrectos';
+      this.success = '';
+    }
+  });
+}
+
 }
