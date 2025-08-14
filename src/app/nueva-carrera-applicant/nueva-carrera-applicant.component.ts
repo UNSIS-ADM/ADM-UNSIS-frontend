@@ -9,35 +9,50 @@ import { ApplicantService } from '../services/applicant.service';
 @Component({
   selector: 'app-nueva-carrera-applicant',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, NavComponent, FooterComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    HttpClientModule,
+    NavComponent,
+    FooterComponent,
+  ],
   templateUrl: './nueva-carrera-applicant.component.html',
-  styleUrls: ['./nueva-carrera-applicant.component.css']
+  styleUrls: ['./nueva-carrera-applicant.component.css'],
 })
 export class NuevaCarreraApplicantComponent implements OnInit {
-
-  carrerasDisponibles: { nombre: string}[] = [];
+  carrerasDisponibles: { nombre: string }[] = [];
 
   formData = {
     carrera: '',
-    comentario: ''
+    comentario: '',
   };
 
-  constructor(private http: HttpClient, private applicantService: ApplicantService) {
+  constructor(
+    private http: HttpClient,
+    private applicantService: ApplicantService
+  ) {
     this.carrerasDisponibles.push(
       { nombre: 'LICENCIATURA EN INFORMATICA' },
       { nombre: 'LICENCIATURA EN ENFERMERÍA' },
       { nombre: 'LICENCIATURA EN ODONTOLOGIA' },
-      { nombre: 'LICENCIATURA EN NUTRICION'},
-      { nombre: 'LICENCIATURA EN ADMINISTRACION PÚBLICA' },
+      { nombre: 'LICENCIATURA EN NUTRICION' },
       { nombre: 'LICENCIATURA EN CIENCIAS BIOMÉDICAS' },
+      { nombre: 'LICENCIATURA EN CIENCIAS EMPRESARIALES' },
+      { nombre: 'LICENCIATURA EN ADMINISTRACION PÚBLICA' }
     );
   }
 
-  ngOnInit(): void {
-  
-  }
-
-
+  /**
+   *
+      { nombre: 'Liecenciatura en Informática' },
+      { nombre: 'Liecenciatura en Enfermería' },
+      { nombre: 'Liecenciatura en Odontología' },
+      { nombre: 'Liecenciatura en Nutrición' },
+      { nombre: 'Liecenciatura en Ciencias Biomédicas' },
+      { nombre: 'Liecenciatura en Ciencias Empresariales' },
+      { nombre: 'Liecenciatura en Administración Pública' }
+   */
+  ngOnInit(): void {}
 
   submitForm(): void {
     if (!this.formData.carrera || !this.formData.comentario) {
@@ -45,17 +60,17 @@ export class NuevaCarreraApplicantComponent implements OnInit {
       return;
     }
 
-    this.applicantService.changeCareer(this.formData.carrera, this.formData.comentario)
+    this.applicantService
+      .changeCareer(this.formData.carrera, this.formData.comentario)
       .subscribe({
         next: () => {
           alert('Solicitud enviada correctamente');
           this.formData = { carrera: '', comentario: '' };
-         
         },
         error: (err) => {
           console.error('Error al enviar la solicitud:', err);
           alert('Hubo un problema al enviar la solicitud');
-        }
+        },
       });
   }
 }
