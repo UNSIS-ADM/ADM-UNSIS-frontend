@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../footer/footer.component';
 import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // Cambia la importación
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-resultado',
