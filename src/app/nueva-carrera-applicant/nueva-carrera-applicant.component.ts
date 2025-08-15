@@ -5,6 +5,8 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { NavComponent } from "../nav/nav.component";
 import { FooterComponent } from "../footer/footer.component";
 import { ApplicantService } from '../services/applicant.service';
+import { AlertService } from '../services/alert.service';
+
 
 @Component({
   selector: 'app-nueva-carrera-applicant',
@@ -30,6 +32,7 @@ export class NuevaCarreraApplicantComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private applicantService: ApplicantService
+    , private alertService: AlertService
   ) {
     this.carrerasDisponibles.push(
       { nombre: 'LICENCIATURA EN INFORMATICA' },
@@ -56,7 +59,7 @@ export class NuevaCarreraApplicantComponent implements OnInit {
 
   submitForm(): void {
     if (!this.formData.carrera || !this.formData.comentario) {
-      alert('Por favor completa todos los campos');
+      this.alertService.showAlert('Por favor completa todos los campos', 'warning');
       return;
     }
 
@@ -64,12 +67,12 @@ export class NuevaCarreraApplicantComponent implements OnInit {
       .changeCareer(this.formData.carrera, this.formData.comentario)
       .subscribe({
         next: () => {
-          alert('Solicitud enviada correctamente');
+          this.alertService.showAlert('Solicitud enviada exitosamente', 'success');
           this.formData = { carrera: '', comentario: '' };
         },
         error: (err) => {
           console.error('Error al enviar la solicitud:', err);
-          alert('Hubo un problema al enviar la solicitud');
+         this.alertService.showAlert('Ya tienes una solicitud en el sistema', 'danger');
         },
       });
   }

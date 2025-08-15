@@ -85,7 +85,7 @@ export class AuthService {
 
   }
   validarApplicant() {
-  return this.http.get('http://localhost:1200/api/applicants');
+  return this.http.get('');
 }
 
 }

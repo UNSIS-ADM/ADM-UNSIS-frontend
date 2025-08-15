@@ -7,6 +7,7 @@ import { ResultadosService } from '../services/resultados.service';
 import { FormsModule } from '@angular/forms';
 import { FiltradoService } from '../services/filtrado.service';
 import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -39,7 +40,8 @@ export class CargaDatosResultadosComponent implements OnInit {
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
     private filtradoService: FiltradoService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private alertService: AlertService
   ) { }
 
   ngOnInit() {
@@ -52,12 +54,12 @@ export class CargaDatosResultadosComponent implements OnInit {
       next: (resultados) => {
         this.datos = resultados;
         this.filteredData = [...this.datos];
-        console.log('Resultados cargados:', this.datos);
+        this.alertService.showAlert('Datos cargados exitosamente', 'success');
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
       error: (err) => {
-        console.error('Error:', err);
+          this.alertService.showAlert('Error al cargar los datos', 'danger');
         this.isLoading = false;
         this.cdRef.detectChanges();
       }
@@ -126,6 +128,7 @@ export class CargaDatosResultadosComponent implements OnInit {
         this.selectedFile = file;
         this.isLoading = true;
         this.cdRef.detectChanges();
+        this.alertService.showAlert(`Archivo "${file.name}" seleccionado.`, 'info');
         this.uploadExcel();
       } else {
         input.value = '';
@@ -136,7 +139,7 @@ export class CargaDatosResultadosComponent implements OnInit {
 
   uploadExcel() {
     if (!this.selectedFile) {
-      alert('Selecciona primero un archivo .xlsx');
+      this.alertService.showAlert('No hay archivo seleccionado', 'warning');
       return;
     }
 
@@ -156,7 +159,7 @@ export class CargaDatosResultadosComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        alert('Error al subir el Excel');
+        this.alertService.showAlert('Error al subir el archivo', 'danger');
         this.isLoading = false;
         this.cdRef.detectChanges();
         this.uploadResult = {

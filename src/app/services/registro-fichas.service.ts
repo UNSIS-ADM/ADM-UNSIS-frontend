@@ -14,6 +14,7 @@ export class RegistroFichasService {
     const params = new HttpParams()
       .set('year', year.toString())
       .set('limit', limit.toString());
+      console.log('Parámetros de la solicitud:', { carrera, year, limit });
 
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
@@ -21,8 +22,9 @@ export class RegistroFichasService {
     });
 
     console.log(`Registrando fichas para ${url} en el año ${year} con límite ${limit}`);
-
+ console.log('Solicitud enviada a:', url, 'con parámetros:', params.toString());
     return this.http.put(url, null, { params, headers });
+   
   }
 
   /** Nuevo método para obtener los disponibles filtrados por año */

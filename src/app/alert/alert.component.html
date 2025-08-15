@@ -1,0 +1,13 @@
+<div class="alert-container">
+  <div *ngFor="let alert of alerts" 
+       [ngClass]="alert.type + (alert.show ? ' show' : ' hide')">
+    <span class="alert-icon">
+      <!-- Iconos Unicode simples -->
+      {{ alert.type === 'success' ? '✔' : '' }}
+      {{ alert.type === 'danger' ? '✖' : '' }}
+      {{ alert.type === 'info' ? 'ℹ' : '' }}
+      {{ alert.type === 'warning' ? '⚠' : '' }}
+    </span>
+    {{ alert.message }}
+  </div>
+</div>

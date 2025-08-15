@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RegistroFichasService } from '../services/registro-fichas.service';
+import { AlertService } from '../services/alert.service';
 import { FooterComponent } from "../footer/footer.component";
 import { NavComponent } from "../nav/nav.component";
 import { CommonModule } from '@angular/common';
@@ -27,12 +28,14 @@ export class AspirantesDisponiblesComponent implements OnInit {
     { key: 'LICENCIATURA EN NUTRICION', label: 'Licenciatura en nutrición' }
   ];
 
-  fichas: Record<string, number> = {};       // Editable
-  disponibles: Record<string, number> = {};  // Solo lectura
-  mensaje: string = '';
+  fichas: Record<string, number> = {};      // Editable
+  disponibles: Record<string, number> = {}; // Solo lectura
   cargando: boolean = false;
 
-  constructor(private registroService: RegistroFichasService) {}
+  constructor(
+    private registroService: RegistroFichasService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     const year = new Date().getFullYear();
@@ -46,36 +49,55 @@ export class AspirantesDisponiblesComponent implements OnInit {
     // Consulta los disponibles del año
     this.registroService.obtenerVacantesPorAnio(year).subscribe({
       next: (data) => {
-        /**
-         * Se espera un arreglo tipo:
-         * [{ career: 'LICENCIATURA EN INFORMATICA', availableSlots: 15 }, ...]
-         */
         data.forEach(item => {
           if (this.disponibles.hasOwnProperty(item.career)) {
             this.disponibles[item.career] = item.availableSlots;
           }
         });
       },
-      error: (err) => console.error('Error al obtener vacantes', err)
+      error: (err) => {
+        console.error('Error al obtener vacantes', err);
+        this.alertService.showAlert('Error al obtener vacantes', 'danger');
+      }
     });
   }
 
   registrarFichas(): void {
-    this.cargando = true;
-    const year = new Date().getFullYear();
+  this.cargando = true;
+  const year = new Date().getFullYear();
 
-    const peticiones = this.carreras.map(carrera => {
-      const cantidad = this.fichas[carrera.key];
-      return this.registroService
-        .registrar(carrera.key, year, cantidad)
-        .toPromise()
-        .then(() => `${carrera.label}: ${cantidad} fichas`)
-        .catch(() => `${carrera.label}: error`);
+  const peticiones = this.carreras.map(carrera => {
+    const cantidad = this.fichas[carrera.key];
+    return this.registroService.registrar(carrera.key, year, cantidad)
+      .toPromise()
+      .then(() => ({ label: carrera.label, cantidad, success: true }))
+      .catch(() => ({ label: carrera.label, cantidad, success: false }));
+  });
+
+  Promise.all(peticiones).then(resultados => {
+    let delay = 0; // tiempo inicial en ms
+
+    resultados.forEach(res => {
+      setTimeout(() => {
+        if (res.success) {
+          this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
+        } else {
+          this.alertService.showAlert(`${res.label}: error al registrar las fichas`, 'danger');
+        }
+      }, delay);
+
+      delay += 1000; // incrementa 1 segundo para la siguiente alerta
     });
 
-    Promise.all(peticiones).then(resultados => {
-      this.mensaje = resultados.join(', ');
+    // Después de mostrar todas las alertas, desactiva cargando
+    setTimeout(() => {
       this.cargando = false;
-    });
-  }
+    }, delay);
+  }).catch(err => {
+    console.error('Error general al registrar fichas', err);
+    this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
+    this.cargando = false;
+  });
+}
+
 }

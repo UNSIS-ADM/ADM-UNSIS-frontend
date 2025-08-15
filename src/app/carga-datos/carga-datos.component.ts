@@ -7,6 +7,8 @@ import { AlumnosService } from '../services/alumnos.service';
 import { FiltradoService } from '../services/filtrado.service';
 import { FormsModule } from '@angular/forms';
 import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
+import { AlertService } from '../services/alert.service';
+
 @Component({
   selector: 'app-carga-datos',
   standalone: true,
@@ -38,7 +40,8 @@ export class CargaDatosComponent implements OnInit {
     private excelService: ExcelServiceApplicants,
     private alumnosService: AlumnosService,
     private filtradoService: FiltradoService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private alertService: AlertService
   ) { }
 
   ngOnInit() {
@@ -55,7 +58,7 @@ export class CargaDatosComponent implements OnInit {
         this.cdRef.detectChanges();
       },
       error: (err) => {
-        console.error('Error:', err);
+        this.alertService.showAlert('Error al cargar los datos', 'danger');
         this.isLoading = false;
         this.cdRef.detectChanges();
       }
@@ -122,6 +125,7 @@ export class CargaDatosComponent implements OnInit {
         this.selectedFile = file;
         this.isLoading = true; // Activar loader antes de subir
         this.cdRef.detectChanges();
+        this.alertService.showAlert(`Archivo "${file.name}" seleccionado.`, 'info');
         this.uploadExcel();
       } else {
         input.value = '';
@@ -150,7 +154,7 @@ export class CargaDatosComponent implements OnInit {
         },
         error: (err) => {
           console.error(err);
-          alert('Error al subir el Excel');
+          this.alertService.showAlert('Error al subir el archivo', 'danger');
           this.isLoading = false;
           this.cdRef.detectChanges();
           this.uploadResult = {
