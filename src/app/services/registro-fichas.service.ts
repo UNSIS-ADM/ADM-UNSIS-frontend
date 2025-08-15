@@ -16,7 +16,6 @@ export class RegistroFichasService {
       .set('limit', limit.toString());
 
     const token = localStorage.getItem('token');
-
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
@@ -24,5 +23,16 @@ export class RegistroFichasService {
     console.log(`Registrando fichas para ${url} en el año ${year} con límite ${limit}`);
 
     return this.http.put(url, null, { params, headers });
+  }
+
+  /** Nuevo método para obtener los disponibles filtrados por año */
+  obtenerVacantesPorAnio(year: number): Observable<any[]> {
+    const params = new HttpParams().set('year', year.toString());
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http.get<any[]>(this.baseUrl, { params, headers });
   }
 }

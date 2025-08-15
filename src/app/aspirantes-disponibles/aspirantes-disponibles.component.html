@@ -1,32 +1,52 @@
 <app-nav></app-nav>
 
 <div class="sm:ml-64 mt-6 min-h-screen flex flex-col justify-between">
-    <!-- registrar-fichas.component.html -->
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-xl font-semibold mb-4 text-[#6a1b1b]">
-            Registrar Fichas por Carrera
-        </h2>
-        <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
-            <div class="grid grid-cols-2 gap-x-8 gap-y-4" *ngFor="let carrera of carreras; let i = index"
-                [ngClass]="{ 'col-span-3': carreras.length - i <= 3 }">
-                <label [for]="carrera.key" class="block text-sm font-medium text-gray-700">
-                    {{ carrera.label }}
-                </label>
-                <input type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]"
-                    class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-               focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
-            </div>
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-xl font-semibold mb-4 text-[#6a1b1b]">
+      Registrar Fichas por Carrera
+    </h2>
 
-            <button type="submit" [disabled]="!fichasForm.form.valid" class="mt-6 bg-[#6a1b1b] text-white px-4 py-2 rounded hover:bg-[#8b2f2f]
-             transition">
-                Registrar Fichas
-            </button>
-        </form>
+    <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
+      <!-- Encabezados -->
+      <div class="grid grid-cols-3 font-semibold border-b pb-2 mb-4">
+        <div>Carrera</div>
+        <div>Nuevo Límite</div>
+        <div>Disponibles</div>
+      </div>
 
-        <div *ngIf="mensaje" class="mt-4 p-4 bg-green-100 text-green-800 rounded">
-            {{ mensaje }}
-        </div>
+      <!-- Filas -->
+      <div class="grid grid-cols-3 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
+        <!-- Nombre carrera -->
+        <div class="flex items-center">{{ carrera.label }}</div>
+
+        <!-- Input editable -->
+        <input type="number"
+               [id]="carrera.key"
+               name="{{ carrera.key }}"
+               [(ngModel)]="fichas[carrera.key]"
+               class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                      focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]"
+               required min="0" />
+
+        <!-- Input solo lectura -->
+        <input type="number"
+               [value]="disponibles[carrera.key]"
+               readonly
+               class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                      bg-gray-100 text-gray-600 cursor-not-allowed" />
+      </div>
+
+      <button type="submit"
+              [disabled]="!fichasForm.form.valid"
+              class="mt-6 bg-[#6a1b1b] text-white px-4 py-2 rounded hover:bg-[#8b2f2f] transition">
+        Registrar Fichas
+      </button>
+    </form>
+
+    <div *ngIf="mensaje" class="mt-4 p-4 bg-green-100 text-green-800 rounded">
+      {{ mensaje }}
     </div>
-<app-footer></app-footer>
-</div>
+  </div>
 
+  <app-footer></app-footer>
+</div>
