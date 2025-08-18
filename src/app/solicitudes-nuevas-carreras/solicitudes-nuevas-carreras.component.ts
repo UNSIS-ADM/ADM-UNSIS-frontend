@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NavComponent } from "../nav/nav.component";
-import { FooterComponent } from "../footer/footer.component";
 import { CommonModule } from '@angular/common';
 import { SolicitudService } from '../services/solicitud.service'; // Ajusta si es diferente
 import { FormsModule } from '@angular/forms';
@@ -9,7 +7,7 @@ import { AlertService } from '../services/alert.service';
 @Component({
   selector: 'app-solicitudes-nuevas-carreras',
   standalone: true,
-  imports: [NavComponent, FooterComponent, CommonModule, FormsModule],
+  imports: [ CommonModule, FormsModule],
   templateUrl: './solicitudes-nuevas-carreras.component.html',
   styleUrls: ['./solicitudes-nuevas-carreras.component.css']
 })
