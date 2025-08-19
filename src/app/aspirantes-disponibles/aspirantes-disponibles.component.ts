@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RegistroFichasService } from '../services/registro-fichas.service';
 import { AlertService } from '../services/alert.service';
-import { FooterComponent } from "../footer/footer.component";
-import { NavComponent } from "../nav/nav.component";
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -15,7 +13,7 @@ interface Carrera {
   selector: 'app-aspirantes-disponibles',
   templateUrl: './aspirantes-disponibles.component.html',
   styleUrls: ['./aspirantes-disponibles.component.css'],
-  imports: [FooterComponent, NavComponent, CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule]
 })
 export class AspirantesDisponiblesComponent implements OnInit {
   carreras: Carrera[] = [
@@ -35,7 +33,7 @@ export class AspirantesDisponiblesComponent implements OnInit {
   constructor(
     private registroService: RegistroFichasService,
     private alertService: AlertService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const year = new Date().getFullYear();
@@ -63,41 +61,41 @@ export class AspirantesDisponiblesComponent implements OnInit {
   }
 
   registrarFichas(): void {
-  this.cargando = true;
-  const year = new Date().getFullYear();
+    this.cargando = true;
+    const year = new Date().getFullYear();
 
-  const peticiones = this.carreras.map(carrera => {
-    const cantidad = this.fichas[carrera.key];
-    return this.registroService.registrar(carrera.key, year, cantidad)
-      .toPromise()
-      .then(() => ({ label: carrera.label, cantidad, success: true }))
-      .catch(() => ({ label: carrera.label, cantidad, success: false }));
-  });
-
-  Promise.all(peticiones).then(resultados => {
-    let delay = 0; // tiempo inicial en ms
-
-    resultados.forEach(res => {
-      setTimeout(() => {
-        if (res.success) {
-          this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
-        } else {
-          this.alertService.showAlert(`${res.label}: error al registrar las fichas`, 'danger');
-        }
-      }, delay);
-
-      delay += 1000; // incrementa 1 segundo para la siguiente alerta
+    const peticiones = this.carreras.map(carrera => {
+      const cantidad = this.fichas[carrera.key];
+      return this.registroService.registrar(carrera.key, year, cantidad)
+        .toPromise()
+        .then(() => ({ label: carrera.label, cantidad, success: true }))
+        .catch(() => ({ label: carrera.label, cantidad, success: false }));
     });
 
-    // Después de mostrar todas las alertas, desactiva cargando
-    setTimeout(() => {
+    Promise.all(peticiones).then(resultados => {
+      let delay = 0; // tiempo inicial en ms
+
+      resultados.forEach(res => {
+        setTimeout(() => {
+          if (res.success) {
+            this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
+          } else {
+            this.alertService.showAlert(`${res.label}: error al registrar las fichas`, 'danger');
+          }
+        }, delay);
+
+        delay += 1000; // incrementa 1 segundo para la siguiente alerta
+      });
+
+      // Después de mostrar todas las alertas, desactiva cargando
+      setTimeout(() => {
+        this.cargando = false;
+      }, delay);
+    }).catch(err => {
+      console.error('Error general al registrar fichas', err);
+      this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
       this.cargando = false;
-    }, delay);
-  }).catch(err => {
-    console.error('Error general al registrar fichas', err);
-    this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
-    this.cargando = false;
-  });
-}
+    });
+  }
 
 }

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { NavComponent } from "../nav/nav.component";
+
 import { FormsModule } from '@angular/forms';
 import { NgClass } from '@angular/common';
-import { FooterComponent } from "../footer/footer.component";
+
 import { CommonModule } from '@angular/common';
 import { SecretariaService } from '../services/secretaria.service';
 import { Router } from '@angular/router';
@@ -13,10 +13,8 @@ import { AlertService } from '../services/alert.service';
   selector: 'app-registrar-usuario',
   standalone: true,
   imports: [
-    NavComponent, 
     FormsModule, 
     NgClass, 
-    FooterComponent, 
     CommonModule,
     HttpClientModule
   ],

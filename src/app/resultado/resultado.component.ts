@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { NavComponent } from "../nav/nav.component";
+
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { FooterComponent } from '../footer/footer.component';
+
 import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // Cambia la importación
 import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-resultado',
   standalone: true,
-  imports: [NavComponent, MatCardModule, CommonModule, FooterComponent],
+  imports: [ MatCardModule, CommonModule],
   templateUrl: './resultado.component.html',
   styleUrls: ['./resultado.component.css']
 })

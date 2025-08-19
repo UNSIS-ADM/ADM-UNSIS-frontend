@@ -1,7 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
-import { NavComponent } from '../nav/nav.component';
-import { FooterComponent } from '../footer/footer.component';
 import { CommonModule } from '@angular/common';
 import { ResultadosService } from '../services/resultados.service';
 import { FormsModule } from '@angular/forms';
@@ -13,8 +11,6 @@ import { AlertService } from '../services/alert.service';
   selector: 'app-carga-datos-resultados',
   standalone: true,
   imports: [
-    NavComponent,
-    FooterComponent,
     CommonModule,
     FormsModule,
     TiempoRelativoPipe
