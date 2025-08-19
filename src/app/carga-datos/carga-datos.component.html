@@ -1,13 +1,13 @@
 <!-- Contenedor principal - Solo visible cuando NO está cargando -->
+<div *ngIf="!isLoading" class="w-full px-4">
 
-<div *ngIf="!isLoading" class=" mt-auto w-[99%] px-45">
-  <div class="bg-white rounded-lg shadow-md overflow-hidden w-[83%] max-h-[90vh]">
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mx-auto w-full lg:w-[90%] xl:w-[83%] max-w-7xl">
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
       <h2 class="text-2xl font-semibold">Carga de Datos de los aspirantes</h2>
     </div>
 
-    <!-- Barra de búsqueda única -->
+    <!-- Barra de búsqueda y carga -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
@@ -23,6 +23,7 @@
             placeholder="Buscar por ficha, nombre, carrera o CURP..."
             class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
 
+          <!-- Loader pequeño en búsqueda -->
           <div *ngIf="buscando" class="absolute right-2">
             <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
               viewBox="0 0 24 24">
@@ -31,6 +32,7 @@
             </svg>
           </div>
 
+          <!-- Botón limpiar búsqueda -->
           <span *ngIf="terminoBusqueda && !buscando"
             class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
             (click)="terminoBusqueda = ''; buscar()">
@@ -38,19 +40,11 @@
           </span>
         </div>
 
+        <!-- Mensaje de error búsqueda -->
         <div *ngIf="errorBusqueda" class="mt-1 text-sm text-red-600">
           No se encontraron resultados para "{{terminoBusqueda}}"
         </div>
       </div>
-    </div>
-
-    <!-- Mensaje cuando no hay datos -->
-    <div *ngIf="filteredData.length === 0 && !isLoading && terminoBusqueda" class="p-8 text-center text-gray-500">
-      No se encontraron resultados para "{{terminoBusqueda}}"
-    </div>
-
-    <div *ngIf="filteredData.length === 0 && !isLoading && !terminoBusqueda" class="p-8 text-center text-gray-500">
-      No hay datos disponibles
     </div>
 
     <!-- Mensajes de estado -->
@@ -60,6 +54,11 @@
 
     <div *ngIf="uploadResult && !uploadResult.success" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
       ❌ {{ uploadResult.message }}
+    </div>
+
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="filteredData.length === 0 && !isLoading" class="p-8 text-center text-gray-500">
+      {{ terminoBusqueda ? 'No se encontraron resultados para "' + terminoBusqueda + '"' : 'No hay datos disponibles' }}
     </div>
 
     <!-- Tabla con scroll -->
@@ -130,9 +129,10 @@
 </div>
 
 <!-- Loader flotante -->
-<!-- Loader flotante -->
-<div *ngIf="isLoading" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center scale-90 origin-center">
-  <div class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
+<div *ngIf="isLoading"
+  class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center scale-90 origin-center">
+  <div
+    class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
     <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
       viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
