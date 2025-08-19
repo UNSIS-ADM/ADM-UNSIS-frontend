@@ -1,5 +1,4 @@
-
-<div class=" px-45 w-[96%] mt-auto">
+<div class="w-full max-w-[95%] mx-auto mt-4">
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
     <!-- Encabezado -->
     <div class="p-6 bg-[#14645c] text-white">
@@ -7,7 +6,6 @@
     </div>
 
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-
       <div class="flex-1 w-full sm:w-auto max-w-md relative">
         <div class="relative flex items-center">
           <input [(ngModel)]="terminoBusqueda" (input)="buscar()"
@@ -45,7 +43,7 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ultimo Acceso</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
           </tr>
         </thead>
@@ -59,7 +57,11 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span
-                [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
+                  'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
+                  'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'
+                }"
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ alumno.status }}
               </span>
@@ -68,6 +70,7 @@
         </tbody>
       </table>
     </div>
+
     <!-- Paginación -->
     <div class="px-4 py-3 border-t">
       <div class="flex items-center justify-between">
@@ -75,7 +78,6 @@
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
           a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
           de {{ filteredData.length }} resultados
-
         </div>
         <div class="flex gap-2">
           <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
@@ -86,11 +88,8 @@
             class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
             Siguiente
           </button>
-
         </div>
       </div>
     </div>
   </div>
 </div>
-
-
