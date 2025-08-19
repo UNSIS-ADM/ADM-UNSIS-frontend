@@ -141,3 +141,10 @@
     <h3 class="text-lg font-semibold text-gray-800">Cargando datos</h3>
   </div>
 </div>
+ <!-- modal confirmacion-->
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [title]="'Confirmar subida'"
+  [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
+  (confirm)="onConfirm($event)">
+</app-confirm-dialog>

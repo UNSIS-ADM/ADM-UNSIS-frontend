@@ -29,6 +29,9 @@ export class AspirantesDisponiblesComponent implements OnInit {
   fichas: Record<string, number> = {};      // Editable
   disponibles: Record<string, number> = {}; // Solo lectura
   cargando: boolean = false;
+  showConfirmModal = false;
+  confirmMessage = '';
+  confirmCallback: (() => void) | null = null;
 
   constructor(
     private registroService: RegistroFichasService,
@@ -59,43 +62,54 @@ export class AspirantesDisponiblesComponent implements OnInit {
       }
     });
   }
+  abrirConfirmacion(message: string, callback: () => void) {
+  this.confirmMessage = message;
+  this.confirmCallback = callback;
+  this.showConfirmModal = true;
+}
+
 
   registrarFichas(): void {
-    this.cargando = true;
-    const year = new Date().getFullYear();
+    const totalFichas = Object.values(this.fichas).reduce((a, b) => a + b, 0);
 
-    const peticiones = this.carreras.map(carrera => {
-      const cantidad = this.fichas[carrera.key];
-      return this.registroService.registrar(carrera.key, year, cantidad)
-        .toPromise()
-        .then(() => ({ label: carrera.label, cantidad, success: true }))
-        .catch(() => ({ label: carrera.label, cantidad, success: false }));
-    });
+    this.abrirConfirmacion(
+      `¿Estás seguro de registrar estas fichas?`,
+      () => {
+        // Esto se ejecuta solo si el usuario confirma
+        this.showConfirmModal = false;
+        this.cargando = true;
+        const year = new Date().getFullYear();
 
-    Promise.all(peticiones).then(resultados => {
-      let delay = 0; // tiempo inicial en ms
+        const peticiones = this.carreras.map(carrera => {
+          const cantidad = this.fichas[carrera.key];
+          return this.registroService.registrar(carrera.key, year, cantidad)
+            .toPromise()
+            .then(() => ({ label: carrera.label, cantidad, success: true }))
+            .catch(() => ({ label: carrera.label, cantidad, success: false }));
+        });
 
-      resultados.forEach(res => {
-        setTimeout(() => {
-          if (res.success) {
-            this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
-          } else {
-            this.alertService.showAlert(`${res.label}: error al registrar las fichas`, 'danger');
-          }
-        }, delay);
+        Promise.all(peticiones).then(resultados => {
+          let delay = 0;
+          resultados.forEach(res => {
+            setTimeout(() => {
+              if (res.success) {
+                this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
+              } else {
+                this.alertService.showAlert(`${res.label}: error al registrar las fichas`, 'danger');
+              }
+            }, delay);
+            delay += 1000;
+          });
 
-        delay += 1000; // incrementa 1 segundo para la siguiente alerta
-      });
-
-      // Después de mostrar todas las alertas, desactiva cargando
-      setTimeout(() => {
-        this.cargando = false;
-      }, delay);
-    }).catch(err => {
-      console.error('Error general al registrar fichas', err);
-      this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
-      this.cargando = false;
-    });
+          setTimeout(() => { this.cargando = false; }, delay);
+        }).catch(err => {
+          console.error('Error general al registrar fichas', err);
+          this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
+          this.cargando = false;
+        });
+      }
+    );
   }
+
 
 }

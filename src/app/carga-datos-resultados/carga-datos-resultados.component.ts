@@ -1,11 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
 import { CommonModule } from '@angular/common';
-import { ResultadosService } from '../services/resultados.service';
 import { FormsModule } from '@angular/forms';
-import { FiltradoService } from '../services/filtrado.service';
 import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
+import { ExcelServiceResultados, ExcelUploadResponse } from '../services/excel.service';
+import { ResultadosService } from '../services/resultados.service';
+import { FiltradoService } from '../services/filtrado.service';
 import { AlertService } from '../services/alert.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -13,13 +14,16 @@ import { AlertService } from '../services/alert.service';
   imports: [
     CommonModule,
     FormsModule,
-    TiempoRelativoPipe
+    TiempoRelativoPipe,
+    ConfirmDialogComponent
   ],
   templateUrl: './carga-datos-resultados.component.html',
   styleUrls: ['./carga-datos-resultados.component.css'],
 })
 export class CargaDatosResultadosComponent implements OnInit {
   selectedFile: File | null = null;
+  fileToConfirm: File | null = null;
+  showConfirm: boolean = false;
   uploadResult: ExcelUploadResponse | null = null;
   datos: any[] = [];
   filteredData: any[] = [];
@@ -38,7 +42,7 @@ export class CargaDatosResultadosComponent implements OnInit {
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
     private alertService: AlertService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadResultados();
@@ -49,19 +53,17 @@ export class CargaDatosResultadosComponent implements OnInit {
     this.resultadosService.getResultados().subscribe({
       next: (resultados) => {
         this.datos = resultados;
-        this.filteredData = [...this.datos];
-        this.alertService.showAlert('Datos cargados exitosamente', 'success');
+        this.filteredData = [...this.datos]; 
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
       error: (err) => {
-          this.alertService.showAlert('Error al cargar los datos', 'danger');
+        this.alertService.showAlert('Error al cargar los datos', 'danger');
         this.isLoading = false;
         this.cdRef.detectChanges();
       }
     });
   }
-
 
   buscar() {
     if (!this.terminoBusqueda.trim()) {
@@ -77,16 +79,13 @@ export class CargaDatosResultadosComponent implements OnInit {
     setTimeout(() => {
       this.filtradoService.buscar(this.terminoBusqueda).subscribe({
         next: (resultados) => {
-          // Si el backend responde con resultados, úsalos; 
-          // si no, cae al filtrado local
           if (resultados.length > 0) {
             this.filteredData = resultados;
             this.errorBusqueda = false;
-            
           } else {
             this.filtrarLocalmente();
           }
-           this.currentPage = 1;
+          this.currentPage = 1;
           this.buscando = false;
         },
         error: () => {
@@ -104,33 +103,33 @@ export class CargaDatosResultadosComponent implements OnInit {
         alumno.ficha?.toString().toLowerCase().includes(termino) ||
         alumno.fullName?.toLowerCase().includes(termino) ||
         alumno.career?.toLowerCase().includes(termino) ||
-        alumno.curp?.toLowerCase().includes(termino)  // Asegúrate de que la propiedad coincida con tu modelo
+        alumno.curp?.toLowerCase().includes(termino)
       );
     });
     this.errorBusqueda = this.filteredData.length === 0;
   }
 
-
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
-      const file = input.files[0];
-
-      const confirmed = window.confirm(
-        `¿Estás seguro de subir el archivo "${file.name}"?`
-      );
-
-      if (confirmed) {
-        this.selectedFile = file;
-        this.isLoading = true;
-        this.cdRef.detectChanges();
-        this.alertService.showAlert(`Archivo "${file.name}" seleccionado.`, 'info');
-        this.uploadExcel();
-      } else {
-        input.value = '';
-        this.selectedFile = null;
-      }
+      this.fileToConfirm = input.files[0];
+      this.showConfirm = true;
+      input.value = '';
     }
+  }
+
+  onConfirm(result: boolean) {
+    this.showConfirm = false;
+
+    if (result && this.fileToConfirm) {
+      this.selectedFile = this.fileToConfirm;
+      this.isLoading = true;
+      this.cdRef.detectChanges();
+      this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
+      this.uploadExcel();
+    }
+
+    this.fileToConfirm = null;
   }
 
   uploadExcel() {
@@ -147,6 +146,7 @@ export class CargaDatosResultadosComponent implements OnInit {
         this.uploadResult = res;
         if (res.success) {
           this.loadResultados();
+          this.alertService.showAlert('Datos cargados exitosamente', 'success');
         } else {
           this.isLoading = false;
           this.cdRef.detectChanges();
@@ -166,12 +166,14 @@ export class CargaDatosResultadosComponent implements OnInit {
       },
     });
   }
-  //paginación 
+
+  // Paginación
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     return this.filteredData.slice(start, end);
   }
+
   siguientePagina() {
     if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
       this.currentPage++;
@@ -183,5 +185,4 @@ export class CargaDatosResultadosComponent implements OnInit {
       this.currentPage--;
     }
   }
-
 }
