@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
-import { NavComponent } from "../nav/nav.component";
-import { FooterComponent } from "../footer/footer.component";
 import { ApplicantService } from '../services/applicant.service';
 import { AlertService } from '../services/alert.service';
 
@@ -15,8 +13,7 @@ import { AlertService } from '../services/alert.service';
     CommonModule,
     FormsModule,
     HttpClientModule,
-    NavComponent,
-    FooterComponent,
+
   ],
   templateUrl: './nueva-carrera-applicant.component.html',
   styleUrls: ['./nueva-carrera-applicant.component.css'],

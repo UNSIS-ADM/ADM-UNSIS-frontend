@@ -1,35 +1,35 @@
-
 <div *ngIf="!isLoginRoute()">
   <div *ngIf="isDesktop; else mobileLayout">
-    <div *ngIf="!isLoginRoute()" class="grid grid-cols-[100px_1fr_100px] grid-rows-[100px_1fr_100px] gap-y-[10px] gap-x-[10px] h-screen">
-  
-  <!-- Header -->
-  <div class="col-span-3 flex items-center justify-center">
-    
-  </div>
+    <div *ngIf="!isLoginRoute()"
+      class="grid grid-cols-[100px_1fr_100px] grid-rows-[100px_1fr_100px] gap-y-[10px] gap-x-[10px] h-screen">
 
-  <!-- Sidebar -->
-  <div class=" p-2">
-    <app-nav></app-nav>
-  </div>
+      <!-- Header -->
+      <div class="col-span-3 flex items-center justify-center">
 
-  <!-- Content -->
-  <div class="p-2  flex items-center justify-center">
-    <app-alert></app-alert>
-    <router-outlet></router-outlet>
-  </div>
+      </div>
 
-  <!-- Extra column a la derecha (opcional) -->
-  <div class=" p-2">
-    <!-- Puedes poner info adicional o dejar vacío -->
-  </div>
+      <!-- Sidebar -->
+      <div class=" p-2">
+        <app-nav></app-nav>
+      </div>
 
-  <!-- Footer -->
-  <div class="col-span-3 items-center justify-center bg-gray-100">
-    <app-footer></app-footer>
-  </div>
+      <!-- Content -->
+      <div class="p-2  flex items-center justify-center">
+        <app-alert></app-alert>
+        <router-outlet></router-outlet>
+      </div>
 
-</div>
+      <!-- Extra column a la derecha (opcional) -->
+      <div class=" p-2">
+        <!-- Puedes poner info adicional o dejar vacío -->
+      </div>
+
+      <!-- Footer -->
+      <div class="col-span-3 items-center justify-center bg-gray-100">
+        <app-footer></app-footer>
+      </div>
+
+    </div>
   </div>
 
   <ng-template #mobileLayout>
@@ -37,7 +37,8 @@
     <div class="grid grid-cols-[1fr] grid-rows-[100px_1fr_100px] gap-y-[10px] gap-x-[10px]">
       <div><app-nav></app-nav></div>
       <div><app-alert></app-alert>
-        <router-outlet></router-outlet></div>
+        <router-outlet></router-outlet>
+      </div>
       <div><app-footer></app-footer></div>
     </div>
   </ng-template>
