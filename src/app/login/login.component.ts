@@ -91,14 +91,8 @@ onSubmit(): void {
       setTimeout(() => {
         this.router.navigate(['/home']);
       }, 1000);
-    },
-    error: (error) => {
-      console.error('Error detallado:', error);
-        this.alertService.showAlert('Usuario o contraseña incorrectos.', 'danger');
-      this.success = '';
     }
-  });
-}
+  }
+})}}
 
 
-}
