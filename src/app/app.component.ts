@@ -68,6 +68,6 @@ export class AppComponent implements OnInit {
   }
 
   isLoginRoute(): boolean {
-    return this.router.url === '/login' || this.router.url === '/#' || this.router.url === '/';
+    return this.router.url === '/login' || this.router.url === '/#' || this.router.url === '/'|| this.router.url === '/not-found';
   }
 }
