@@ -84,8 +84,11 @@ export class AuthService {
     return userInfo ? JSON.parse(userInfo) : null;
 
   }
-  validarApplicant() {
-  return this.http.get('http://localhost:1200/api/applicants');
+  // auth.service.ts
+validarApplicant() {
+  // Llamada ligera que hará 403 si el backend está bloqueando applicants
+  return this.http.get(environment.apiUrl + '/api/applicant/me'); // o cualquier endpoint que use ROLE_APPLICANT
 }
+
 
 }

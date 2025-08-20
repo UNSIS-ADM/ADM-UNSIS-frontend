@@ -60,10 +60,12 @@ export class LoginComponent {
             }, 1000);
           },
           error: (err) => {
-            if (err.status === 403 && err.error?.error?.includes('Acceso temporalmente restringido')) {
-              this.error = 'Acceso temporalmente restringido para ROLE_APPLICANT';
+            if (err.status === 403){
+              this.error = err.error?.error || 'Acceso temporalmente restringido para ROLE_APPLICANT';
               this.success = '';
-              return; // No navega a ninguna parte
+               setTimeout(() => {
+                 this.router.navigate(['/not-found']);
+               }, 2000);
             }
             // Si es otro error, mostramos genérico
             this.error = 'Error en validación de acceso';

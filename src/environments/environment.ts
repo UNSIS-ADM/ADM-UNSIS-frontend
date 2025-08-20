@@ -8,5 +8,7 @@ export const environment = {
   postsecretariasEndpoint: '/auth/users',
   fichasdispiniblesEndpoint: '/admin/vacancies',
   cambiodecarreraEndpoint: '/api/applicant',
-  respuestasolicitudEndpoint: '/api/applicant/change-career/requests'
+  respuestasolicitudEndpoint: '/api/applicant/change-career/requests',
+  accessRestrictionEndpoint: '/api/admin/access-restriction',
+
 };

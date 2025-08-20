@@ -5,87 +5,131 @@ import { RoleGuard } from './guards/role.guard';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
+    loadComponent: () =>
+      import('./login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'login',
-    loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
+    loadComponent: () =>
+      import('./login/login.component').then((m) => m.LoginComponent),
   },
-  {   
+  {
     path: 'registrar',
-    loadComponent: () => import('./registrar-usuario/registrar-usuario.component').then(m => m.RegistrarUsuarioComponent),
+    loadComponent: () =>
+      import('./registrar-usuario/registrar-usuario.component').then(
+        (m) => m.RegistrarUsuarioComponent
+      ),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { roles: ['ROLE_ADMIN'] },
   },
-  {   
+  {
     path: 'home',
-    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent),
+    loadComponent: () =>
+      import('./home/home.component').then((m) => m.HomeComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_APPLICANT'] }
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER', 'ROLE_APPLICANT'] },
   },
   {
     path: 'resultado',
-    loadComponent: () => import('./resultado/resultado.component').then(m => m.ResultadoComponent),
+    loadComponent: () =>
+      import('./resultado/resultado.component').then(
+        (m) => m.ResultadoComponent
+      ),
     canActivate: [RoleGuard],
-    data: { roles: [ 'ROLE_APPLICANT'] }
+    data: { roles: ['ROLE_APPLICANT'] },
   },
-  { 
-    path: 'usuario', 
+  {
+    path: 'usuario',
     component: UsuarioComponent,
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { roles: ['ROLE_ADMIN'] },
   },
-   { 
-    path: 'aspirantes', 
-    loadComponent: () => import('./aspirantes-disponibles/aspirantes-disponibles.component').then(m => m.AspirantesDisponiblesComponent),
+  {
+    path: 'aspirantes',
+    loadComponent: () =>
+      import('./aspirantes-disponibles/aspirantes-disponibles.component').then(
+        (m) => m.AspirantesDisponiblesComponent
+      ),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { roles: ['ROLE_ADMIN'] },
   },
   {
     path: 'cargar',
-    loadComponent: () => import('./carga-datos/carga-datos.component')
-      .then(m => m.CargaDatosComponent),
+    loadComponent: () =>
+      import('./carga-datos/carga-datos.component').then(
+        (m) => m.CargaDatosComponent
+      ),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { roles: ['ROLE_ADMIN'] },
   },
   {
     path: 'cargarresultados',
-    loadComponent: () => import('./carga-datos-resultados/carga-datos-resultados.component')
-      .then(m => m.CargaDatosResultadosComponent),
+    loadComponent: () =>
+      import('./carga-datos-resultados/carga-datos-resultados.component').then(
+        (m) => m.CargaDatosResultadosComponent
+      ),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] }
+    data: { roles: ['ROLE_ADMIN'] },
   },
   {
     path: 'alumnos',
-    loadComponent: () => import('./alumnos/alumnos.component').then(m => m.AlumnosComponent),
+    loadComponent: () =>
+      import('./alumnos/alumnos.component').then((m) => m.AlumnosComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] }
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
   },
-    {
+  {
     path: 'carrera-applicant',
-    loadComponent: () => import('./nueva-carrera-applicant/nueva-carrera-applicant.component').then(m => m.NuevaCarreraApplicantComponent),
+    loadComponent: () =>
+      import(
+        './nueva-carrera-applicant/nueva-carrera-applicant.component'
+      ).then((m) => m.NuevaCarreraApplicantComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_APPLICANT'] }
-  }
-  ,
-    {
-    path: 'Solcambio',
-    loadComponent: () => import('./solicitudes-nuevas-carreras/solicitudes-nuevas-carreras.component').then(m => m.SolicitudesNuevasCarrerasComponent),
-    canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
-  }
-  ,
-    {
-    path: 'Solcambiar',
-    loadComponent: () => import('./solicitud-carrera-estudiante/solicitud-carrera-estudiante.component').then(m => m.SolicitudCarreraEstudianteComponent),
-    canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
+    data: { roles: ['ROLE_APPLICANT'] },
   },
-    {
-    path: 'respsolicitud',
-    loadComponent: () => import('./solicitud/solicitud.component').then(m => m.SolicitudComponent),
+  {
+    path: 'Solcambio',
+    loadComponent: () =>
+      import(
+        './solicitudes-nuevas-carreras/solicitudes-nuevas-carreras.component'
+      ).then((m) => m.SolicitudesNuevasCarrerasComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_APPLICANT'] }
-  }
-  ,
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
+  },
+  {
+    path: 'Solcambiar',
+    loadComponent: () =>
+      import(
+        './solicitud-carrera-estudiante/solicitud-carrera-estudiante.component'
+      ).then((m) => m.SolicitudCarreraEstudianteComponent),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
+  },
+  {
+    path: 'respsolicitud',
+    loadComponent: () =>
+      import('./solicitud/solicitud.component').then(
+        (m) => m.SolicitudComponent
+      ),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_APPLICANT'] },
+  },
+  {
+    path: 'access-restriction',
+    loadComponent: () =>
+      import('./admin/access-restriction/access-restriction.component').then(
+        (m) => m.AccessRestrictionComponent
+      ),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN'] },
+  },
+  {
+    path: 'not-found',
+    loadComponent: () =>
+      import('./restricted/restricted.component').then(
+        (m) => m.RestrictedComponent
+      ),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_APPLICANT'] },
+  },
 ];

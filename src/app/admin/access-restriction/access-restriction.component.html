@@ -1,47 +1,41 @@
-<mat-card>
-    <h2>Restricción de acceso (ROLE_APPLICANT)</h2>
+<div *ngIf="restriction; else loadingTpl">
+  <h2>Restricción de Acceso Aspirantes</h2>
 
-    <form [formGroup]="form" (ngSubmit)="onSave()">
-        <div>
-            <label>Habilitada</label>
-            <mat-slide-toggle formControlName="enabled"></mat-slide-toggle>
-        </div>
+  <div>
+    <label>Fecha inicio:
+      <input type="date" [(ngModel)]="restriction.startDate" />
+    </label>
+    <label>Hora inicio:
+      <input type="time" [(ngModel)]="restriction.startTime" />
+    </label>
+  </div>
 
-        <div>
-            <mat-form-field appearance="fill">
-                <mat-label>Fecha inicio (YYYY-MM-DD)</mat-label>
-                <input matInput formControlName="startDate" />
-            </mat-form-field>
+  <div>
+    <label>Fecha fin:
+      <input type="date" [(ngModel)]="restriction.endDate" />
+    </label>
+    <label>Hora fin:
+      <input type="time" [(ngModel)]="restriction.endTime" />
+    </label>
+  </div>
 
-            <mat-form-field appearance="fill">
-                <mat-label>Fecha fin (YYYY-MM-DD)</mat-label>
-                <input matInput formControlName="endDate" />
-            </mat-form-field>
-        </div>
+  <div>
+    <label>Descripción:
+      <input type="text" [(ngModel)]="restriction.description" />
+    </label>
+  </div>
 
-        <div>
-            <mat-form-field appearance="fill">
-                <mat-label>Hora inicio (HH:mm)</mat-label>
-                <input matInput formControlName="startTime" />
-            </mat-form-field>
+<div>
+    <button (click)="saveRestriction()" [disabled]="saving">
+        {{ saving ? 'Guardando...' : 'Guardar' }}
+    </button>
 
-            <mat-form-field appearance="fill">
-                <mat-label>Hora fin (HH:mm)</mat-label>
-                <input matInput formControlName="endTime" />
-            </mat-form-field>
-        </div>
+    <button (click)="toggleEnabled()" [disabled]="saving">
+        {{ restriction.enabled ? 'Desactivar' : 'Activar' }}
+    </button>
+</div>
+</div>
 
-        <div>
-            <mat-form-field appearance="fill" style="width:100%">
-                <mat-label>Descripción</mat-label>
-                <input matInput formControlName="description" />
-            </mat-form-field>
-        </div>
-
-        <div style="margin-top:16px">
-            <button mat-raised-button color="primary" type="submit">Guardar</button>
-        </div>
-
-        <p *ngIf="msg">{{ msg }}</p>
-    </form>
-</mat-card>
+<ng-template #loadingTpl>
+  <p>Cargando restricción...</p>
+</ng-template>

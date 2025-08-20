@@ -1,91 +1,83 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { AccessRestriction } from '../../models/access-restriction.model';
 import { AccessRestrictionService } from '../../services/access-restriction.service';
-import { AccessRestrictionDTO } from '../../models/access-restriction.model';
-
-// Angular Material imports (ajusta según uses)
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router'; // Importar Router para redirección
 
 @Component({
   selector: 'app-access-restriction',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-  ],
   templateUrl: './access-restriction.component.html',
+  imports: [CommonModule, FormsModule],
+  styleUrls: ['./access-restriction.component.css'],
 })
-export class AccessRestrictionComponent {
-  form: FormGroup;
-  msg = '';
+export class AccessRestrictionComponent implements OnInit {
+  restriction: AccessRestriction | null = null;
+  loading = true;
+  saving = false; // Nuevo estado para controlar el guardado
 
-  constructor(private fb: FormBuilder, private svc: AccessRestrictionService) {
-    this.form = this.fb.group({
-      id: [null],
-      roleName: ['ROLE_APPLICANT'],
-      startDate: [''],
-      endDate: [''],
-      startTime: ['09:00'],
-      endTime: ['17:00'],
-      enabled: [false],
-      description: [''],
-    });
+  constructor(
+    private restrictionService: AccessRestrictionService,
+    private router: Router // Inyectar Router
+  ) {}
 
-    this.load();
+  ngOnInit(): void {
+    this.loadRestriction();
   }
 
-  load() {
-    this.svc.getRestriction().subscribe({
-      next: (r) => {
-        if (r) {
-          this.form.patchValue(r as Partial<AccessRestrictionDTO>);
-        }
+  loadRestriction() {
+    this.restrictionService.getRestriction().subscribe({
+      next: (res) => {
+        this.restriction = res;
+        this.loading = false;
       },
       error: (err) => {
-        console.error('Error al cargar restricción:', err);
+        console.error(err);
+        this.loading = false;
+        alert('Error al cargar la restricción');
       },
     });
   }
 
-  onSave() {
-    const payload = this.form.value as AccessRestrictionDTO;
-    payload.roleName = payload.roleName || 'ROLE_APPLICANT';
+  toggleEnabled() {
+    if (!this.restriction || !this.restriction.id) return;
 
-    this.svc.saveRestriction(payload).subscribe({
-      next: (saved) => {
-        this.msg = 'Restricción guardada';
-        if (saved) {
-          this.form.patchValue(saved as Partial<AccessRestrictionDTO>);
-        }
-        setTimeout(() => (this.msg = ''), 3000);
+    this.restrictionService
+      .toggleEnabled(this.restriction.id, !this.restriction.enabled)
+      .subscribe({
+        next: (res) => {
+          this.restriction = res;
+          alert(
+            `Restricción ${
+              res.enabled ? 'activada' : 'desactivada'
+            } correctamente`
+          );
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Error al cambiar el estado de la restricción');
+        },
+      });
+  }
+
+  saveRestriction() {
+    if (!this.restriction) return;
+
+    this.saving = true; // Activar estado de guardado
+
+    this.restrictionService.saveOrUpdate(this.restriction).subscribe({
+      next: (res) => {
+        this.restriction = res;
+        this.saving = false;
+        alert('Restricción guardada correctamente');
+        this.router.navigate(['/home']); // Redirigir al home
       },
       error: (err) => {
-        console.error('Error guardando restricción:', err);
-        this.msg = 'Error guardando';
+        console.error(err);
+        this.saving = false;
+        alert('Error al guardar la restricción');
       },
     });
   }
 }
-
-
-/*
-import { Component } from '@angular/core';
-@Component({
-  selector: 'app-access-restriction',
-  imports: [],
-  templateUrl: './access-restriction.component.html',
-  styleUrl: './access-restriction.component.css'
-})
-export class AccessRestrictionComponent {
-}
-*/
