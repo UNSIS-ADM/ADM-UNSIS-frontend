@@ -1,1 +1,69 @@
-<router-outlet></router-outlet>
+<div *ngIf="!isLoginRoute()">
+  <!-- Desktop -->
+  <div *ngIf="isDesktop; else mobileLayout" class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="h-[100px] flex items-center justify-center">
+      <!-- aquí tu header -->
+    </header>
+
+    <!-- Contenido principal con sidebar y contenido -->
+    <div class="flex-1 grid grid-cols-[100px_1fr_100px] gap-x-[10px] gap-y-[10px]">
+
+      <!-- Sidebar -->
+      <aside class="p-2">
+        <app-nav></app-nav>
+      </aside>
+
+      <!-- Content -->
+      <main class="p-2 flex flex-col">
+        <app-alert></app-alert>
+        <router-outlet></router-outlet>
+      </main>
+
+      <!-- Extra column a la derecha -->
+      <div class="p-2">
+        <!-- opcional -->
+      </div>
+    </div>
+
+    <!-- Footer siempre abajo -->
+    <footer class="h-[100px] bg-gray-100  items-center justify-center">
+      <app-footer></app-footer>
+    </footer>
+  </div>
+
+  <!-- Mobile layout -->
+  <ng-template #mobileLayout>
+    <div class="flex flex-col min-h-screen">
+
+      <!-- Header/nav -->
+      <header class="h-[100px]">
+        <app-nav></app-nav>
+      </header>
+
+      <!-- Contenido -->
+      <main class="p-2 flex-1 overflow-auto">
+        <app-alert></app-alert>
+        <router-outlet></router-outlet>
+      </main>
+      <!-- Footer fijo abajo -->
+      <footer class="h-[100px] bg-gray-100  items-center justify-center">
+        <app-footer></app-footer>
+      </footer>
+    </div>
+  </ng-template>
+</div>
+
+
+<!-- Layout login -->
+<div *ngIf="isLoginRoute()" class="flex flex-col min-h-screen">
+  <header class="h-[60px]"></header>
+
+  <main class="flex-1">
+    <app-alert></app-alert>
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="h-[60px]"></footer>
+</div>

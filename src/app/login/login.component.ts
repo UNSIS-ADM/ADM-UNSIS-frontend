@@ -8,6 +8,7 @@ import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-login',
@@ -23,23 +24,26 @@ export class LoginComponent {
   };
   error = '';
   success = '';
-
+ 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private alertService: AlertService
   ) { }
 
-  onSubmit(): void {
+onSubmit(): void {
   console.log('Intentando login con:', this.credentials);
 
   this.authService.login(this.credentials).subscribe({
     next: (response) => {
       console.log('Login exitoso:', response);
 
+      // Guardar token si existe
       if (response.token) {
         this.authService.saveToken(response.token);
       }
 
+      // Guardar info de usuario en localStorage
       const userInfo = {
         username: response.username,
         roles: response.roles,
@@ -74,19 +78,27 @@ export class LoginComponent {
         });
       } else {
         // Otros roles siguen el flujo normal
-        this.success = '¡Sesión iniciada con éxito!';
-        this.error = '';
-        setTimeout(() => {
-          this.router.navigate(['/home']);
-        }, 1000);
-      }
+        //this.success = '¡Sesión iniciada con éxito!';
+        //this.error = '';
+        //setTimeout(() => {
+     //     this.router.navigate(['/home']);
+      //  }, 1000);
+     // }
+
+      // Redirección directa para cualquier rol
+       this.alertService.showAlert('¡Login exitoso!', 'success');
+      this.error = '';
+      setTimeout(() => {
+        this.router.navigate(['/home']);
+      }, 1000);
     },
     error: (error) => {
       console.error('Error detallado:', error);
-      this.error = 'Usuario o contraseña incorrectos';
+        this.alertService.showAlert('Usuario o contraseña incorrectos.', 'danger');
       this.success = '';
     }
   });
 }
+
 
 }

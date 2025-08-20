@@ -1,14 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NavComponent } from "../nav/nav.component";
-import { FooterComponent } from "../footer/footer.component";
 import { CommonModule } from '@angular/common';
 import { SolicitudService } from '../services/solicitud.service'; // Ajusta si es diferente
 import { FormsModule } from '@angular/forms';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-solicitudes-nuevas-carreras',
   standalone: true,
-  imports: [NavComponent, FooterComponent, CommonModule, FormsModule],
+  imports: [ CommonModule, FormsModule],
   templateUrl: './solicitudes-nuevas-carreras.component.html',
   styleUrls: ['./solicitudes-nuevas-carreras.component.css']
 })
@@ -30,7 +29,9 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
   comentarioSecretaria = '';
   solicitudSeleccionadaId: number | null = null;
 
-  constructor(private solicitudService: SolicitudService) { }
+  constructor(private solicitudService: SolicitudService,
+              private alertService: AlertService
+  ) { }
 
   ngOnInit(): void {
     this.obtenerSolicitudes();
@@ -78,10 +79,10 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
       next: () => {
         this.cerrarModal();
         this.obtenerSolicitudes(); // Recargar solicitudes
-        
+        this.alertService.showAlert('Respuesta enviada correctamente', 'success');
       },
       error: err => {
-        console.error('Error al responder solicitud:', err);
+        this.alertService.showAlert('Error al enviar la respuesta', 'danger');
       }
     });
   }

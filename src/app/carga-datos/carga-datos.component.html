@@ -1,14 +1,13 @@
-<app-nav></app-nav>
-
 <!-- Contenedor principal - Solo visible cuando NO está cargando -->
-<div *ngIf="!isLoading" class="sm:ml-64 mt-auto p-9">
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+<div *ngIf="!isLoading" class="w-full px-4">
+
+  <div class="bg-white rounded-lg shadow-md overflow-hidden mx-auto w-full lg:w-[90%] xl:w-[83%] max-w-7xl">
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
       <h2 class="text-2xl font-semibold">Carga de Datos de los aspirantes</h2>
     </div>
 
-    <!-- Barra de búsqueda única -->
+    <!-- Barra de búsqueda y carga -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
@@ -22,8 +21,9 @@
         <div class="relative flex items-center">
           <input [(ngModel)]="terminoBusqueda" (input)="buscar()"
             placeholder="Buscar por ficha, nombre, carrera o CURP..."
-            class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+            class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
 
+          <!-- Loader pequeño en búsqueda -->
           <div *ngIf="buscando" class="absolute right-2">
             <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
               viewBox="0 0 24 24">
@@ -32,6 +32,7 @@
             </svg>
           </div>
 
+          <!-- Botón limpiar búsqueda -->
           <span *ngIf="terminoBusqueda && !buscando"
             class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
             (click)="terminoBusqueda = ''; buscar()">
@@ -39,19 +40,11 @@
           </span>
         </div>
 
+        <!-- Mensaje de error búsqueda -->
         <div *ngIf="errorBusqueda" class="mt-1 text-sm text-red-600">
           No se encontraron resultados para "{{terminoBusqueda}}"
         </div>
       </div>
-    </div>
-
-    <!-- Mensaje cuando no hay datos -->
-    <div *ngIf="filteredData.length === 0 && !isLoading && terminoBusqueda" class="p-8 text-center text-gray-500">
-      No se encontraron resultados para "{{terminoBusqueda}}"
-    </div>
-
-    <div *ngIf="filteredData.length === 0 && !isLoading && !terminoBusqueda" class="p-8 text-center text-gray-500">
-      No hay datos disponibles
     </div>
 
     <!-- Mensajes de estado -->
@@ -63,58 +56,62 @@
       ❌ {{ uploadResult.message }}
     </div>
 
-    <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden" />
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="filteredData.length === 0 && !isLoading" class="p-8 text-center text-gray-500">
+      {{ terminoBusqueda ? 'No se encontraron resultados para "' + terminoBusqueda + '"' : 'No hay datos disponibles' }}
+    </div>
 
-    <!-- Tabla -->
+    <!-- Tabla con scroll -->
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-[#14645c]">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">FICHA</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ubicación</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Teléfono</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Sala Examen</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ultimo acceso</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let alumno of paginatedData">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
-           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
+      <div class="max-h-[65vh] overflow-y-auto">
+        <table class="min-w-[1200px] divide-y divide-gray-200">
+          <thead class="bg-[#14645c] sticky top-0 z-10">
+            <tr>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">FICHA</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ubicación</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Teléfono</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Sala Examen</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último acceso</th>
+              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
+            </tr>
+          </thead>
 
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let alumno of paginatedData">
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.phone}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
+              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
 
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{alumno.status || 'Cargado'}}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td class="px-3 py-4 whitespace-nowrap">
+                <span
+                  [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                  class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full">
+                  {{alumno.status || 'Cargado'}}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Paginación -->
-    <div class="px-4 py-3 border-t">
+    <div class="px-3 py-3 border-t">
       <div class="flex items-center justify-between">
         <div class="text-sm text-gray-500">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
           a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
           de {{ filteredData.length }} resultados
-
         </div>
         <div class="flex gap-2">
           <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
@@ -131,14 +128,9 @@
   </div>
 </div>
 
-<!-- Footer - Solo visible cuando NO está cargando -->
-<div *ngIf="!isLoading" class="sm:ml-64">
-  <div *ngIf="paginatedData.length < itemsPerPage" class="h-42"></div>
-  <app-footer></app-footer>
-</div>
-
-<!-- Loader flotante (sin fondo, sobre contenido) -->
-<div *ngIf="isLoading" class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+<!-- Loader flotante -->
+<div *ngIf="isLoading"
+  class="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center scale-90 origin-center">
   <div
     class="pointer-events-auto text-center p-6 bg-white/90 rounded-lg shadow-xl border border-gray-200 backdrop-blur-sm">
     <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -149,3 +141,10 @@
     <h3 class="text-lg font-semibold text-gray-800">Cargando datos</h3>
   </div>
 </div>
+ <!-- modal confirmacion-->
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [title]="'Confirmar subida'"
+  [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
+  (confirm)="onConfirm($event)">
+</app-confirm-dialog>

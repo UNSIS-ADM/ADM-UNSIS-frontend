@@ -1,78 +1,82 @@
-<app-nav></app-nav>
+<div class="w-full flex justify-center mt-6 px-2">
+  <div class="w-full md:w-[90%] lg:w-[80%] xl:w-[70%] bg-white rounded-lg shadow-md overflow-hidden">
 
-<div  class="sm:ml-64 mt-auto p-9">
-<div class="overflow-x-auto">
-        <div class="p-6 bg-[#24645c] text-white">
+    <!-- Encabezado -->
+    <div class="p-6 bg-[#24645c] text-white">
       <h2 class="text-2xl font-semibold">Solicitudes de cambio de carrera</h2>
     </div>
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-[#14645c]">
-      <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Id</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del aspirante</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <tr *ngFor="let solicitud of solicitudes">
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.id }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.ficha }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.antiguacarrera }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.nuevaCarrera }}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.comentario }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">
-          <span
-            [ngClass]="{
-              'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
-              'bg-red-100 text-red-800': solicitud.estado === 'Rechazada',
-              'bg-yellow-100 text-yellow-800': solicitud.estado === 'Pendiente'
-            }"
-            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-            {{ solicitud.estado }}
-          </span>
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-          <button
-            class="text-yellow-600 hover:text-yellow-800 bg-yellow-100 mr-2 px-3 py-1 rounded"
-            (click)="abrirModal(solicitud.id)">
-            Atender
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
 
+    <!-- Tabla scrollable en móvil -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-[#14645c]">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Id</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del aspirante</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let solicitud of solicitudes">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.ficha }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.antiguacarrera }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.nuevaCarrera }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.comentario }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                [ngClass]="{
+                  'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
+                  'bg-red-100 text-red-800': solicitud.estado === 'Rechazada',
+                  'bg-yellow-100 text-yellow-800': solicitud.estado === 'Pendiente'
+                }"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{ solicitud.estado }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <button
+                class="text-yellow-600 hover:text-yellow-800 bg-yellow-100 mr-2 px-3 py-1 rounded"
+                (click)="abrirModal(solicitud.id)">
+                Atender
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- Paginación -->
-<!-- Paginación -->
+    <!-- Paginación -->
     <div class="px-4 py-3 border-t">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-2">
         <div class="text-sm text-gray-500">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
           a {{ Math.min(currentPage * itemsPerPage, solicitudes.length) }}
           de {{ solicitudes.length }} resultados
-
         </div>
         <div class="flex gap-2">
           <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Anterior
           </button>
           <button (click)="siguientePagina()" [disabled]="currentPage * itemsPerPage >= solicitudes.length"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Siguiente
           </button>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
 <!-- Modal -->
-<div *ngIf="modalVisible" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+<div *ngIf="modalVisible" 
+     class="fixed inset-0 flex items-center justify-center z-50"
+     style="background-color: rgba(0, 0, 0, 0.474);">
   <div class="bg-white p-6 rounded shadow-lg w-96">
     <h3 class="text-lg font-semibold mb-4">Responder solicitud</h3>
     <textarea [(ngModel)]="comentarioSecretaria" placeholder="Escribe tu comentario"
@@ -87,10 +91,4 @@
       <button (click)="cerrarModal()" class="ml-2 text-gray-600 hover:text-gray-900">Cancelar</button>
     </div>
   </div>
-</div>
-</div>
-<div class="sm:ml-64">
-  
-<div *ngIf="paginatedData.length < itemsPerPage" class="h-95"></div>
-  <app-footer></app-footer>
 </div>

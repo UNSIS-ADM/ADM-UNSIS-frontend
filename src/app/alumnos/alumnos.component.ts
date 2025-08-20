@@ -1,7 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NavComponent } from '../nav/nav.component';
-import { FooterComponent } from '../footer/footer.component';
 import { AlumnosService } from '../services/alumnos.service'; // Asegúrate de que la ruta sea correcta
 import { FiltradoService } from '../services/filtrado.service'; // Asegúrate de que la ruta sea correcta
 import { FormsModule } from '@angular/forms';
@@ -11,7 +9,7 @@ import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
 @Component({
   selector: 'app-alumnos',
   standalone: true,
-  imports: [CommonModule, NavComponent, FooterComponent, FormsModule,TiempoRelativoPipe],
+  imports: [CommonModule, FormsModule,TiempoRelativoPipe],
   templateUrl: './alumnos.component.html',
   styleUrls: ['./alumnos.component.css']
 })

@@ -94,18 +94,9 @@ export const routes: Routes = [
         './solicitudes-nuevas-carreras/solicitudes-nuevas-carreras.component'
       ).then((m) => m.SolicitudesNuevasCarrerasComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
-  },
-  {
-    path: 'Solcambiar',
-    loadComponent: () =>
-      import(
-        './solicitud-carrera-estudiante/solicitud-carrera-estudiante.component'
-      ).then((m) => m.SolicitudCarreraEstudianteComponent),
-    canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
-  },
-  {
+    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
+  },   
+    {
     path: 'respsolicitud',
     loadComponent: () =>
       import('./solicitud/solicitud.component').then(

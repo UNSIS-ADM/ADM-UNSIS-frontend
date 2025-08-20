@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { RespsolicitudService } from '../services/respsolicitud.service';
-import { FooterComponent } from "../footer/footer.component";
-import { NavComponent } from "../nav/nav.component";
+
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-solicitud',
-  imports: [FooterComponent, NavComponent, CommonModule],
+  imports: [ CommonModule],
   templateUrl: './solicitud.component.html',
   styleUrl: './solicitud.component.css'
 })

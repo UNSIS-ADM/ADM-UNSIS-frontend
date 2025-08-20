@@ -1,0 +1,44 @@
+.alert-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 9999;
+}
+
+.alert-container div {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  color: white;
+  min-width: 250px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.alert-container div.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.alert-container div.hide {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Colores por tipo */
+.success { background-color: #28a745; }
+.danger { background-color: #dc3545; }
+.info { background-color: #17a2b8; }
+.warning { background-color: #ffc107; color: black; }
+
+.alert-icon {
+  font-weight: bold;
+}

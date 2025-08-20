@@ -9,12 +9,25 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { initFlowbite } from 'flowbite';
+import { AlertService } from '../services/alert.service';
 
 @Component({
   selector: 'app-nav',
-  imports: [RouterModule, CommonModule, MatToolbarModule, MatCardModule, MatFormFieldModule, MatInputModule, MatIconModule, MatMenuModule, MatSidenavModule, MatDividerModule, MatButtonModule],
+  imports: [
+    RouterModule,
+    CommonModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatIconModule,
+    MatMenuModule,
+    MatSidenavModule,
+    MatDividerModule,
+    MatButtonModule
+  ],
   standalone: true,
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css']
@@ -26,13 +39,13 @@ export class NavComponent implements OnInit {
   isSubmenuOpen = false;
   isCargaMenuOpen = false;
   roles: string[] = [];
-  username: string = ''; // Nueva propiedad para el nombre del usuario
+  username: string = '';
 
-  constructor() {
+  constructor(private alertService: AlertService, private router: Router) {
     const user = JSON.parse(localStorage.getItem('user_info') || '{}');
     this.roles = user.roles || [];
-   this.username = user?.full_name || 'Invitado';
-   console.log('nombre del usuario:', this.username);
+    this.username = user?.full_name || 'Invitado';
+    console.log('nombre del usuario:', this.username);
   }
 
   @HostListener('window:resize', [])
@@ -78,4 +91,19 @@ export class NavComponent implements OnInit {
   hasRole(role: string): boolean {
     return this.roles.includes(role);
   }
+
+logout() {
+  const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+  const nombre = user?.full_name || 'Invitado';
+  
+  // Mostrar alerta con el nombre
+  this.alertService.showAlert(`Adiós, ${nombre}`, 'success');
+  
+  // Limpiar sesión
+  localStorage.removeItem('user_info');
+  
+  // Redirigir al login
+  this.router.navigate(['/login']);
+}
+
 }
