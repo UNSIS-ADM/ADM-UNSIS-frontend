@@ -1,0 +1,29 @@
+mat-card {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+mat-form-field {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+button {
+    margin-top: 15px;
+}
+
+p {
+    margin-top: 10px;
+    color: green;
+    font-weight: bold;
+}
+
+mat-slide-toggle {
+    margin: 10px 0;
+    display: block;
+}

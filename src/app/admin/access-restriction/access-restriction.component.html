@@ -1,0 +1,41 @@
+<div *ngIf="restriction; else loadingTpl">
+  <h2>Restricción de Acceso Aspirantes</h2>
+
+  <div>
+    <label>Fecha inicio:
+      <input type="date" [(ngModel)]="restriction.startDate" />
+    </label>
+    <label>Hora inicio:
+      <input type="time" [(ngModel)]="restriction.startTime" />
+    </label>
+  </div>
+
+  <div>
+    <label>Fecha fin:
+      <input type="date" [(ngModel)]="restriction.endDate" />
+    </label>
+    <label>Hora fin:
+      <input type="time" [(ngModel)]="restriction.endTime" />
+    </label>
+  </div>
+
+  <div>
+    <label>Descripción:
+      <input type="text" [(ngModel)]="restriction.description" />
+    </label>
+  </div>
+
+<div>
+    <button (click)="saveRestriction()" [disabled]="saving">
+        {{ saving ? 'Guardando...' : 'Guardar' }}
+    </button>
+
+    <button (click)="toggleEnabled()" [disabled]="saving">
+        {{ restriction.enabled ? 'Desactivar' : 'Activar' }}
+    </button>
+</div>
+</div>
+
+<ng-template #loadingTpl>
+  <p>Cargando restricción...</p>
+</ng-template>
