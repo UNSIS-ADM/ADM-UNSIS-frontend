@@ -65,8 +65,10 @@ export class CargaDatosResultadosComponent implements OnInit {
     });
   }
 
+ 
   buscar() {
-    if (!this.terminoBusqueda.trim()) {
+    const termino = this.terminoBusqueda.trim();
+    if (!termino) {
       this.filteredData = [...this.datos];
       this.errorBusqueda = false;
       this.currentPage = 1;
@@ -76,35 +78,44 @@ export class CargaDatosResultadosComponent implements OnInit {
     this.buscando = true;
     this.errorBusqueda = false;
 
+    // Detectar tipo automáticamente
+    let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
+    if (/^\d/.test(termino)) tipo = 'ficha'; // empieza con número → ficha
+    else if (this.datos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
+    else tipo = 'fullName';
+
+
+
+    // Buscar remotamente
     setTimeout(() => {
-      this.filtradoService.buscar(this.terminoBusqueda).subscribe({
+      this.filtradoService.buscar(termino, tipo).subscribe({
         next: (resultados) => {
           if (resultados.length > 0) {
             this.filteredData = resultados;
             this.errorBusqueda = false;
           } else {
-            this.filtrarLocalmente();
+            this.filtrarLocalmente(termino, tipo);
           }
           this.currentPage = 1;
           this.buscando = false;
         },
         error: () => {
-          this.filtrarLocalmente();
+          this.filtrarLocalmente(termino, tipo);
           this.buscando = false;
         }
       });
     }, 300);
   }
 
-  private filtrarLocalmente() {
-    const termino = this.terminoBusqueda.toLowerCase();
+  private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
+    termino = termino.toLowerCase();
     this.filteredData = this.datos.filter(alumno => {
-      return (
-        alumno.ficha?.toString().toLowerCase().includes(termino) ||
-        alumno.fullName?.toLowerCase().includes(termino) ||
-        alumno.career?.toLowerCase().includes(termino) ||
-        alumno.curp?.toLowerCase().includes(termino)
-      );
+      switch (tipo) {
+        case 'fullName': return alumno.fullName?.toLowerCase().includes(termino);
+        case 'ficha': return alumno.applicantId?.toString().toLowerCase().includes(termino);
+        case 'curp': return alumno.curp?.toLowerCase().includes(termino);
+        case 'career': return alumno.career?.toLowerCase().includes(termino);
+      }
     });
     this.errorBusqueda = this.filteredData.length === 0;
   }
