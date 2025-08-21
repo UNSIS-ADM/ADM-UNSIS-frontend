@@ -1,12 +1,14 @@
-<nav class="fixed top-0 left-0 w-full bg-[#6a1b1b] z-50 border-b border-[#8b2424]">
+<nav class="fixed top-0 left-0 w-full bg-[#6a1b1b] z-50 border-b border-[#6a1b1b]">
   <div class="flex items-center justify-between w-full px-4 py-3">
     <!-- Botón menú y logo -->
     <div class="flex items-center">
       <button (click)="toggleSidebar()" type="button"
-              class="inline-flex items-center p-2 text-white rounded-lg hover:bg-[#8b2424] focus:outline-none">
+        class="inline-flex items-center p-2 text-white rounded-lg hover:bg-[#6a1b1b] focus:outline-none">
         <span class="sr-only">Abrir sidebar</span>
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+          <path
+            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+          </path>
         </svg>
       </button>
 
@@ -18,181 +20,230 @@
 
     <!-- Menú usuario -->
     <div class="flex items-center">
-        <div class="relative">
-          <button id="dropdownUserButton" (click)="toggleUserMenu()"
-            class="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-[#24645c] focus:outline-none">
-            <img class="w-8 h-8 rounded-full" src="/assets/images/unsis-logo.png" alt="user photo">
-          </button>
+      <div class="relative">
+        <button id="dropdownUserButton" (click)="toggleUserMenu()"
+          class="flex text-sm bg-gray-800 rounded-full focus:ring-2 focus:ring-[#24645c] focus:outline-none">
+          <img class="w-8 h-8 rounded-full" src="/assets/images/unsis-logo.png" alt="user photo">
+        </button>
 
-          <!-- Menú desplegable -->
-          <div id="dropdown-user" [ngClass]="{'hidden': !isUserMenuOpen}"
-            class="absolute right-0 mt-2 bg-[#fff3f3] divide-y divide-[#6a1b1b] rounded-lg shadow-lg w-44 z-50">
-            <div class="px-4 py-3">
-              <p class="text-sm text-[#6a1b1b] font-semibold">{{username}}</p>
-            </div>
-            <ul class="py-2">
-              <li *ngIf=" hasRole('ROLE_ADMIN')">
-                <a href="/registrar" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
-                  Registrar Usuarios
-                </a>
-              </li>
-              <li>
-                <a (click)="logout()"
-                  class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
-                  Cerrar Sesión
-                </a>
-              </li>
-            </ul>
+        <!-- Menú desplegable -->
+        <div id="dropdown-user" [ngClass]="{'hidden': !isUserMenuOpen}"
+          class="absolute right-0 mt-2 bg-[#fff3f3] divide-y divide-[#6a1b1b] rounded-lg shadow-lg w-44 z-50">
+          <div class="px-4 py-3">
+            <p class="text-sm text-[#6a1b1b] font-semibold">{{username}}</p>
           </div>
+          <ul class="py-2">
+            <li *ngIf="hasRole('ROLE_ADMIN')">
+              <a href="/registrar" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
+                Registrar Usuarios
+              </a>
+            </li>
+            <li>
+              <a (click)="logout()" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
+                Cerrar Sesión
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
-  
+  </div>
 </nav>
 
 <!-- Sidebar -->
-<aside [ngClass]="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
-       class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform bg-[#6a1b1b] border-r border-[#8b2424]">
+<aside [ngClass]="{
+        'translate-x-0 w-64': isSidebarOpen, 
+        'w-16': !isSidebarOpen
+      }"
+  class="fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 bg-[#6a1b1b] border-r border-[#8b2424] overflow-hidden">
   <div class="h-full px-3 pb-4 overflow-y-auto bg-[#6a1b1b]">
+    <!-- Sidebar -->
     <ul class="space-y-2 font-medium">
-      <!-- Inicio: visible para todos -->
+
+      <!-- Inicio -->
       <li *ngIf="hasRole('ROLE_ADMIN') || hasRole('ROLE_USER') || hasRole('ROLE_APPLICANT')">
         <a routerLink="/home"
-          class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-         <!-- <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 21">
-            <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-            <path
-              d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-          </svg>-->
-          <svg class="w-5 h-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 flex-shrink-0 text-white group-hover:text-[#6a1b1b]" viewBox="0 0 20 20"
+            fill="currentColor">
             <path d="M10 2L2 9h2v7h4V11h4v5h4V9h2L10 2z" />
           </svg>
-          <span class="ms-3">Inicio</span>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}"
+            class="group-hover:text-[#6a1b1b]">Inicio</span>
         </a>
       </li>
 
-      <!-- Menú Carga de Datos: solo admin -->
+      <!-- Carga de Datos -->
       <li *ngIf="hasRole('ROLE_ADMIN')">
         <button type="button" (click)="toggleCargaMenu()"
-          class="flex items-center w-full p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path
-              d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+          class="flex items-center w-full p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
           </svg>
-          <span class="flex-1 ms-3 text-left">Carga de Datos</span>
-          <svg class="w-3 h-3 transition-transform" [ngClass]="{'rotate-180': isCargaMenuOpen}" aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3 flex-1 text-left': isSidebarOpen}"
+            class="group-hover:text-[#6a1b1b]">
+            Carga de Datos
+          </span>
+          <svg *ngIf="isSidebarOpen" class="w-3 h-3 transition-transform group-hover:text-[#6a1b1b]"
+            [ngClass]="{'rotate-180': isCargaMenuOpen}" fill="none" viewBox="0 0 10 6">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="m1 1 4 4 4-4" />
           </svg>
         </button>
-        <ul [ngClass]="{'hidden': !isCargaMenuOpen}" class="py-2 space-y-2">
+
+        <ul [ngClass]="{'hidden': !isCargaMenuOpen || !isSidebarOpen}" class="py-2 space-y-2">
           <li>
             <a [routerLink]="['/cargar']" [queryParams]="{tipo: 'alumnos'}"
-              class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
-              <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              class="flex items-center w-full p-2 text-white rounded-lg pl-11 group hover:bg-white hover:text-[#6a1b1b]">
+              <svg class="w-4 h-4 mr-2 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                </path>
               </svg>
-              Cargar Alumnos
+              <span class="group-hover:text-[#6a1b1b]">Cargar Alumnos</span>
             </a>
           </li>
           <li>
             <a [routerLink]="['/cargarresultados']" [queryParams]="{tipo: 'resultados'}"
-              class="flex items-center w-full p-2 text-white transition duration-75 pl-11 group hover:bg-white hover:text-[#6a1b1b] rounded-lg">
-              <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              class="flex items-center w-full p-2 text-white rounded-lg pl-11 group hover:bg-white hover:text-[#6a1b1b]">
+              <svg class="w-4 h-4 mr-2 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              Cargar Resultados
+              <span class="group-hover:text-[#6a1b1b]">Cargar Resultados</span>
             </a>
           </li>
         </ul>
       </li>
-
-      <!-- Menús adicionales por rol -->
-      <!-- Para Alumnos -->
+      <!-- Alumnos -->
       <li *ngIf="hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')">
-        <a href="/alumnos" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+        <a routerLink="/alumnos"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 flex-shrink-0 text-white group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
-          <span class="ms-3">Alumnos</span>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Alumnos
+          </span>
         </a>
       </li>
 
-      <!-- Para Resultado -->
+      <!-- Resultado -->
       <li *ngIf="hasRole('ROLE_APPLICANT')">
-        <a href="/resultado" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        <a routerLink="/resultado"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4">
+            </path>
           </svg>
-          <span class="ms-3">Resultado</span>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Resultado
+          </span>
         </a>
       </li>
 
-      <!-- Para Respuesta de solicitud -->
+      <!-- Respuesta Solicitud -->
+
       <li *ngIf="hasRole('ROLE_APPLICANT')">
-        <a href="/respsolicitud" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        <a routerLink="/respsolicitud"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+            </path>
           </svg>
-          <span class="ms-3">Respuesta de solicitud</span>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Respuesta Solicitud
+          </span>
         </a>
       </li>
 
-      <!-- Para Fichas Disponibles -->
-      <li *ngIf="hasRole('ROLE_ADMIN')">
-        <a href="/aspirantes" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-          </svg>
-          <span class="ms-3">Fichas Disponibles</span>
-        </a>
-      </li>
+      <!-- Fichas Disponibles -->
 
-      <!-- Para Cambio de carrera -->
-      <li *ngIf="hasRole('ROLE_APPLICANT')">
-        <a href="/carrera-applicant" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-          </svg>
-          <span class="ms-3">Cambio de carrera</span>
-        </a>
-      </li>
-
-      <!-- Para Cambios de carrera (admin/user) -->
       <li *ngIf="hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')">
-        <a href="/Solcambio" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <a routerLink="/aspirantes"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+            </path>
           </svg>
-          <span class="ms-3">Cambios de carrera</span>
-        </a>
-      </li>
-      
-      <li *ngIf="hasRole('ROLE_ADMIN')">
-        <a href="/access-restriction" class="flex items-center p-2 text-white rounded-lg hover:bg-white hover:text-[#6a1b1b] group">
-          <!-- Ícono actualizado: flechas cruzadas (intercambio) -->
-          <svg class="w-5 h-5 text-white transition duration-75 group-hover:text-[#6a1b1b]" fill="none" stroke="currentColor"
-            stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17l4-4m0 0l-4-4m4 4H7m0 4l-4-4m0 0l4-4m-4 4h14" />
-          </svg>
-          <span class="ms-3">Regla</span>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Fichas de Carreras
+          </span>
         </a>
       </li>
 
+      <!-- Cambio Carrera -->
+      <li *ngIf="hasRole('ROLE_APPLICANT')">
+        <a routerLink="/carrera-applicant"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+            </path>
+          </svg>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Cambio Carrera
+          </span>
+        </a>
+      </li>
+
+      <!-- Cambios Carrera -->
+
+      <li *ngIf="hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')">
+        <a routerLink="/Solcambio"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+          </svg>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Cambios Carrera
+          </span>
+        </a>
+      </li>
+
+      <!-- Reglas -->
+
+      <li *ngIf="hasRole('ROLE_ADMIN')">
+        <a routerLink="/access-restriction"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+            </path>
+          </svg>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Reglas
+          </span>
+        </a>
+      </li>
 
     </ul>
+
   </div>
 </aside>
 
-<!-- Contenedor del contenido principal -->
+<!-- Contenido principal -->
 <div class="flex-1 transition-all duration-200 ease-in-out p-4 mt-14 sm:ml-64">
-  <!-- Aquí va tu contenido principal -->
+
 </div>
 
-<!-- Overlay para móvil -->
+<!-- Overlay móvil -->
 <div *ngIf="isSidebarOpen" (click)="toggleSidebar()"
   class="fixed inset-0 z-30 bg-white bg-opacity-50 backdrop-blur-sm transition-opacity sm:hidden">
 </div>

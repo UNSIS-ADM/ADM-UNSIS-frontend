@@ -36,7 +36,7 @@ onSubmit(): void {
 
   this.authService.login(this.credentials).subscribe({
     next: (response) => {
-      console.log('Login exitoso:', response);
+     this.alertService.showAlert('¡Login exitoso!', 'success'); 
 
       // Guardar token si existe
       if (response.token) {
