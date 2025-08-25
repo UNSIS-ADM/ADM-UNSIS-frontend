@@ -1,68 +1,73 @@
-
-
-<div class=" flex flex-col ">
+<div class="flex flex-col">
   <!-- Contenido principal -->
   <div class="flex-grow mt-6">
-    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 class="text-xl font-semibold mb-4 text-[#6a1b1b]">
         Registrar Fichas por Carrera
       </h2>
 
       <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
-        <!-- Encabezados -->
-        <div class="grid grid-cols-3 font-semibold border-b pb-2 mb-4">
+        <!-- Encabezados con select de año -->
+        <div class="grid grid-cols-5 font-semibold border-b pb-2 mb-4 items-center">
           <div>Carrera</div>
           <div>Nuevo Límite</div>
+          <div>Limite Actual</div>
           <div>Disponibles</div>
+          <div class="flex flex-col items-center">
+            <label class="mb-1">Ciclo Escolar</label>
+            <select [(ngModel)]="anioSeleccionado" name="anio" class="block w-28 px-3 py-1 border border-gray-300 rounded-md shadow-sm
+                           focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
+              <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+            </select>
+          </div>
         </div>
 
         <!-- Filas -->
-        <div class="grid grid-cols-3 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
+        <div class="grid grid-cols-5 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
           <!-- Nombre carrera -->
           <div class="flex items-center">{{ carrera.label }}</div>
 
           <!-- Input editable -->
-          <input type="number"
-                 [id]="carrera.key"
-                 name="{{ carrera.key }}"
-                 [(ngModel)]="fichas[carrera.key]"
-                 class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-                        focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]"
-                 required min="0" />
+          <input type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+              focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
 
-          <!-- Input solo lectura -->
-          <input type="number"
-                 [value]="disponibles[carrera.key]"
-                 readonly
-                 class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-                        bg-gray-100 text-gray-600 cursor-not-allowed" />
+          <!-- Límite actual solo lectura -->
+          <input type="number" [value]="limitesActuales[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+              bg-gray-100 text-gray-600 cursor-not-allowed" />
+
+          <!-- Disponibles -->
+          <input type="number" [value]="disponibles[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+              bg-gray-100 text-gray-600 cursor-not-allowed" />
+
+
+          <!-- Columna vacía para alinear -->
+          <div></div>
         </div>
 
-        <button type="submit"
-                [disabled]="!fichasForm.form.valid"
-                class="mt-6 bg-[#6a1b1b] text-white px-4 py-2 rounded hover:bg-[#8b2f2f] transition">
+        <div class="mt-4 text-right text-sm text-gray-600">
+          Año seleccionado: <span class="font-semibold text-[#6a1b1b]">{{ anioSeleccionado }}</span>
+        </div>
+
+        <button type="submit" [disabled]="!fichasForm.form.valid"
+          class="mt-6 bg-[#6a1b1b] text-white px-4 py-2 rounded hover:bg-[#8b2f2f] transition">
           Registrar Fichas
         </button>
       </form>
-
-
-
     </div>
   </div>
-
 </div>
+
 <!-- Modal de confirmación -->
-<div *ngIf="showConfirmModal"
-     class="fixed inset-0 flex items-start justify-center pt-10 z-50"
-     style="background-color: rgba(0,0,0,0.2);">
+<div *ngIf="showConfirmModal" class="fixed inset-0 flex items-start justify-center pt-10 z-50"
+  style="background-color: rgba(0,0,0,0.2);">
   <div class="bg-white rounded-lg shadow-lg w-80 p-4 slide-down">
     <h3 class="text-lg font-bold mb-2">Confirmación</h3>
     <p class="mb-4">{{ confirmMessage }}</p>
     <div class="flex justify-end gap-2">
       <button (click)="showConfirmModal = false"
-              class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
       <button (click)="confirmCallback && confirmCallback()"
-              class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aceptar</button>
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Aceptar</button>
     </div>
   </div>
 </div>

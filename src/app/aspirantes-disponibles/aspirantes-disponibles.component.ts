@@ -26,12 +26,20 @@ export class AspirantesDisponiblesComponent implements OnInit {
     { key: 'LICENCIATURA EN NUTRICION', label: 'Licenciatura en nutrición' }
   ];
 
-  fichas: Record<string, number> = {};      // Editable
-  disponibles: Record<string, number> = {}; // Solo lectura
+  fichas: Record<string, number> = {};           // Editable
+  disponibles: Record<string, number> = {};      // Solo lectura
+  limitesActuales: Record<string, number> = {};  // Límite actual por carrera
   cargando: boolean = false;
+
+  // Modal
   showConfirmModal = false;
   confirmMessage = '';
   confirmCallback: (() => void) | null = null;
+
+  // Años
+  anios: number[] = [];
+  anioSeleccionado: number = new Date().getFullYear();
+  numAniosAtras: number = 5; // Cantidad de años anteriores a mostrar
 
   constructor(
     private registroService: RegistroFichasService,
@@ -39,20 +47,41 @@ export class AspirantesDisponiblesComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const year = new Date().getFullYear();
+    // Generar años automáticamente (años actuales y anteriores)
+    const anioActual = new Date().getFullYear();
+    this.anios = Array.from({ length: this.numAniosAtras + 1 }, (_, i) => anioActual - i);
 
-    // Inicializa en 0
+    // Inicializa fichas y disponibles en 0
     this.carreras.forEach(c => {
       this.fichas[c.key] = 0;
       this.disponibles[c.key] = 0;
+      this.limitesActuales[c.key] = 0;
     });
 
-    // Consulta los disponibles del año
-    this.registroService.obtenerVacantesPorAnio(year).subscribe({
+    // Carga vacantes del año seleccionado (actual por defecto)
+    this.cargarVacantes(this.anioSeleccionado);
+  }
+
+  onAnioChange(): void {
+    this.cargarVacantes(this.anioSeleccionado);
+
+    // Reinicia fichas al cambiar de año
+    this.carreras.forEach(c => this.fichas[c.key] = 0);
+  }
+
+  cargarVacantes(anio: number): void {
+    this.registroService.obtenerVacantesPorAnio(anio).subscribe({
       next: (data) => {
+        // Reinicia disponibles y límites
+        this.carreras.forEach(c => {
+          this.disponibles[c.key] = 0;
+          this.limitesActuales[c.key] = 0;
+        });
+
         data.forEach(item => {
           if (this.disponibles.hasOwnProperty(item.career)) {
             this.disponibles[item.career] = item.availableSlots;
+            this.limitesActuales[item.career] = item.limitCount || 0;
           }
         });
       },
@@ -62,27 +91,25 @@ export class AspirantesDisponiblesComponent implements OnInit {
       }
     });
   }
-  abrirConfirmacion(message: string, callback: () => void) {
-  this.confirmMessage = message;
-  this.confirmCallback = callback;
-  this.showConfirmModal = true;
-}
 
+  abrirConfirmacion(message: string, callback: () => void) {
+    this.confirmMessage = message;
+    this.confirmCallback = callback;
+    this.showConfirmModal = true;
+  }
 
   registrarFichas(): void {
     const totalFichas = Object.values(this.fichas).reduce((a, b) => a + b, 0);
 
     this.abrirConfirmacion(
-      `¿Estás seguro de registrar estas fichas?`,
+      `¿Estás seguro de registrar estas fichas para el año ${this.anioSeleccionado}?`,
       () => {
-        // Esto se ejecuta solo si el usuario confirma
         this.showConfirmModal = false;
         this.cargando = true;
-        const year = new Date().getFullYear();
 
         const peticiones = this.carreras.map(carrera => {
           const cantidad = this.fichas[carrera.key];
-          return this.registroService.registrar(carrera.key, year, cantidad)
+          return this.registroService.registrar(carrera.key, this.anioSeleccionado, cantidad)
             .toPromise()
             .then(() => ({ label: carrera.label, cantidad, success: true }))
             .catch(() => ({ label: carrera.label, cantidad, success: false }));
@@ -101,7 +128,11 @@ export class AspirantesDisponiblesComponent implements OnInit {
             delay += 1000;
           });
 
-          setTimeout(() => { this.cargando = false; }, delay);
+          // Recarga la página después de mostrar todas las alertas
+          setTimeout(() => {
+            this.cargando = false;
+            window.location.reload();
+          }, delay);
         }).catch(err => {
           console.error('Error general al registrar fichas', err);
           this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
@@ -110,6 +141,5 @@ export class AspirantesDisponiblesComponent implements OnInit {
       }
     );
   }
-
 
 }
