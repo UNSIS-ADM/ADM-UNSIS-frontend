@@ -15,8 +15,8 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
   styleUrls: ['./access-restriction.component.css'],
 })
 export class AccessRestrictionComponent implements OnInit {
-  restriction: AccessRestriction | null = null;
-  loading = true;
+  // Inicializamos con objeto por defecto (campos null) para mostrar siempre los inputs
+  restriction: AccessRestriction = this.defaultRestriction();
   saving = false;
 
   // Para el modal de confirmación
@@ -34,16 +34,31 @@ export class AccessRestrictionComponent implements OnInit {
     this.loadRestriction();
   }
 
+  private defaultRestriction(): AccessRestriction {
+    return {
+      id: null,
+      roleName: 'ROLE_APPLICANT',
+      startDate: null,
+      endDate: null,
+      startTime: null,
+      endTime: null,
+      enabled: false,
+      description: null,
+    };
+  }
+
   loadRestriction() {
     this.restrictionService.getRestriction().subscribe({
       next: (res) => {
-        this.restriction = res;
-        this.loading = false;
+        // si el backend devuelve null por alguna razón, usar default;
+        // si devuelve DTO con campos null, se asignan directamente
+        this.restriction = res ?? this.defaultRestriction();
       },
       error: (err) => {
         console.error(err);
-        this.loading = false;
         this.alertService.showAlert('Error al cargar la restricción', 'danger');
+        // mantener default en caso de error
+        this.restriction = this.defaultRestriction();
       },
     });
   }
@@ -61,13 +76,21 @@ export class AccessRestrictionComponent implements OnInit {
   }
 
   private toggleEnabled() {
-    if (!this.restriction || !this.restriction.id) return;
+    if (!this.restriction || !this.restriction.id) {
+      // Si no existe id y quieres crear la regla al activar, podrías hacerlo aquí.
+      // Por ahora, si no hay id no hacemos toggle.
+      this.alertService.showAlert(
+        'No hay una restricción guardada para togglear',
+        'warning'
+      );
+      return;
+    }
 
     this.restrictionService
       .toggleEnabled(this.restriction.id, !this.restriction.enabled)
       .subscribe({
         next: (res) => {
-          this.restriction = res;
+          this.restriction = res ?? this.restriction;
           this.alertService.showAlert(
             this.restriction.enabled
               ? 'Restricción habilitada'
@@ -99,14 +122,13 @@ export class AccessRestrictionComponent implements OnInit {
 
     this.restrictionService.saveOrUpdate(this.restriction).subscribe({
       next: (res) => {
-        this.restriction = res;
+        this.restriction = res ?? this.restriction;
         this.saving = false;
-
         this.alertService.showAlert(
           'Restricción guardada exitosamente',
           'success'
         );
-        this.router.navigate(['/home']);
+        this.router.navigate(['/restriction']);//Debe quedarse en la tuta
       },
       error: (err) => {
         console.error(err);

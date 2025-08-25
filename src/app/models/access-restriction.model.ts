@@ -1,10 +1,10 @@
 export interface AccessRestriction {
-  id?: number;
-  roleName: string; // "ROLE_APPLICANT"
-  startDate: string; // formato yyyy-MM-dd
-  endDate: string;
-  startTime: string; // formato HH:mm
-  endTime: string;
-  enabled: boolean;
-  description?: string;
+  id: number | null;
+  roleName: string | null;
+  startDate: string | null; // yyyy-MM-dd
+  endDate: string | null;
+  startTime: string | null; // HH:mm
+  endTime: string | null;
+  enabled: boolean | null;
+  description: string | null;
 }
