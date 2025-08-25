@@ -36,7 +36,7 @@ onSubmit(): void {
 
   this.authService.login(this.credentials).subscribe({
     next: (response) => {
-     this.alertService.showAlert('¡Login exitoso!', 'success'); 
+      
 
       // Guardar token si existe
       if (response.token) {
@@ -55,9 +55,10 @@ onSubmit(): void {
       // Si el rol es ROLE_APPLICANT, validamos en el endpoint
       if (response.roles.includes('ROLE_APPLICANT')) {
         this.authService.validarApplicant().subscribe({
+          
           next: () => {
             // Si pasa la validación, continuamos como siempre
-            this.success = '¡Sesión iniciada con éxito!';
+            this.alertService.showAlert('¡Login exitoso!', 'success');
             this.error = '';
             setTimeout(() => {
               this.router.navigate(['/home']);
@@ -65,27 +66,16 @@ onSubmit(): void {
           },
           error: (err) => {
             if (err.status === 403){
-              this.error = err.error?.error || 'Acceso temporalmente restringido para ROLE_APPLICANT';
-              this.success = '';
+              this.alertService.showAlert('Acceso denegado.', 'danger');
                setTimeout(() => {
                  this.router.navigate(['/not-found']);
                }, 2000);
             }
-            // Si es otro error, mostramos genérico
-            this.error = 'Error en validación de acceso';
-            this.success = '';
+            
           }
         });
       } else {
-        // Otros roles siguen el flujo normal
-        //this.success = '¡Sesión iniciada con éxito!';
-        //this.error = '';
-        //setTimeout(() => {
-     //     this.router.navigate(['/home']);
-      //  }, 1000);
-     // }
-
-      // Redirección directa para cualquier rol
+      
        this.alertService.showAlert('¡Login exitoso!', 'success');
       this.error = '';
       setTimeout(() => {
