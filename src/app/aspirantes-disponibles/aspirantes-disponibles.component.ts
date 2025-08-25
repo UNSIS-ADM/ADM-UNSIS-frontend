@@ -3,6 +3,7 @@ import { RegistroFichasService } from '../services/registro-fichas.service';
 import { AlertService } from '../services/alert.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialogComponent } from "../confirm-dialog/confirm-dialog.component";
 
 interface Carrera {
   key: string;
@@ -13,7 +14,7 @@ interface Carrera {
   selector: 'app-aspirantes-disponibles',
   templateUrl: './aspirantes-disponibles.component.html',
   styleUrls: ['./aspirantes-disponibles.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent]
 })
 export class AspirantesDisponiblesComponent implements OnInit {
   carreras: Carrera[] = [
@@ -141,5 +142,6 @@ export class AspirantesDisponiblesComponent implements OnInit {
       }
     );
   }
+  
 
 }
