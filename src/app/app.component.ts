@@ -52,22 +52,26 @@ export class AppComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    this.checkScreenSize(); // Detectar tamaño al iniciar
-  }
+ngOnInit() {
+  this.checkScreenSize(); // Detecta al iniciar
+}
 
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.checkScreenSize(); // Detectar tamaño al redimensionar
-  }
+ngAfterViewInit() {
+  this.checkScreenSize(); // Refuerza detección ya con la vista lista
+}
 
-  checkScreenSize() {
-    // Consideramos escritorio >= 1024px
-    this.isDesktop = window.innerWidth >= 1024;
-    // console.log('Es escritorio:', this.isDesktop);
-  }
+@HostListener('window:resize')
+onResize() {
+  this.checkScreenSize();
+}
 
-  isLoginRoute(): boolean {
-    return this.router.url === '/login' || this.router.url === '/#' || this.router.url === '/'|| this.router.url === '/not-found';
-  }
+checkScreenSize() {
+  this.isDesktop = window.innerWidth >= 1024;
+}
+
+isLoginRoute(): boolean {
+  const url = this.router.url;
+  return url.startsWith('/login') || url === '/' || url === '/not-found';
+}
+
 }

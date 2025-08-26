@@ -51,11 +51,13 @@
 </nav>
 
 <!-- Sidebar -->
-<aside [ngClass]="{
-        'translate-x-0 w-64': isSidebarOpen, 
-        'w-16': !isSidebarOpen
-      }"
-  class="fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 bg-[#6a1b1b] border-r border-[#8b2424] overflow-hidden">
+<aside
+  [ngClass]="{
+    'translate-x-0 w-64': isSidebarOpen, 
+    'hidden sm:block sm:w-16': !isSidebarOpen
+  }"
+  class="fixed top-0 left-0 z-40 h-screen pt-20 transition-all duration-300 bg-[#6a1b1b] border-r border-[#8b2424] overflow-hidden"
+>
   <div class="h-full px-3 pb-4 overflow-y-auto bg-[#6a1b1b]">
     <!-- Sidebar -->
     <ul class="space-y-2 font-medium">
@@ -245,5 +247,5 @@
 
 <!-- Overlay móvil -->
 <div *ngIf="isSidebarOpen" (click)="toggleSidebar()"
-  class="fixed inset-0 z-30 bg-white bg-opacity-50 backdrop-blur-sm transition-opacity sm:hidden">
+     class="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm transition-opacity">
 </div>
