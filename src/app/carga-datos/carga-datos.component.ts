@@ -41,7 +41,7 @@ export class CargaDatosComponent implements OnInit {
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
     private alertService: AlertService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.loadAlumnos();
