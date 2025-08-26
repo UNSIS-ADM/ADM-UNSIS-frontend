@@ -63,12 +63,14 @@ export class AspirantesDisponiblesComponent implements OnInit {
     this.cargarVacantes(this.anioSeleccionado);
   }
 
-  onAnioChange(): void {
-    this.cargarVacantes(this.anioSeleccionado);
+ onAnioChange(): void {
+  // Llama a cargarVacantes con el año que está seleccionado en el select
+  this.cargarVacantes(this.anioSeleccionado);
 
-    // Reinicia fichas al cambiar de año
-    this.carreras.forEach(c => this.fichas[c.key] = 0);
-  }
+  // Reinicia fichas al cambiar de año
+  this.carreras.forEach(c => this.fichas[c.key] = 0);
+}
+
 
   cargarVacantes(anio: number): void {
     this.registroService.obtenerVacantesPorAnio(anio).subscribe({
