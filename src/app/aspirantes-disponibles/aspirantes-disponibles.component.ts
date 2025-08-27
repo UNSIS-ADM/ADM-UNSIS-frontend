@@ -24,7 +24,8 @@ export class AspirantesDisponiblesComponent implements OnInit {
     { key: 'LICENCIATURA EN ENFERMERÍA', label: 'Licenciatura en Enfermería' },
     { key: 'LICENCIATURA EN INFORMATICA', label: 'Licenciatura en Informática' },
     { key: 'LICENCIATURA EN ODONTOLOGÍA', label: 'Licenciatura en Odontología' },
-    { key: 'LICENCIATURA EN NUTRICION', label: 'Licenciatura en Nutrición' }
+    { key: 'LICENCIATURA EN NUTRICION', label: 'Licenciatura en Nutrición' },
+    { key: 'LICENCIATURA EN MEDICINA', label: 'Licenciatura en Medicina' },
   ];
 
   fichas: Record<string, number> = {};           // Editable
