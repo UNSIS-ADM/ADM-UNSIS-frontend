@@ -73,9 +73,17 @@ export class NavComponent implements OnInit {
     this.isSubmenuOpen = !this.isSubmenuOpen;
   }
 
-  toggleCargaMenu(): void {
+  toggleCargaMenu() {
+  if (!this.isSidebarOpen) {
+    // Si está cerrado, primero lo abrimos
+    this.isSidebarOpen = true;
+    // Y abrimos directamente el menú de Carga de Datos
+    this.isCargaMenuOpen = true;
+  } else {
+    // Si ya está abierto, solo alternamos el menú
     this.isCargaMenuOpen = !this.isCargaMenuOpen;
   }
+}
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
