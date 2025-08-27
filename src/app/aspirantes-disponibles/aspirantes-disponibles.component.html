@@ -3,47 +3,47 @@
   <div class="flex-grow mt-6">
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 class="text-xl font-semibold mb-4 text-[#6a1b1b]">
-        Registrar Fichas por Carrera
+        Registrar fichas por carrera
       </h2>
 
       <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
         <!-- Encabezados con select de año -->
-        <div class="grid grid-cols-5 font-semibold border-b pb-2 mb-4 items-center">
-          <div>Carrera</div>
-          <div>Nuevo Límite</div>
-          <div>Limite Actual</div>
+        <!-- Encabezados con select de año -->
+        <div class="grid grid-cols-6 font-semibold border-b pb-2 mb-4 items-center">
+          <div class="col-span-2">Carrera</div> <!-- Ahora ocupa dos columnas -->
+          <div>Nuevo límite</div>
+          <div>Limite actual</div>
           <div>Disponibles</div>
           <div class="flex flex-col items-center">
-            <label class="mb-1">Ciclo Escolar</label>
+            <label class="mb-1">Ciclo escolar</label>
             <select [(ngModel)]="anioSeleccionado" name="anio" (change)="onAnioChange()" class="block w-28 px-3 py-1 border border-gray-300 rounded-md shadow-sm
-               focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
+       focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
               <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
             </select>
-
           </div>
         </div>
 
         <!-- Filas -->
-        <div class="grid grid-cols-5 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
-          <!-- Nombre carrera -->
-          <div class="flex items-center">{{ carrera.label }}</div>
+        <div class="grid grid-cols-6 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
+          <!-- Nombre carrera ocupa dos columnas -->
+          <div class="flex items-center col-span-2 ">{{ carrera.label }}</div>
 
           <!-- Input editable -->
           <input type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-              focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
+      focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
 
           <!-- Límite actual solo lectura -->
           <input type="number" [value]="limitesActuales[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-              bg-gray-100 text-gray-600 cursor-not-allowed" />
+      bg-gray-100 text-gray-600 cursor-not-allowed" />
 
           <!-- Disponibles -->
           <input type="number" [value]="disponibles[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-              bg-gray-100 text-gray-600 cursor-not-allowed" />
-
+      bg-gray-100 text-gray-600 cursor-not-allowed" />
 
           <!-- Columna vacía para alinear -->
           <div></div>
         </div>
+        
 
         <div class="mt-4 text-right text-sm text-gray-600">
           Año seleccionado: <span class="font-semibold text-[#6a1b1b]">{{ anioSeleccionado }}</span>
