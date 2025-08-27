@@ -7,6 +7,8 @@ import { ResultadosService } from '../services/resultados.service';
 import { FiltradoService } from '../services/filtrado.service';
 import { AlertService } from '../services/alert.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { Router } from '@angular/router';
+import { RegistroFichasService } from '../services/registro-fichas.service';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -41,8 +43,11 @@ export class CargaDatosResultadosComponent implements OnInit {
     private resultadosService: ResultadosService,
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
-    private alertService: AlertService
-  ) {}
+    private alertService: AlertService,
+    private router: Router,
+      private registroFichasService: RegistroFichasService  
+
+  ) { }
 
   ngOnInit() {
     this.loadResultados();
@@ -50,10 +55,13 @@ export class CargaDatosResultadosComponent implements OnInit {
 
   loadResultados() {
     this.isLoading = true;
+
     this.resultadosService.getResultados().subscribe({
+
       next: (resultados) => {
         this.datos = resultados;
-        this.filteredData = [...this.datos]; 
+        console.log(this.datos);
+        this.filteredData = [...this.datos];
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
@@ -65,9 +73,10 @@ export class CargaDatosResultadosComponent implements OnInit {
     });
   }
 
- 
+
   buscar() {
     const termino = this.terminoBusqueda.trim();
+    console.log(this.filteredData);
     if (!termino) {
       this.filteredData = [...this.datos];
       this.errorBusqueda = false;
@@ -121,12 +130,30 @@ export class CargaDatosResultadosComponent implements OnInit {
   }
 
   onFileSelected(evt: Event) {
-    const input = evt.target as HTMLInputElement;
-    if (input.files && input.files.length) {
-      this.fileToConfirm = input.files[0];
-      this.showConfirm = true;
-      input.value = '';
-    }
+    // 👇 ejemplo: tomamos el año actual, puedes cambiarlo si tu app selecciona un año específico
+    const anioActual = new Date().getFullYear();
+
+    this.registroFichasService.obtenerVacantesPorAnio(anioActual).subscribe({
+      next: (vacantes) => {
+        if (!vacantes || vacantes.length === 0) {
+          this.alertService.showAlert('No hay fichas registradas, primero debes registrar vacantes.', 'warning');
+          this.router.navigate(['/aspirantes']);
+          return;
+        }
+
+        // 👇 si sí hay vacantes → permitir selección de archivo
+        const input = evt.target as HTMLInputElement;
+        if (input.files && input.files.length) {
+          this.fileToConfirm = input.files[0];
+          this.showConfirm = true;
+          input.value = '';
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.alertService.showAlert('Error al verificar vacantes', 'danger');
+      }
+    });
   }
 
   onConfirm(result: boolean) {
