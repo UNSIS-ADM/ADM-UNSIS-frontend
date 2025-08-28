@@ -103,58 +103,66 @@ export class LoginComponent {
     private alertService: AlertService
   ) {}
 
-  onSubmit(): void {
-    console.log('Intentando login con:', this.credentials);
+onSubmit(): void {
+  console.log('Intentando login con:', this.credentials);
 
-    this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        // Guardar token si existe
-        if (response.token) {
-          this.authService.saveToken(response.token);
-        }
+  this.authService.login(this.credentials).subscribe({
+    next: (response) => {
+      // Guardar token si existe
+      if (response.token) {
+        this.authService.saveToken(response.token);
+      }
 
-        // Guardar info de usuario en localStorage
-        const userInfo = {
-          username: response.username,
-          roles: response.roles,
-          full_name: response.fullName,
-        };
-        localStorage.setItem('user_info', JSON.stringify(userInfo));
-        console.log(
-          'Información del usuario guardada:',
-          JSON.stringify(userInfo)
-        );
+      // Guardar info de usuario en localStorage
+      const userInfo = {
+        username: response.username,
+        roles: response.roles,
+        full_name: response.fullName,
+      };
+      localStorage.setItem('user_info', JSON.stringify(userInfo));
+      console.log('Información del usuario guardada:', JSON.stringify(userInfo));
 
-        // Si el rol es ROLE_APPLICANT, validamos en el endpoint
-        if (response.roles.includes('ROLE_APPLICANT')) {
-          this.authService.validarApplicant().subscribe({
-            next: () => {
-              // Si pasa la validación, continuamos como siempre
-              this.alertService.showAlert('¡Login exitoso!', 'success');
-              this.error = '';
+      // Si el rol es ROLE_APPLICANT, validamos en el endpoint
+      if (response.roles.includes('ROLE_APPLICANT')) {
+        this.authService.validarApplicant().subscribe({
+          next: () => {
+            this.alertService.showAlert('¡Login exitoso!', 'success');
+            this.error = '';
+            setTimeout(() => {
+              this.router.navigate(['/home']);
+            }, 1000);
+          },
+          error: (err) => {
+            if (err.status === 403) {
+              this.alertService.showAlert('Acceso denegado.', 'danger');
               setTimeout(() => {
-                this.router.navigate(['/home']);
-              }, 1000);
-            },
-            error: (err) => {
-              if (err.status === 403) {
-                this.alertService.showAlert('Acceso denegado.', 'danger');
-                setTimeout(() => {
-                  this.router.navigate(['/not-found']);
-                }, 2000);
-              }
-            },
-          });
-        } else {
-          this.alertService.showAlert('¡Login exitoso!', 'success');
-          this.error = '';
-          setTimeout(() => {
-            this.router.navigate(['/home']);
-          }, 1000);
-        }
-      },
-    });
-  }
+                this.router.navigate(['/not-found']);
+              }, 2000);
+            } else {
+              this.alertService.showAlert('Error validando applicant.', 'danger');
+            }
+          }
+        });
+      } else {
+        this.alertService.showAlert('¡Login exitoso!', 'success');
+        this.error = '';
+        setTimeout(() => {
+          this.router.navigate(['/home']);
+        }, 1000);
+      }
+    },
+    error: (err) => {
+      console.error('Error en login:', err);
+      if (err.status === 401) {
+        this.alertService.showAlert('Error en el servidor. Intenta más tarde.', 'danger');
+     
+      } else {
+           this.alertService.showAlert('Usuario o contraseña incorrectos.', 'danger');
+      }
+    }
+  });
+}
+
 }
 
 
