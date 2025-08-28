@@ -51,7 +51,7 @@ export const routes: Routes = [
         (m) => m.AspirantesDisponiblesComponent
       ),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN'] },
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
   },
   {
     path: 'cargar',

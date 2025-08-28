@@ -32,7 +32,7 @@ export class AspirantesDisponiblesComponent implements OnInit {
   disponibles: Record<string, number> = {};      // Solo lectura
   limitesActuales: Record<string, number> = {};  // Límite actual por carrera
   cargando: boolean = false;
-
+  roles: string[] = [];
   // Modal
   showConfirmModal = false;
   confirmMessage = '';
@@ -46,7 +46,8 @@ export class AspirantesDisponiblesComponent implements OnInit {
   constructor(
     private registroService: RegistroFichasService,
     private alertService: AlertService
-  ) { }
+  ) { const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+    this.roles = user.roles || []; }
 
   ngOnInit(): void {
     // Generar años automáticamente (años actuales y anteriores)
@@ -64,13 +65,13 @@ export class AspirantesDisponiblesComponent implements OnInit {
     this.cargarVacantes(this.anioSeleccionado);
   }
 
- onAnioChange(): void {
-  // Llama a cargarVacantes con el año que está seleccionado en el select
-  this.cargarVacantes(this.anioSeleccionado);
+  onAnioChange(): void {
+    // Llama a cargarVacantes con el año que está seleccionado en el select
+    this.cargarVacantes(this.anioSeleccionado);
 
-  // Reinicia fichas al cambiar de año
-  this.carreras.forEach(c => this.fichas[c.key] = 0);
-}
+    // Reinicia fichas al cambiar de año
+    this.carreras.forEach(c => this.fichas[c.key] = 0);
+  }
 
 
   cargarVacantes(anio: number): void {
@@ -145,6 +146,8 @@ export class AspirantesDisponiblesComponent implements OnInit {
       }
     );
   }
-  
 
+  hasRole(role: string): boolean {
+    return this.roles.includes(role);
+  }
 }
