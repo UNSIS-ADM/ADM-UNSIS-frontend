@@ -10,7 +10,7 @@
         <!-- Encabezados -->
         <div class="grid grid-cols-6 font-semibold border-b pb-2 mb-2 items-center relative">
           <div class="col-span-2">Carrera</div>
-          <div>Nuevo límite</div>
+          <div *ngIf="hasRole('ROLE_ADMIN')"  >Nuevo límite</div>
           <div>Límite actual</div>
           <div>Disponibles</div>
           <div>Ciclo escolar</div>
@@ -18,7 +18,13 @@
 
         <!-- Select alineado a la 6ta columna -->
         <div class="grid grid-cols-6 mb-4">
-          <div class="col-start-6">
+          <div *ngIf="hasRole('ROLE_ADMIN')" class="col-start-6">
+            <select [(ngModel)]="anioSeleccionado" name="anio" (change)="onAnioChange()" class="block w-28 px-3 py-1 border border-gray-300 rounded-md shadow-sm
+      focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
+              <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+            </select>
+          </div>
+           <div *ngIf="hasRole('ROLE_USER')" class="col-start-5">
             <select [(ngModel)]="anioSeleccionado" name="anio" (change)="onAnioChange()" class="block w-28 px-3 py-1 border border-gray-300 rounded-md shadow-sm
       focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
               <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
@@ -33,7 +39,7 @@
           <div class="flex items-center col-span-2 ">{{ carrera.label }}</div>
 
           <!-- Input editable -->
-          <input type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+          <input *ngIf="hasRole('ROLE_ADMIN')" type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
       focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
 
           <!-- Límite actual solo lectura -->
@@ -53,7 +59,7 @@
           Año seleccionado: <span class="font-semibold text-[#6a1b1b]">{{ anioSeleccionado }}</span>
         </div>
 
-        <button type="submit" [disabled]="!fichasForm.form.valid"
+        <button *ngIf="hasRole('ROLE_ADMIN')" type="submit" [disabled]="!fichasForm.form.valid"
           class="mt-6 bg-[#548e88] text-white px-4 py-2 rounded hover:bg-[#29726b] transition">
           Registrar Fichas
         </button>
