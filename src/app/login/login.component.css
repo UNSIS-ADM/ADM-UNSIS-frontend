@@ -1,4 +1,128 @@
-/* --- Estructura --- */
+:root {
+  --red-dark: #832934;
+  --green-soft: #195251;
+  --btn-main: #0b5350;
+  --btn-hover: #821a23;
+  --white-opaque: rgba(255, 255, 255, 0.98);
+}
+
+/* pequeña animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card,
+form,
+.login-card * {
+  animation: fadeInUp 260ms ease both;
+}
+
+/* focus visible personalizado para inputs */
+input:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(25, 82, 81, 0.06);
+  border-color: var(--green-soft);
+}
+
+/* scroll interno controlado si el contenido crece */
+.login-card {
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+/* tamaño del logo/banner */
+img[alt="Logo UNSIS"] {
+  max-width: 160px;
+  height: auto;
+}
+
+/* pequeña mejora para el botón disabled (si no usas ngClass) */
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* animación fade-in para success */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 280ms ease both;
+}
+
+/* Carousel container rules */
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease, transform .6s ease;
+  transform: scale(1.02);
+}
+
+.carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Imagenes del carrusel: mantener proporción y mostrar completas */
+.carousel-img {
+  width: auto;
+  max-width: 90%;
+  height: auto;
+  max-height: 500px;
+  /* acorde a tu altura 1090x320 */
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* indicadores (puntos) */
+aside .w-2.h-2 {
+  width: .5rem;
+  height: .5rem;
+}
+
+/* responsive tweaks: reduce carousel height en pantallas más pequeñas */
+@media (max-width: 1279px) {
+  .carousel-img {
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 1023px) {
+  aside {
+    display: none !important;
+  }
+
+  /* keep behavior: hide left on mobile */
+}
+
+/**Sinux/
+
+
+/* --- Estructura de carlitos para abajo --- */
 .login-card {
   max-width: 420px;
   margin: 2rem auto;
@@ -6,8 +130,9 @@
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-  background: white;
   font-family: 'Poppins', sans-serif;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
 }
 
 /* --- Encabezado (Vino oscuro) --- */
