@@ -53,7 +53,7 @@ export class ResultadoComponent implements OnInit {
     if (!this.alumno) return;
     // Normaliza los valores para evitar problemas de mayúsculas/minúsculas
     const carrera = (this.alumno.career || '').toLowerCase().trim();
-    const resultado = (this.alumno.result || '').toLowerCase().trim();
+    const resultado = (this.alumno.status || '').toLowerCase().trim();
 
     this.esMedicina = carrera === 'licenciatura en medicina';
     this.esAceptado = resultado === 'aceptado';
