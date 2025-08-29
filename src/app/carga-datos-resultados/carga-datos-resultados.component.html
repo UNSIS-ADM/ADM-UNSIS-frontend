@@ -54,16 +54,16 @@
       No hay datos disponibles
     </div>
 
-    <!-- Mensajes de estado -->
+    <!-- Mensajes de estado
     <div *ngIf="uploadResult?.success"
       class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
-      ✅ ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
+       ¡Archivo cargado correctamente! Se subieron {{ datos.length }} registros.
     </div>
 
     <div *ngIf="uploadResult && !uploadResult.success"
       class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
-      ❌ {{ uploadResult.message }}
-    </div>
+      {{ uploadResult.message }}
+    </div> -->
 
     <!-- Tabla -->
     <div *ngIf="filteredData.length > 0" class="overflow-x-auto">

@@ -142,39 +142,50 @@ export class CargaDatosComponent implements OnInit {
     this.fileToConfirm = null;
   }
 
-  uploadExcel() {
-    if (!this.selectedFile) {
-      this.alertService.showAlert('Selecciona primero un archivo .xlsx', 'warning');
-      return;
-    }
-
-    this.isLoading = true;
-    this.cdRef.detectChanges();
-
-    this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
-      next: (res) => {
-        this.uploadResult = res;
-        if (res.success) {
-          this.loadAlumnos();
-        } else {
-          this.isLoading = false;
-          this.cdRef.detectChanges();
-        }
-        setTimeout(() => (this.uploadResult = null), 5000);
-      },
-      error: (err) => {
-        console.error(err);
-        this.alertService.showAlert('Error al subir el archivo', 'danger');
-        this.isLoading = false;
-        this.cdRef.detectChanges();
-        this.uploadResult = {
-          success: false,
-          message: 'No se pudo subir el archivo. Intenta de nuevo.',
-          errors: [],
-        };
-      },
-    });
+uploadExcel() {
+  if (!this.selectedFile) {
+    this.alertService.showAlert('No hay archivo seleccionado', 'warning');
+    return;
   }
+
+  this.isLoading = true;
+  this.cdRef.detectChanges();
+
+  this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
+    next: (res) => {
+      this.uploadResult = res;
+
+      if (res.success) {
+        this.loadAlumnos();
+        this.alertService.showAlert('Datos cargados exitosamente', 'success');
+      } else {
+        // Mostrar el mensaje principal
+        this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
+
+        // Si hay errores detallados, los mostramos concatenados
+        if (res.errors && res.errors.length > 0) {
+          const errores = res.errors.join('<br>');
+          this.alertService.showAlert(`Detalles:<br>${errores}`, 'warning');
+        }
+      }
+
+      this.isLoading = false;
+      this.cdRef.detectChanges();
+    },
+    error: (err) => {
+      console.error(err);
+      this.uploadResult = {
+        success: false,
+        message: 'No se pudo subir el archivo. Intenta de nuevo.',
+        errors: [],
+      };
+      this.alertService.showAlert(this.uploadResult.message, 'danger');
+      this.isLoading = false;
+      this.cdRef.detectChanges();
+    },
+  });
+}
+
 
   // Paginación
   get paginatedData() {
