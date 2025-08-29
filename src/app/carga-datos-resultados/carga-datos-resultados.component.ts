@@ -191,10 +191,7 @@ export class CargaDatosResultadosComponent implements OnInit {
         this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
 
         // Si hay errores detallados, los mostramos concatenados
-        if (res.errors && res.errors.length > 0) {
-          const errores = res.errors.join('<br>');
-          this.alertService.showAlert(`Detalles:<br>${errores}`, 'warning');
-        }
+     
       }
 
       this.isLoading = false;
@@ -207,7 +204,7 @@ export class CargaDatosResultadosComponent implements OnInit {
         message: 'No se pudo subir el archivo. Intenta de nuevo.',
         errors: [],
       };
-      this.alertService.showAlert(this.uploadResult.message, 'danger');
+      //this.alertService.showAlert(this.uploadResult.message, 'danger');
       this.isLoading = false;
       this.cdRef.detectChanges();
     },
