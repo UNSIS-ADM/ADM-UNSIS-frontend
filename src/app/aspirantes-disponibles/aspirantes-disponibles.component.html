@@ -10,7 +10,7 @@
         <!-- Encabezados -->
         <div class="grid grid-cols-6 font-semibold border-b pb-2 mb-2 items-center relative">
           <div class="col-span-2">Carrera</div>
-          <div *ngIf="hasRole('ROLE_ADMIN')"  >Nuevo límite</div>
+          <div *ngIf="hasRole('ROLE_ADMIN')">Nuevo límite</div>
           <div>Límite actual</div>
           <div>Disponibles</div>
           <div>Ciclo escolar</div>
@@ -24,7 +24,7 @@
               <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
             </select>
           </div>
-           <div *ngIf="hasRole('ROLE_USER')" class="col-start-5">
+          <div *ngIf="hasRole('ROLE_USER')" class="col-start-5">
             <select [(ngModel)]="anioSeleccionado" name="anio" (change)="onAnioChange()" class="block w-28 px-3 py-1 border border-gray-300 rounded-md shadow-sm
       focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required>
               <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
@@ -39,8 +39,10 @@
           <div class="flex items-center col-span-2 ">{{ carrera.label }}</div>
 
           <!-- Input editable -->
-          <input *ngIf="hasRole('ROLE_ADMIN')" type="number" [id]="carrera.key" name="{{ carrera.key }}" [(ngModel)]="fichas[carrera.key]" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-      focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" required min="0" />
+          <input placeholder="0" *ngIf="hasRole('ROLE_ADMIN')" type="number" [id]="carrera.key" name="{{ carrera.key }}"
+            [value]="fichas[carrera.key] || ''" (input)="onInputChange($event, carrera.key)" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+              focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" min="0" />
+
 
           <!-- Límite actual solo lectura -->
           <input type="number" [value]="limitesActuales[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm

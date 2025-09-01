@@ -102,7 +102,11 @@ export class AspirantesDisponiblesComponent implements OnInit {
     this.confirmCallback = callback;
     this.showConfirmModal = true;
   }
-
+onInputChange(event: Event, key: string) {
+  const input = event.target as HTMLInputElement;
+  // Si el input queda vacío, asignamos 0
+  this.fichas[key] = input.value ? Number(input.value) : 0;
+}
   registrarFichas(): void {
     const totalFichas = Object.values(this.fichas).reduce((a, b) => a + b, 0);
 
