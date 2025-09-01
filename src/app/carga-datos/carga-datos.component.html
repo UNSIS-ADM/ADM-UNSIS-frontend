@@ -98,30 +98,50 @@
                 </span>
               </td>
             </tr>
+              <!-- Filas vacías si faltan -->
+          <tr *ngFor="let _ of emptyRows">
+            <td colspan="8" class="px-3 py-4">&nbsp;</td>
+          </tr>
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- Paginación -->
-    <div class="px-3 py-3 border-t">
-      <div class="flex items-center justify-between">
-        <div class="text-sm text-gray-500">
-          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
-          a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
-          de {{ filteredData.length }} resultados
-        </div>
-        <div class="flex gap-2">
-          <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
-            Anterior
-          </button>
-          <button (click)="siguientePagina()" [disabled]="currentPage * itemsPerPage >= filteredData.length"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6]">
-            Siguiente
-          </button>
-        </div>
-      </div>
+<div class="px-3 py-3 border-t">
+  <div class="flex flex-col items-center gap-2">
+    <!-- Texto de info -->
+    <div class="text-sm text-gray-500 text-center">
+      Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
+      a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
+      de {{ filteredData.length }} resultados
+    </div>
+
+    <!-- Controles de paginación centrados -->
+    <div class="flex gap-1 items-center justify-center">
+      <!-- Botón Anterior -->
+      <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
+        class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
+        Anterior
+      </button>
+
+      <!-- Botones de páginas -->
+      <ng-container *ngFor="let page of pages">
+        <button *ngIf="page !== '...'; else dots" (click)="goToPage(+page)"
+          [class.bg-[#14645c]]="page === currentPage" [class.text-white]="page === currentPage"
+          class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
+          {{ page }}
+        </button>
+        <ng-template #dots>
+          <span class="px-2">…</span>
+        </ng-template>
+      </ng-container>
+
+      <!-- Botón Siguiente -->
+      <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
+        class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
+        Siguiente
+      </button>
     </div>
   </div>
 </div>
