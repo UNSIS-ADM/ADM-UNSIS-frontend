@@ -113,5 +113,10 @@ logout() {
   // Redirigir al login
   this.router.navigate(['/login']);
 }
+closeMenus() {
+  this.isCargaMenuOpen = false;   // Cierra el menú de carga
+  this.isSidebarOpen = false;     // Si quieres que también se cierre el sidebar
+}
+
 
 }
