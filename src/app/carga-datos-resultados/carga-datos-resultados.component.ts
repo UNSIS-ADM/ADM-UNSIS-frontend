@@ -23,6 +23,7 @@ import { RegistroFichasService } from '../services/registro-fichas.service';
   styleUrls: ['./carga-datos-resultados.component.css'],
 })
 export class CargaDatosResultadosComponent implements OnInit {
+
   selectedFile: File | null = null;
   fileToConfirm: File | null = null;
   showConfirm: boolean = false;
@@ -45,8 +46,7 @@ export class CargaDatosResultadosComponent implements OnInit {
     private cdRef: ChangeDetectorRef,
     private alertService: AlertService,
     private router: Router,
-      private registroFichasService: RegistroFichasService  
-
+    private registroFichasService: RegistroFichasService  
   ) { }
 
   ngOnInit() {
@@ -55,12 +55,11 @@ export class CargaDatosResultadosComponent implements OnInit {
 
   loadResultados() {
     this.isLoading = true;
+    this.cdRef.detectChanges(); // 👈 actualizar vista antes de la petición
 
     this.resultadosService.getResultados().subscribe({
-
       next: (resultados) => {
         this.datos = resultados;
-        console.log(this.datos);
         this.filteredData = [...this.datos];
         this.isLoading = false;
         this.cdRef.detectChanges();
@@ -73,10 +72,8 @@ export class CargaDatosResultadosComponent implements OnInit {
     });
   }
 
-
   buscar() {
     const termino = this.terminoBusqueda.trim();
-    console.log(this.filteredData);
     if (!termino) {
       this.filteredData = [...this.datos];
       this.errorBusqueda = false;
@@ -87,30 +84,24 @@ export class CargaDatosResultadosComponent implements OnInit {
     this.buscando = true;
     this.errorBusqueda = false;
 
-    // Detectar tipo automáticamente
     let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-    if (/^\d/.test(termino)) tipo = 'ficha'; // empieza con número → ficha
+    if (/^\d/.test(termino)) tipo = 'ficha';
     else if (this.datos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
     else tipo = 'fullName';
 
-
-
-    // Buscar remotamente
     setTimeout(() => {
       this.filtradoService.buscar(termino, tipo).subscribe({
         next: (resultados) => {
-          if (resultados.length > 0) {
-            this.filteredData = resultados;
-            this.errorBusqueda = false;
-          } else {
-            this.filtrarLocalmente(termino, tipo);
-          }
+          if (resultados.length > 0) this.filteredData = resultados;
+          else this.filtrarLocalmente(termino, tipo);
           this.currentPage = 1;
           this.buscando = false;
+          this.cdRef.detectChanges();
         },
         error: () => {
           this.filtrarLocalmente(termino, tipo);
           this.buscando = false;
+          this.cdRef.detectChanges();
         }
       });
     }, 300);
@@ -130,30 +121,12 @@ export class CargaDatosResultadosComponent implements OnInit {
   }
 
   onFileSelected(evt: Event) {
-    // 👇 ejemplo: tomamos el año actual, puedes cambiarlo si tu app selecciona un año específico
-    const anioActual = new Date().getFullYear();
-
-    this.registroFichasService.obtenerVacantesPorAnio(anioActual).subscribe({
-      next: (vacantes) => {
-        if (!vacantes || vacantes.length === 0) {
-          this.alertService.showAlert('No hay fichas registradas, primero debes registrar vacantes.', 'warning');
-          this.router.navigate(['/aspirantes']);
-          return;
-        }
-
-        // 👇 si sí hay vacantes → permitir selección de archivo
-        const input = evt.target as HTMLInputElement;
-        if (input.files && input.files.length) {
-          this.fileToConfirm = input.files[0];
-          this.showConfirm = true;
-          input.value = '';
-        }
-      },
-      error: (err) => {
-        console.error(err);
-        this.alertService.showAlert('Error al verificar vacantes', 'danger');
-      }
-    });
+    const input = evt.target as HTMLInputElement;
+    if (input.files && input.files.length) {
+      this.fileToConfirm = input.files[0];
+      this.showConfirm = true;
+      input.value = '';
+    }
   }
 
   onConfirm(result: boolean) {
@@ -171,48 +144,42 @@ export class CargaDatosResultadosComponent implements OnInit {
   }
 
   uploadExcel() {
-  if (!this.selectedFile) {
-    this.alertService.showAlert('No hay archivo seleccionado', 'warning');
-    return;
+    if (!this.selectedFile) {
+      this.alertService.showAlert('No hay archivo seleccionado', 'warning');
+      return;
+    }
+
+    this.isLoading = true;
+    this.cdRef.detectChanges();
+
+    this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
+      next: (res) => {
+        this.uploadResult = res;
+
+        if (res.success) {
+          this.loadResultados();
+          this.alertService.showAlert('Datos cargados exitosamente', 'success');
+        } else {
+          this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
+        }
+
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.uploadResult = {
+          success: false,
+          message: 'No se pudo subir el archivo. Intenta de nuevo.',
+          errors: [],
+        };
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+      },
+    });
   }
 
-  this.isLoading = true;
-  this.cdRef.detectChanges();
-
-  this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
-    next: (res) => {
-      this.uploadResult = res;
-
-      if (res.success) {
-        this.loadResultados();
-        this.alertService.showAlert('Datos cargados exitosamente', 'success');
-      } else {
-        // Mostrar el mensaje principal
-        this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
-
-        // Si hay errores detallados, los mostramos concatenados
-     
-      }
-
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    },
-    error: (err) => {
-      console.error(err);
-      this.uploadResult = {
-        success: false,
-        message: 'No se pudo subir el archivo. Intenta de nuevo.',
-        errors: [],
-      };
-      //this.alertService.showAlert(this.uploadResult.message, 'danger');
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    },
-  });
-}
-
-
-  // Paginación
+  // --- Paginación ---
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
@@ -220,62 +187,48 @@ export class CargaDatosResultadosComponent implements OnInit {
   }
 
   siguientePagina() {
-    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
-      this.currentPage++;
-    }
+    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) this.currentPage++;
   }
 
   paginaAnterior() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
+    if (this.currentPage > 1) this.currentPage--;
   }
-  
+
   get totalPages(): number {
-  return Math.ceil(this.filteredData.length / this.itemsPerPage);
-}
-
-get pages(): (number | string)[] {
-  const total = this.totalPages;
-  const current = this.currentPage;
-  const delta = 1; // cantidad de páginas alrededor de la actual
-
-  const range: (number | string)[] = [];
-  const rangeWithDots: (number | string)[] = [];
-  let last: number | undefined;
-
-  for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-      range.push(i);
-    }
+    return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
 
-  for (let i of range) {
-    if (last !== undefined && typeof i === 'number') {
-      if ((i as number) - last === 2) {
-        rangeWithDots.push(last + 1);
-      } else if ((i as number) - last > 2) {
-        rangeWithDots.push('...');
+  get pages(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const delta = 1;
+    const range: (number | string)[] = [];
+    const rangeWithDots: (number | string)[] = [];
+    let last: number | undefined;
+
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) range.push(i);
+    }
+
+    for (let i of range) {
+      if (last !== undefined && typeof i === 'number') {
+        if ((i as number) - last === 2) rangeWithDots.push(last + 1);
+        else if ((i as number) - last > 2) rangeWithDots.push('...');
       }
+      rangeWithDots.push(i);
+      last = i as number;
     }
-    rangeWithDots.push(i);
-    last = i as number;
+
+    return rangeWithDots;
   }
 
-  return rangeWithDots;
-}
-
-goToPage(page: number) {
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) this.currentPage = page;
   }
-}
-get emptyRows(): any[] {
-  const rowsOnPage = this.paginatedData.length;
-  if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) {
-    return Array(this.itemsPerPage - rowsOnPage);
-  }
-  return [];
-}
 
+  get emptyRows(): any[] {
+    const rowsOnPage = this.paginatedData.length;
+    if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
+    return [];
+  }
 }

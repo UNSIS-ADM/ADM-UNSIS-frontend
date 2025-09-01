@@ -128,25 +128,23 @@ export class CargaDatosComponent implements OnInit {
     }
   }
 
-  onConfirm(result: boolean) {
-    this.showConfirm = false;
+onConfirm(result: boolean) {
+  this.showConfirm = false;
 
-    if (result && this.fileToConfirm) {
-      this.selectedFile = this.fileToConfirm;
-      this.isLoading = true;
-      this.cdRef.detectChanges();
-      this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
-      this.uploadExcel();
-    }
-
-    this.fileToConfirm = null;
+  if (result && this.fileToConfirm) {
+    this.selectedFile = this.fileToConfirm;
+    this.isLoading = true;          // 👈 activamos el loader
+    this.cdRef.detectChanges();     // 👈 actualizamos vista inmediatamente
+    this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
+    this.uploadExcel();
   }
+
+  this.fileToConfirm = null;
+}
+
 
 uploadExcel() {
-  if (!this.selectedFile) {
-    this.alertService.showAlert('No hay archivo seleccionado', 'warning');
-    return;
-  }
+  if (!this.selectedFile) return;
 
   this.isLoading = true;
   this.cdRef.detectChanges();
@@ -156,21 +154,17 @@ uploadExcel() {
       this.uploadResult = res;
 
       if (res.success) {
-        this.loadAlumnos();
+        // Mostrar mensaje de éxito primero
         this.alertService.showAlert('Datos cargados exitosamente', 'success');
+
+        // Luego recargar los datos
+        this.loadAlumnos();
       } else {
-        // Mostrar el mensaje principal
+        // Mostrar mensaje de error
         this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
-
-        // Si hay errores detallados, los mostramos concatenados
-        if (res.errors && res.errors.length > 0) {
-          const errores = res.errors.join('<br>');
-          this.alertService.showAlert(`Detalles:<br>${errores}`, 'warning');
-        }
+        this.isLoading = false;
+        this.cdRef.detectChanges();
       }
-
-      this.isLoading = false;
-      this.cdRef.detectChanges();
     },
     error: (err) => {
       console.error(err);
@@ -182,7 +176,7 @@ uploadExcel() {
       this.alertService.showAlert(this.uploadResult.message, 'danger');
       this.isLoading = false;
       this.cdRef.detectChanges();
-    },
+    }
   });
 }
 
