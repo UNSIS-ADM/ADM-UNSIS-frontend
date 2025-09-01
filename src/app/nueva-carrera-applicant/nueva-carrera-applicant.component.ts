@@ -43,19 +43,24 @@ export class NuevaCarreraApplicantComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    // 🚀 Obtener datos del alumno al iniciar
-    this.resultadosService.getResultadosUsuario().subscribe({
-      next: (data) => {
-        this.carreraActual = (data.career || '').trim().toUpperCase();
-        console.log('Carrera actual:', this.carreraActual);
-      },
-      error: (err) => {
-        console.error('Error al obtener carrera del alumno:', err);
-        this.alertService.showAlert('No se pudo cargar tu carrera actual', 'danger');
-      },
-    });
-  }
+ ngOnInit(): void {
+ 
+  this.resultadosService.getResultadosUsuario().subscribe({
+    next: (data) => {
+      this.carreraActual = (data.career || '').trim().toUpperCase();
+      console.log('Carrera actual:', this.carreraActual);
+
+      this.carrerasDisponibles = this.carrerasDisponibles.filter(
+        (c) => c.nombre.toUpperCase() !== this.carreraActual
+      );
+    },
+    error: (err) => {
+      console.error('Error al obtener carrera del alumno:', err);
+      this.alertService.showAlert('No se pudo cargar tu carrera actual', 'danger');
+    },
+  });
+}
+
 
   submitForm(): void {
     if (!this.formData.carrera || !this.formData.comentario) {

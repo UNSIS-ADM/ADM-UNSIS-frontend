@@ -18,13 +18,13 @@ interface Carrera {
 })
 export class AspirantesDisponiblesComponent implements OnInit {
   carreras: Carrera[] = [
-    { key: 'LICENCIATURA EN ADMINISTRACION PÚBLICA', label: 'Licenciatura en Administración Pública' },
+    { key: 'LICENCIATURA EN ADMINISTRACIÓN PÚBLICA', label: 'Licenciatura en Administración Pública' },
     { key: 'LICENCIATURA EN CIENCIAS EMPRESARIALES', label: 'Licenciatura en Ciencias Empresariales' },
     { key: 'LICENCIATURA EN CIENCIAS BIOMÉDICAS', label: 'Licenciatura en Ciencias Biomédicas' },
     { key: 'LICENCIATURA EN ENFERMERÍA', label: 'Licenciatura en Enfermería' },
-    { key: 'LICENCIATURA EN INFORMATICA', label: 'Licenciatura en Informática' },
+    { key: 'LICENCIATURA EN INFORMÁTICA', label: 'Licenciatura en Informática' },
     { key: 'LICENCIATURA EN ODONTOLOGÍA', label: 'Licenciatura en Odontología' },
-    { key: 'LICENCIATURA EN NUTRICION', label: 'Licenciatura en Nutrición' },
+    { key: 'LICENCIATURA EN NUTRICIÓN', label: 'Licenciatura en Nutrición' },
     { key: 'LICENCIATURA EN MEDICINA', label: 'Licenciatura en Medicina' },
   ];
 

@@ -117,5 +117,50 @@ export class AlumnosComponent implements OnInit {
       this.currentPage--;
     }
   }
+  get totalPages(): number {
+  return Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+  get pages(): (number | string)[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+  const delta = 1; // cantidad de páginas alrededor de la actual
+
+  const range: (number | string)[] = [];
+  const rangeWithDots: (number | string)[] = [];
+  let last: number | undefined;
+
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      range.push(i);
+    }
+  }
+
+  for (let i of range) {
+    if (last !== undefined && typeof i === 'number') {
+      if ((i as number) - last === 2) {
+        rangeWithDots.push(last + 1);
+      } else if ((i as number) - last > 2) {
+        rangeWithDots.push('...');
+      }
+    }
+    rangeWithDots.push(i);
+    last = i as number;
+  }
+
+  return rangeWithDots;
+}
+
+goToPage(page: number) {
+  if (page >= 1 && page <= this.totalPages) {
+    this.currentPage = page;
+  }
+}
+get emptyRows(): any[] {
+  const rowsOnPage = this.paginatedData.length;
+  if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) {
+    return Array(this.itemsPerPage - rowsOnPage);
+  }
+  return [];
+}
 
 }

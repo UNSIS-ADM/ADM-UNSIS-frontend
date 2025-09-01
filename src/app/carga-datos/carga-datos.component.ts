@@ -128,25 +128,23 @@ export class CargaDatosComponent implements OnInit {
     }
   }
 
-  onConfirm(result: boolean) {
-    this.showConfirm = false;
+onConfirm(result: boolean) {
+  this.showConfirm = false;
 
-    if (result && this.fileToConfirm) {
-      this.selectedFile = this.fileToConfirm;
-      this.isLoading = true;
-      this.cdRef.detectChanges();
-      this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
-      this.uploadExcel();
-    }
-
-    this.fileToConfirm = null;
+  if (result && this.fileToConfirm) {
+    this.selectedFile = this.fileToConfirm;
+    this.isLoading = true;          // 👈 activamos el loader
+    this.cdRef.detectChanges();     // 👈 actualizamos vista inmediatamente
+    this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
+    this.uploadExcel();
   }
+
+  this.fileToConfirm = null;
+}
+
 
 uploadExcel() {
-  if (!this.selectedFile) {
-    this.alertService.showAlert('No hay archivo seleccionado', 'warning');
-    return;
-  }
+  if (!this.selectedFile) return;
 
   this.isLoading = true;
   this.cdRef.detectChanges();
@@ -156,21 +154,17 @@ uploadExcel() {
       this.uploadResult = res;
 
       if (res.success) {
-        this.loadAlumnos();
+        // Mostrar mensaje de éxito primero
         this.alertService.showAlert('Datos cargados exitosamente', 'success');
+
+        // Luego recargar los datos
+        this.loadAlumnos();
       } else {
-        // Mostrar el mensaje principal
+        // Mostrar mensaje de error
         this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
-
-        // Si hay errores detallados, los mostramos concatenados
-        if (res.errors && res.errors.length > 0) {
-          const errores = res.errors.join('<br>');
-          this.alertService.showAlert(`Detalles:<br>${errores}`, 'warning');
-        }
+        this.isLoading = false;
+        this.cdRef.detectChanges();
       }
-
-      this.isLoading = false;
-      this.cdRef.detectChanges();
     },
     error: (err) => {
       console.error(err);
@@ -182,7 +176,7 @@ uploadExcel() {
       this.alertService.showAlert(this.uploadResult.message, 'danger');
       this.isLoading = false;
       this.cdRef.detectChanges();
-    },
+    }
   });
 }
 
@@ -205,4 +199,50 @@ uploadExcel() {
       this.currentPage--;
     }
   }
+    get totalPages(): number {
+  return Math.ceil(this.filteredData.length / this.itemsPerPage);
+    }
+  get pages(): (number | string)[] {
+  const total = this.totalPages;
+  const current = this.currentPage;
+  const delta = 1; // cantidad de páginas alrededor de la actual
+
+  const range: (number | string)[] = [];
+  const rangeWithDots: (number | string)[] = [];
+  let last: number | undefined;
+
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      range.push(i);
+    }
+  }
+
+  for (let i of range) {
+    if (last !== undefined && typeof i === 'number') {
+      if ((i as number) - last === 2) {
+        rangeWithDots.push(last + 1);
+      } else if ((i as number) - last > 2) {
+        rangeWithDots.push('...');
+      }
+    }
+    rangeWithDots.push(i);
+    last = i as number;
+  }
+
+  return rangeWithDots;
+}
+
+goToPage(page: number) {
+  if (page >= 1 && page <= this.totalPages) {
+    this.currentPage = page;
+  }
+}
+get emptyRows(): any[] {
+  const rowsOnPage = this.paginatedData.length;
+  if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) {
+    return Array(this.itemsPerPage - rowsOnPage);
+  }
+  return [];
+}
+
 }
