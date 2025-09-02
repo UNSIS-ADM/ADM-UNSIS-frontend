@@ -13,9 +13,12 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Id</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del aspirante</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del
+              aspirante</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
@@ -28,22 +31,20 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.nuevaCarrera }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.comentario }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span
-                [ngClass]="{
+              <span [ngClass]="{
                   'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
                   'bg-red-100 text-red-800': solicitud.estado === 'Rechazada',
                   'bg-yellow-100 text-yellow-800': solicitud.estado === 'Pendiente'
-                }"
-                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ solicitud.estado }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button
-                class="text-yellow-600 hover:text-yellow-800 bg-yellow-100 mr-2 px-3 py-1 rounded"
+              <button class="text-white bg-[#548e88] hover:bg-green-700 mr-2 px-3 py-1 rounded shadow-sm"
                 (click)="abrirModal(solicitud.id)">
                 Atender
               </button>
+
             </td>
           </tr>
         </tbody>
@@ -74,18 +75,18 @@
 </div>
 
 <!-- Modal -->
-<div *ngIf="modalVisible" 
-     class="fixed inset-0 flex items-center justify-center z-50"
-     style="background-color: rgba(0, 0, 0, 0.474);">
+<div *ngIf="modalVisible" class="fixed inset-0 flex items-center justify-center z-50"
+  style="background-color: rgba(0, 0, 0, 0.474);">
   <div class="bg-white p-6 rounded shadow-lg w-96">
     <h3 class="text-lg font-semibold mb-4">Responder solicitud</h3>
     <textarea [(ngModel)]="comentarioSecretaria" placeholder="Escribe tu comentario"
-              class="w-full p-2 border rounded mb-4"></textarea>
+      class="w-full p-2 border rounded mb-4"></textarea>
     <div class="flex justify-end gap-2">
       <button (click)="enviarRespuesta('RECHAZADO')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
         Rechazar
       </button>
-      <button (click)="enviarRespuesta('ACEPTADO')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+      <button (click)="enviarRespuesta('ACEPTADO')"
+        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
         Aceptar
       </button>
       <button (click)="cerrarModal()" class="ml-2 text-gray-600 hover:text-gray-900">Cancelar</button>

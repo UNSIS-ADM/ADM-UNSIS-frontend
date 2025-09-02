@@ -45,6 +45,7 @@ export class CargaDatosComponent implements OnInit {
 
   ngOnInit() {
     this.loadAlumnos();
+    
   }
 
   loadAlumnos() {
