@@ -1,21 +1,20 @@
 import { Component, OnInit } from '@angular/core';
-
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-
 import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // Cambia la importación
 import { AlertService } from '../services/alert.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-resultado',
   standalone: true,
-  imports: [ MatCardModule, CommonModule],
+  imports: [MatCardModule, CommonModule,RouterLink],
   templateUrl: './resultado.component.html',
   styleUrls: ['./resultado.component.css']
 })
 export class ResultadoComponent implements OnInit {
   emailContacto = 'admision.unsis@gmail.com';
-  
+
   // Datos del alumno
   alumno: any = null;
 
@@ -23,6 +22,19 @@ export class ResultadoComponent implements OnInit {
   resultado = {
     promedio: null
   };
+// resultado.component.ts
+todasCarreras: string[] = [
+  'Licenciatura en Administración Municipal',
+  'Licenciatura en Ciencias Empresariales',
+  'Licenciatura en Administración Pública',
+  'Licenciatura en Informática',
+  'Licenciatura en Enfermería',
+  'Licenciatura en Odontología',
+  'Licenciatura en Nutrición',
+  'Licenciatura en Ciencias Biomédicas (En proceso de registro)'
+];
+
+carrerasDisponibles: string[] = [];
 
   // Flags para controlar la vista
   vacio = false;
@@ -49,21 +61,26 @@ export class ResultadoComponent implements OnInit {
   }
 
   // Método para actualizar las banderas cuando cambian los datos
-  actualizarFlags() {
-    if (!this.alumno) return;
-    // Normaliza los valores para evitar problemas de mayúsculas/minúsculas
-    const carrera = (this.alumno.career || '').toLowerCase().trim();
-    const resultado = (this.alumno.status || '').toLowerCase().trim();
+actualizarFlags() {
+  if (!this.alumno) return;
 
-    this.esMedicina = carrera === 'licenciatura en medicina';
-    this.esAceptado = resultado === 'aceptado';
-    this.esReprobado = resultado === 'rechazado';
-    this.esMedicinaReprobado = this.esMedicina && this.esReprobado;
-    this.esOtraCarreraReprobado = !this.esMedicina && this.esReprobado;
+  const carrera = (this.alumno.career || '').toLowerCase().trim();
+  const resultado = (this.alumno.status || '').toLowerCase().trim();
 
-    // Actualizar resultado para medicina si es necesario
-    if (this.esMedicina) {
-      this.resultado.promedio = this.alumno.score;
-    }
+  this.esMedicina = carrera === 'licenciatura en medicina';
+  this.esAceptado = resultado === 'aceptado';
+  this.esReprobado = resultado === 'rechazado';
+  this.esMedicinaReprobado = this.esMedicina && this.esReprobado;
+  this.esOtraCarreraReprobado = !this.esMedicina && this.esReprobado;
+
+  if (this.esMedicina) {
+    this.resultado.promedio = this.alumno.score;
   }
+
+  // 🔥 Filtrar las carreras disponibles quitando la del alumno
+  this.carrerasDisponibles = this.todasCarreras.filter(
+    c => c.toLowerCase().trim() !== carrera
+  );
+}
+
 }
