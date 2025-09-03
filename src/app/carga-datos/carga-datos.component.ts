@@ -21,6 +21,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   styleUrls: ['./carga-datos.component.css'],
 })
 export class CargaDatosComponent implements OnInit {
+
   selectedFile: File | null = null;
   fileToConfirm: File | null = null;
   showConfirm: boolean = false;
@@ -35,6 +36,11 @@ export class CargaDatosComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
+
+  // 👇 Nuevas propiedades para años
+  aniosDisponibles: number[] = [];
+  anioSeleccionado: string = '';
+
   constructor(
     private excelService: ExcelServiceApplicants,
     private alumnosService: AlumnosService,
@@ -44,8 +50,14 @@ export class CargaDatosComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.generarAnios();
     this.loadAlumnos();
-    
+  }
+
+  private generarAnios() {
+    const currentYear = new Date().getFullYear();
+    this.aniosDisponibles = Array.from({ length: 5 }, (_, i) => currentYear - i);
+    this.anioSeleccionado = currentYear.toString(); // año actual seleccionado
   }
 
   loadAlumnos() {
@@ -53,7 +65,10 @@ export class CargaDatosComponent implements OnInit {
     this.alumnosService.getAlumnos().subscribe({
       next: (resultados) => {
         this.datos = resultados;
-        this.filteredData = [...this.datos];
+
+        // Filtrar por año seleccionado
+        this.filtrarPorAnio();
+
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
@@ -65,10 +80,20 @@ export class CargaDatosComponent implements OnInit {
     });
   }
 
+  filtrarPorAnio() {
+    if (!this.anioSeleccionado) {
+      this.filteredData = [...this.datos];
+    } else {
+      const year = +this.anioSeleccionado;
+      this.filteredData = this.datos.filter(a => a.admissionYear === year);
+    }
+    this.currentPage = 1;
+  }
+
   buscar() {
     const termino = this.terminoBusqueda.trim();
     if (!termino) {
-      this.filteredData = [...this.datos];
+      this.filtrarPorAnio(); // aplicar también filtro por año
       this.errorBusqueda = false;
       this.currentPage = 1;
       return;
@@ -77,30 +102,29 @@ export class CargaDatosComponent implements OnInit {
     this.buscando = true;
     this.errorBusqueda = false;
 
-    // Detectar tipo automáticamente
     let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-    if (/^\d/.test(termino)) tipo = 'ficha'; // empieza con número → ficha
+    if (/^\d/.test(termino)) tipo = 'ficha';
     else if (this.datos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
     else tipo = 'fullName';
 
-
-
-    // Buscar remotamente
     setTimeout(() => {
       this.filtradoService.buscar(termino, tipo).subscribe({
         next: (resultados) => {
-          if (resultados.length > 0) {
-            this.filteredData = resultados;
-            this.errorBusqueda = false;
-          } else {
-            this.filtrarLocalmente(termino, tipo);
-          }
+          if (resultados.length > 0) this.filteredData = resultados;
+          else this.filtrarLocalmente(termino, tipo);
+
+          // aplicar filtro por año
+          this.filtrarPorAnio();
+
           this.currentPage = 1;
           this.buscando = false;
+          this.cdRef.detectChanges();
         },
         error: () => {
           this.filtrarLocalmente(termino, tipo);
+          this.filtrarPorAnio();
           this.buscando = false;
+          this.cdRef.detectChanges();
         }
       });
     }, 300);
@@ -119,7 +143,6 @@ export class CargaDatosComponent implements OnInit {
     this.errorBusqueda = this.filteredData.length === 0;
   }
 
-
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
@@ -129,60 +152,54 @@ export class CargaDatosComponent implements OnInit {
     }
   }
 
-onConfirm(result: boolean) {
-  this.showConfirm = false;
+  onConfirm(result: boolean) {
+    this.showConfirm = false;
 
-  if (result && this.fileToConfirm) {
-    this.selectedFile = this.fileToConfirm;
-    this.isLoading = true;          // 👈 activamos el loader
-    this.cdRef.detectChanges();     // 👈 actualizamos vista inmediatamente
-    this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
-    this.uploadExcel();
+    if (result && this.fileToConfirm) {
+      this.selectedFile = this.fileToConfirm;
+      this.isLoading = true;
+      this.cdRef.detectChanges();
+      this.alertService.showAlert(`Archivo "${this.fileToConfirm.name}" seleccionado.`, 'info');
+      this.uploadExcel();
+    }
+
+    this.fileToConfirm = null;
   }
 
-  this.fileToConfirm = null;
-}
+  uploadExcel() {
+    if (!this.selectedFile) return;
 
+    this.isLoading = true;
+    this.cdRef.detectChanges();
 
-uploadExcel() {
-  if (!this.selectedFile) return;
+    this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
+      next: (res) => {
+        this.uploadResult = res;
 
-  this.isLoading = true;
-  this.cdRef.detectChanges();
-
-  this.excelService.uploadApplicants(this.selectedFile, this.token).subscribe({
-    next: (res) => {
-      this.uploadResult = res;
-
-      if (res.success) {
-        // Mostrar mensaje de éxito primero
-        this.alertService.showAlert('Datos cargados exitosamente', 'success');
-
-        // Luego recargar los datos
-        this.loadAlumnos();
-      } else {
-        // Mostrar mensaje de error
-        this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
+        if (res.success) {
+          this.alertService.showAlert('Datos cargados exitosamente', 'success');
+          this.loadAlumnos();
+        } else {
+          this.alertService.showAlert(res.message || 'Error al procesar el archivo', 'danger');
+          this.isLoading = false;
+          this.cdRef.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.uploadResult = {
+          success: false,
+          message: 'No se pudo subir el archivo. Intenta de nuevo.',
+          errors: [],
+        };
+        this.alertService.showAlert(this.uploadResult.message, 'danger');
         this.isLoading = false;
         this.cdRef.detectChanges();
       }
-    },
-    error: (err) => {
-      console.error(err);
-      this.uploadResult = {
-        success: false,
-        message: 'No se pudo subir el archivo. Intenta de nuevo.',
-        errors: [],
-      };
-      this.alertService.showAlert(this.uploadResult.message, 'danger');
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    }
-  });
-}
+    });
+  }
 
-
-  // Paginación
+  // --- Paginación ---
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
@@ -190,60 +207,48 @@ uploadExcel() {
   }
 
   siguientePagina() {
-    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
-      this.currentPage++;
-    }
+    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) this.currentPage++;
   }
 
   paginaAnterior() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-    }
+    if (this.currentPage > 1) this.currentPage--;
   }
-    get totalPages(): number {
-  return Math.ceil(this.filteredData.length / this.itemsPerPage);
-    }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredData.length / this.itemsPerPage);
+  }
+
   get pages(): (number | string)[] {
-  const total = this.totalPages;
-  const current = this.currentPage;
-  const delta = 1; // cantidad de páginas alrededor de la actual
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const delta = 1;
+    const range: (number | string)[] = [];
+    const rangeWithDots: (number | string)[] = [];
+    let last: number | undefined;
 
-  const range: (number | string)[] = [];
-  const rangeWithDots: (number | string)[] = [];
-  let last: number | undefined;
-
-  for (let i = 1; i <= total; i++) {
-    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-      range.push(i);
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) range.push(i);
     }
-  }
 
-  for (let i of range) {
-    if (last !== undefined && typeof i === 'number') {
-      if ((i as number) - last === 2) {
-        rangeWithDots.push(last + 1);
-      } else if ((i as number) - last > 2) {
-        rangeWithDots.push('...');
+    for (let i of range) {
+      if (last !== undefined && typeof i === 'number') {
+        if ((i as number) - last === 2) rangeWithDots.push(last + 1);
+        else if ((i as number) - last > 2) rangeWithDots.push('...');
       }
+      rangeWithDots.push(i);
+      last = i as number;
     }
-    rangeWithDots.push(i);
-    last = i as number;
+
+    return rangeWithDots;
   }
 
-  return rangeWithDots;
-}
-
-goToPage(page: number) {
-  if (page >= 1 && page <= this.totalPages) {
-    this.currentPage = page;
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) this.currentPage = page;
   }
-}
-get emptyRows(): any[] {
-  const rowsOnPage = this.paginatedData.length;
-  if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) {
-    return Array(this.itemsPerPage - rowsOnPage);
-  }
-  return [];
-}
 
+  get emptyRows(): any[] {
+    const rowsOnPage = this.paginatedData.length;
+    if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
+    return [];
+  }
 }

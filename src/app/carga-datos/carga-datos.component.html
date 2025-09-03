@@ -1,42 +1,50 @@
-<div class="relative w-full px-4"> <!-- Contenedor relativo -->
+<!-- Contenedor principal relativo para overlay del loader -->
+<div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center relative">
 
-  <div class="bg-white rounded-lg shadow-md overflow-hidden mx-auto w-full  max-w-7xl">
+  <div class="w-full max-w-7xl bg-white rounded-lg shadow-md overflow-hidden">
+
     <!-- Encabezado -->
-    <div class="p-6 bg-[#24645c] text-white">
-      <h2 class="text-2xl font-semibold">Carga de Datos de los aspirantes</h2>
+    <div class="p-6 bg-[#24645c] text-white rounded-t-lg">
+      <h2 class="text-2xl font-semibold">Resultados de aspirantes</h2>
     </div>
 
     <!-- Barra de búsqueda y carga -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
-               class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
+          class="px-3 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
           Nueva Carga
         </label>
         <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden">
       </div>
 
       <div class="flex-1 w-full sm:w-auto max-w-md relative">
-        <div class="relative flex items-center">
-          <input type="text" [(ngModel)]="terminoBusqueda" (input)="buscar()"
-                 placeholder="Buscar por ficha, nombre, carrera"
-                 class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]" />
+        <div class="relative flex items-center gap-2">
+          <!-- 🔹 Select de año -->
+          <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+            class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{anio}}</option>
+          </select>
 
-          <!-- Loader pequeño en búsqueda -->
-          <div *ngIf="buscando" class="absolute right-2">
-            <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
-                 viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
+          <!-- 🔹 Buscador -->
+          <div class="relative flex items-center flex-1">
+            <input [(ngModel)]="terminoBusqueda" (input)="buscar()" placeholder="Buscar por ficha, nombre, carrera"
+              class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+
+            <!-- Loader pequeño de búsqueda -->
+            <div *ngIf="buscando" class="absolute right-2">
+              <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            </div>
+
+            <!-- Botón limpiar búsqueda -->
+            <span *ngIf="terminoBusqueda && !buscando"
+              class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
+              (click)="terminoBusqueda = ''; buscar()">×</span>
           </div>
-
-          <!-- Botón limpiar búsqueda -->
-          <span *ngIf="terminoBusqueda && !buscando"
-                class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
-                (click)="terminoBusqueda = ''; buscar()">
-            ×
-          </span>
         </div>
 
         <!-- Mensaje de error búsqueda -->
@@ -47,54 +55,54 @@
     </div>
 
     <!-- Mensaje cuando no hay datos -->
-    <div *ngIf="filteredData.length === 0" class="p-8 text-center text-gray-500">
-      {{ terminoBusqueda ? 'No se encontraron resultados para "' + terminoBusqueda + '"' : 'No hay datos disponibles' }}
+    <div *ngIf="filteredData.length === 0 && !terminoBusqueda" class="p-8 text-center text-gray-500">
+      No hay datos disponibles
+    </div>
+    <div *ngIf="filteredData.length === 0 && terminoBusqueda" class="p-8 text-center text-gray-500">
+      No se encontraron resultados para "{{terminoBusqueda}}"
     </div>
 
-    <!-- Tabla con scroll -->
-    <div class="overflow-x-auto">
-      <div class="max-h-[65vh] overflow-y-auto">
-        <table class="min-w-[1200px] divide-y divide-gray-200">
-          <thead class="bg-[#14645c] sticky top-0 z-10">
-            <tr>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">FICHA</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ubicación</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Sala Examen</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último acceso</th>
-              <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
-            </tr>
-          </thead>
+    <!-- Tabla de resultados -->
+    <div *ngIf="filteredData.length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-[#14645c]">
+          <tr>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentarios</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let alumno of paginatedData">
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.score}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.comment}}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
+            <td class="px-3 py-4 whitespace-nowrap">
+              <span [ngClass]="{
+                'bg-green-100 text-green-800': alumno.status== 'ACEPTADO',
+                'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
+                'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                {{alumno.status || 'Cargado'}}
+              </span>
+            </td>
+          </tr>
 
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let alumno of paginatedData">
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
-              <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
-              <td class="px-3 py-4 whitespace-nowrap">
-                <span
-                  [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDING'}"
-                  class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full">
-                  {{alumno.status || 'Cargado'}}
-                </span>
-              </td>
-            </tr>
-
-            <!-- Filas vacías si faltan -->
-            <tr *ngFor="let _ of emptyRows">
-              <td colspan="8" class="px-3 py-4">&nbsp;</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          <!-- Filas vacías si faltan -->
+          <tr *ngFor="let _ of emptyRows">
+            <td colspan="9" class="px-3 py-5">&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Paginación -->
@@ -108,14 +116,14 @@
 
         <div class="flex gap-1 items-center justify-center">
           <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
-                  class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Anterior
           </button>
 
           <ng-container *ngFor="let page of pages">
             <button *ngIf="page !== '...'; else dots" (click)="goToPage(+page)"
-                    [class.bg-[#14645c]]="page === currentPage" [class.text-white]="page === currentPage"
-                    class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
+              [class.bg-[#14645c]]="page === currentPage" [class.text-white]="page === currentPage"
+              class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
               {{ page }}
             </button>
             <ng-template #dots>
@@ -124,30 +132,29 @@
           </ng-container>
 
           <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
-                  class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
+            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Siguiente
           </button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Loader sobre el contenedor -->
-  <div *ngIf="isLoading"
-       class="absolute inset-0 z-50 flex items-center justify-center">
-    <div class="text-center p-6 bg-white rounded-lg shadow-xl border border-gray-200">
-      <svg class="animate-spin h-12 w-12 text-[#24645c] mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-           viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-      </svg>
-      <h3 class="text-lg font-semibold text-gray-800">Cargando datos...</h3>
+    <!-- Loader sobrepuesto -->
+    <div *ngIf="isLoading" class="absolute inset-0 z-50 flex items-center justify-center ">
+      <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200 flex items-center gap-3">
+        <svg class="animate-spin h-8 w-8 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <span class="text-gray-700">Cargando...</span>
+      </div>
     </div>
+
+    <!-- Modal de confirmación -->
+    <app-confirm-dialog *ngIf="showConfirm" [title]="'Confirmar subida'"
+      [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
+    </app-confirm-dialog>
+
   </div>
-
-  <!-- Modal de confirmación -->
-  <app-confirm-dialog *ngIf="showConfirm" [title]="'Confirmar subida'"
-                      [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
-  </app-confirm-dialog>
-
 </div>

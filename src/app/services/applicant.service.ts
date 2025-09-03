@@ -28,7 +28,7 @@ export class ApplicantService {
     });
 
     console.log(this.apiUrl); // Para depurar
-
+    console.log("nueva carrera",newCareer);
     // Envía la petición con los headers
     return this.http.post(`${this.apiUrl}/change-career`, body, { headers });
   }

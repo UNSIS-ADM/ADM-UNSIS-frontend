@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SolicitudService } from '../services/solicitud.service'; // Ajusta si es diferente
+import { SolicitudService } from '../services/solicitud.service';
 import { FormsModule } from '@angular/forms';
 import { AlertService } from '../services/alert.service';
 
@@ -12,25 +12,22 @@ import { AlertService } from '../services/alert.service';
   styleUrls: ['./solicitudes-nuevas-carreras.component.css']
 })
 export class SolicitudesNuevasCarrerasComponent implements OnInit {
+
+  solicitudes: any[] = [];           // datos crudos
+  filteredData: any[] = [];          // datos filtrados
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
 
-  solicitudes: {
-    id: number;
-    ficha: string;
-    nuevaCarrera: string;
-    antiguacarrera: string;
-    comentario: string;
-    estado: string;
-  }[] = [];
-
+  // Modal
   modalVisible = false;
   comentarioSecretaria = '';
   solicitudSeleccionadaId: number | null = null;
 
-  constructor(private solicitudService: SolicitudService,
-              private alertService: AlertService
+  constructor(
+    private solicitudService: SolicitudService,
+    private alertService: AlertService,
+    private cdRef: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -48,10 +45,13 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
           comentario: item.requestComment,
           estado: item.estado || 'Pendiente'
         }));
-        console.log(this.solicitudes);
+        // Inicializamos filteredData
+        this.filteredData = [...this.solicitudes];
+        this.cdRef.detectChanges();
       },
       error: err => {
         console.error('Error al obtener solicitudes:', err);
+        this.alertService.showAlert('Error al obtener solicitudes', 'danger');
       }
     });
   }
@@ -78,24 +78,25 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.cerrarModal();
-        this.obtenerSolicitudes(); // Recargar solicitudes
+        this.obtenerSolicitudes();
         this.alertService.showAlert('Respuesta enviada correctamente', 'success');
       },
       error: err => {
+        console.error(err);
         this.alertService.showAlert('Error al enviar la respuesta', 'danger');
       }
     });
   }
 
-  // Paginación
+  /** 🔹 PAGINACIÓN igual a CargaDatosComponent */
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
-    return this.solicitudes.slice(start, end);
+    return this.filteredData.slice(start, end);
   }
 
   siguientePagina() {
-    if ((this.currentPage * this.itemsPerPage) < this.solicitudes.length) {
+    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) {
       this.currentPage++;
     }
   }
@@ -105,4 +106,53 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
       this.currentPage--;
     }
   }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredData.length / this.itemsPerPage);
+  }
+
+  get pages(): (number | string)[] {
+    const total = this.totalPages;
+    const current = this.currentPage;
+    const delta = 1;
+
+    const range: (number | string)[] = [];
+    const rangeWithDots: (number | string)[] = [];
+    let last: number | undefined;
+
+    for (let i = 1; i <= total; i++) {
+      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+        range.push(i);
+      }
+    }
+
+    for (let i of range) {
+      if (last !== undefined && typeof i === 'number') {
+        if ((i as number) - last === 2) {
+          rangeWithDots.push(last + 1);
+        } else if ((i as number) - last > 2) {
+          rangeWithDots.push('...');
+        }
+      }
+      rangeWithDots.push(i);
+      last = i as number;
+    }
+
+    return rangeWithDots;
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  get emptyRows(): any[] {
+    const rowsOnPage = this.paginatedData.length;
+    if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) {
+      return Array(this.itemsPerPage - rowsOnPage);
+    }
+    return [];
+  }
+
 }

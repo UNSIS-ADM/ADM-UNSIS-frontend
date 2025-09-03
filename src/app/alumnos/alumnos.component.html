@@ -1,38 +1,60 @@
-<div class="w-full max-w-[95%] mx-auto mt-4">
-  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+<!-- Contenedor principal relativo para overlay del loader -->
+<div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center relative">
+
+  <div class="w-full max-w-7xl bg-white rounded-lg shadow-md overflow-hidden">
+
     <!-- Encabezado -->
-    <div class="p-6 bg-[#14645c] text-white">
-      <h2 class="text-2xl font-semibold">Lista de aspirantes</h2>
+    <div class="p-6 bg-[#24645c] text-white rounded-t-lg">
+      <h2 class="text-2xl font-semibold">Resultados de aspirantes</h2>
     </div>
 
+    <!-- Barra de búsqueda y carga -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+  
       <div class="flex-1 w-full sm:w-auto max-w-md relative">
-        <div class="relative flex items-center">
-          <input [(ngModel)]="terminoBusqueda" (input)="buscar()" placeholder="Buscar por ficha, nombre, carrera "
-            class="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+        <div class="relative flex items-center gap-2">
+          <!-- 🔹 Select de año -->
+          <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+            class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{anio}}</option>
+          </select>
 
-          <div *ngIf="buscando" class="absolute right-2">
-            <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
-              viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-            </svg>
+          <!-- 🔹 Buscador -->
+          <div class="relative flex items-center flex-1">
+            <input [(ngModel)]="terminoBusqueda" (input)="buscar()" placeholder="Buscar por ficha, nombre, carrera"
+              class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+
+            <!-- Loader pequeño de búsqueda -->
+            <div *ngIf="buscando" class="absolute right-2">
+              <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+            </div>
+
+            <!-- Botón limpiar búsqueda -->
+            <span *ngIf="terminoBusqueda && !buscando"
+              class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
+              (click)="terminoBusqueda = ''; buscar()">×</span>
           </div>
-
-          <span *ngIf="terminoBusqueda && !buscando"
-            class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
-            (click)="terminoBusqueda = ''; buscar()">
-            ×
-          </span>
         </div>
 
+        <!-- Mensaje de error búsqueda -->
         <div *ngIf="errorBusqueda" class="mt-1 text-sm text-red-600">
           No se encontraron resultados para "{{terminoBusqueda}}"
         </div>
       </div>
     </div>
 
-    <!-- Tabla -->
+    <!-- Mensaje cuando no hay datos -->
+    <div *ngIf="filteredData.length === 0 && !terminoBusqueda" class="p-8 text-center text-gray-500">
+      No hay datos disponibles
+    </div>
+    <div *ngIf="filteredData.length === 0 && terminoBusqueda" class="p-8 text-center text-gray-500">
+      No se encontraron resultados para "{{terminoBusqueda}}"
+    </div>
+    
     <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">

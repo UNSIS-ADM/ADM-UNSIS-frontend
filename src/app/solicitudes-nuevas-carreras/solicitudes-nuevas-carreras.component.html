@@ -1,30 +1,33 @@
 <div class="w-full flex justify-center mt-6 px-2">
-  <div class="w-full  bg-white rounded-lg shadow-md overflow-hidden">
+  <div class="w-full bg-white rounded-lg shadow-md overflow-hidden">
 
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white">
       <h2 class="text-2xl font-semibold">Solicitudes de cambio de carrera</h2>
     </div>
 
-    <!-- Tabla scrollable en móvil -->
-    <div class="overflow-x-auto">
+    <!-- Mensajes cuando no hay datos -->
+    <div *ngIf="filteredData.length === 0" class="p-8 text-center text-gray-500">
+      No hay solicitudes disponibles
+    </div>
+
+    <!-- Tabla scrollable -->
+    <div *ngIf="filteredData.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Id</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada
-            </th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del
-              aspirante</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del aspirante</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let solicitud of solicitudes">
+          <!-- 🔹 usamos paginatedData -->
+          <tr *ngFor="let solicitud of paginatedData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.id }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.ficha }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.antiguacarrera }}</td>
@@ -32,10 +35,10 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.comentario }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [ngClass]="{
-                  'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
-                  'bg-red-100 text-red-800': solicitud.estado === 'Rechazada',
-                  'bg-yellow-100 text-yellow-800': solicitud.estado === 'Pendiente'
-                }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
+                'bg-red-100 text-red-800': solicitud.estado === 'Rechazada',
+                'bg-yellow-100 text-yellow-800': solicitud.estado === 'Pendiente'
+              }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ solicitud.estado }}
               </span>
             </td>
@@ -44,27 +47,44 @@
                 (click)="abrirModal(solicitud.id)">
                 Atender
               </button>
-
             </td>
+          </tr>
+
+          <!-- 🔹 Filas vacías -->
+          <tr *ngFor="let _ of emptyRows">
+            <td colspan="7" class="px-6 py-5">&nbsp;</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Paginación -->
-    <div class="px-4 py-3 border-t">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-2">
-        <div class="text-sm text-gray-500">
+    <!-- 🔹 Paginación estilo “Resultados de aspirantes” -->
+    <div class="px-3 py-3 border-t">
+      <div class="flex flex-col items-center gap-2">
+        <div class="text-sm text-gray-500 text-center">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
-          a {{ Math.min(currentPage * itemsPerPage, solicitudes.length) }}
-          de {{ solicitudes.length }} resultados
+          a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
+          de {{ filteredData.length }} resultados
         </div>
-        <div class="flex gap-2">
+
+        <div class="flex gap-1 items-center justify-center">
           <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
             class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Anterior
           </button>
-          <button (click)="siguientePagina()" [disabled]="currentPage * itemsPerPage >= solicitudes.length"
+
+          <ng-container *ngFor="let page of pages">
+            <button *ngIf="page !== '...'; else dots" (click)="goToPage(+page)"
+              [class.bg-[#14645c]]="page === currentPage" [class.text-white]="page === currentPage"
+              class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
+              {{ page }}
+            </button>
+            <ng-template #dots>
+              <span class="px-2">…</span>
+            </ng-template>
+          </ng-container>
+
+          <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
             class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
             Siguiente
           </button>
