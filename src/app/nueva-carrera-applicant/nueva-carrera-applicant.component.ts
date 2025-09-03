@@ -82,7 +82,8 @@ export class NuevaCarreraApplicantComponent implements OnInit {
           this.formData = { carrera: '', comentario: '' };
           this.router.navigate(['/respsolicitud']);
         },
-        error: () => {
+        error: (err) => {
+           console.error('❌ Error devuelto por el backend:', err);
           this.alertService.showAlert('Ya tienes una solicitud en el sistema', 'danger');
           this.router.navigate(['/respsolicitud']);
         },

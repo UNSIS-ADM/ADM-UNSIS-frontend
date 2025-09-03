@@ -38,7 +38,11 @@ export class CargaDatosResultadosComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
+  // 👇 agrega estas dos propiedades
+ public anioSeleccionado: string = ''; // año actualmente seleccionado
+  public aniosDisponibles: number[] = []; // lista de años únicos disponibles
 
+  
   constructor(
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
@@ -50,27 +54,47 @@ export class CargaDatosResultadosComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+      this.generarAnios();  
     this.loadResultados();
   }
+loadResultados() {
+  this.isLoading = true;
+  this.cdRef.detectChanges();
 
-  loadResultados() {
-    this.isLoading = true;
-    this.cdRef.detectChanges(); // 👈 actualizar vista antes de la petición
+  this.resultadosService.getResultados().subscribe({
+    next: (resultados) => {
+      this.datos = resultados;
+      this.filteredData = [...this.datos];
 
-    this.resultadosService.getResultados().subscribe({
-      next: (resultados) => {
-        this.datos = resultados;
-        this.filteredData = [...this.datos];
-        this.isLoading = false;
-        this.cdRef.detectChanges();
-      },
-      error: (err) => {
-        this.alertService.showAlert('Error al cargar los datos', 'danger');
-        this.isLoading = false;
-        this.cdRef.detectChanges();
-      }
-    });
-  }
+      // 🔹 años que vienen del endpoint
+      const yearsFromEndpoint = this.datos.map(a => a.admissionYear);
+
+      // 🔹 años desde el actual hasta 5 atrás
+      const currentYear = new Date().getFullYear();
+      const lastFiveYears = Array.from({length:5},(_,i)=>currentYear - i);
+
+      // 🔹 combinas ambos
+      this.aniosDisponibles = [...new Set([...yearsFromEndpoint, ...lastFiveYears])]
+        .sort((a,b)=>b-a);
+
+      // 🔹 seleccionar año actual automáticamente
+      this.anioSeleccionado = currentYear.toString();
+
+      // 🔹 filtrar para mostrar solo ese año al cargar
+      this.filtrarPorAnio();
+
+      this.isLoading = false;
+      this.cdRef.detectChanges();
+    },
+    error: (err) => {
+      this.alertService.showAlert('Error al cargar los datos', 'danger');
+      this.isLoading = false;
+      this.cdRef.detectChanges();
+    }
+  });
+}
+
+
 
   buscar() {
     const termino = this.terminoBusqueda.trim();
@@ -105,6 +129,7 @@ export class CargaDatosResultadosComponent implements OnInit {
         }
       });
     }, 300);
+     this.filtrarPorAnio();
   }
 
   private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
@@ -119,7 +144,24 @@ export class CargaDatosResultadosComponent implements OnInit {
     });
     this.errorBusqueda = this.filteredData.length === 0;
   }
+  private generarAnios() {
+  const currentYear = new Date().getFullYear();
+  this.aniosDisponibles = [];
+  for (let i = 0; i < 5; i++) {
+    this.aniosDisponibles.push(currentYear - i);
+  }
+}
 
+filtrarPorAnio() {
+  if (!this.anioSeleccionado) {
+    this.filteredData = [...this.datos];
+  } else {
+    const year = +this.anioSeleccionado;
+    // 🔹 filtrar usando admissionYear
+    this.filteredData = this.datos.filter(a => a.admissionYear === year);
+  }
+  this.currentPage = 1;
+}
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
