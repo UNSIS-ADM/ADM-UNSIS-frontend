@@ -36,6 +36,9 @@ export class CargaDatosComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
+  showModal: boolean = false;
+  selectedApplicant: any = null; // aquí guardamos el aspirante que se va a editar
+
 
   // 👇 Nuevas propiedades para años
   aniosDisponibles: number[] = [];
@@ -251,4 +254,60 @@ export class CargaDatosComponent implements OnInit {
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
     return [];
   }
+
+//editar alumnos modal 
+openModal(id: number) {
+  this.alumnosService.getApplicantById(id).subscribe({
+    next: (data) => {
+      this.selectedApplicant = data;  // 👈 guardamos SOLO ese alumno
+      this.showModal = true;
+    },
+    error: (err) => {
+      console.error('Error:', err);
+    }
+  });
+}
+
+  closeModal() {
+    this.showModal = false;
+  }
+// componente.ts
+saveApplicant() {
+  if (!this.selectedApplicant?.id) {
+    console.error('No hay aspirante seleccionado');
+    return;
+  }
+
+  // construyes el body con los campos que quieres enviar:
+  const data = {
+    id: this.selectedApplicant.id,
+    ficha: this.selectedApplicant.ficha,
+    curp: this.selectedApplicant.curp,
+    careerAtResult: this.selectedApplicant.careerAtResult,
+    fullName: this.selectedApplicant.fullName,
+    career: this.selectedApplicant.career,
+    location: this.selectedApplicant.location,
+    examRoom: this.selectedApplicant.examRoom,
+    examDate: this.selectedApplicant.examDate,
+    admissionYear: this.selectedApplicant.admissionYear,
+    lastLogin: this.selectedApplicant.lastLogin,
+    score: this.selectedApplicant.score,
+    resultDate: this.selectedApplicant.resultDate
+  };
+
+  this.alumnosService.editApplicantById(this.selectedApplicant.id, data)
+    .subscribe({
+      next: (res) => {
+        console.log('Aspirante editado correctamente', res);
+        // refresca lista si hace falta
+        this.loadAlumnos();
+        this.closeModal();
+      },
+      error: (err) => {
+        console.error('Error al editar aspirante', err);
+      }
+    });
+}
+
+
 }

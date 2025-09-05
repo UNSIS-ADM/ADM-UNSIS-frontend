@@ -76,6 +76,7 @@
             <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentarios</th>
             <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
             <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -95,6 +96,11 @@
                 class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{alumno.status || 'Cargado'}}
               </span>
+            </td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
+              <button (click)="openModal(alumno.id)" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Editar datos
+              </button>
             </td>
           </tr>
 
@@ -157,5 +163,64 @@
       [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
     </app-confirm-dialog>
 
+  </div>
+</div>
+<!-- Modal -->
+<div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 animate-fade-in 
+              max-h-[80vh] overflow-y-auto"> <!-- 👈 scroll -->
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Editar Aspirante</h2>
+
+    <!-- Formulario para un solo alumno -->
+    <form *ngIf="selectedApplicant" class="grid grid-cols-6 gap-4">
+
+      <!-- Ficha -->
+      <div class="col-span-2">
+        <label class="block mb-1 text-sm font-medium text-gray-600">Ficha</label>
+        <input type="text" [(ngModel)]="selectedApplicant.ficha" name="ficha"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+
+      <!-- Nombre -->
+      <div class="col-span-4">
+        <label class="block mb-1 text-sm font-medium text-gray-600">Nombre</label>
+        <input type="text" [(ngModel)]="selectedApplicant.fullName" name="fullName"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <!-- Carrera y Ubicación -->
+      <div class="col-span-3">
+        <label class="block mb-1 text-sm font-medium text-gray-600">Carrera</label>
+        <input type="text" [(ngModel)]="selectedApplicant.career" name="career"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+      </div>
+      <div class="col-span-3">
+        <label class="block mb-1 text-sm font-medium text-gray-600">Ubicación</label>
+        <input type="text" [(ngModel)]="selectedApplicant.location" name="location"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+      <!-- Sala y Status -->
+      <div class="col-span-3">
+        <label class="block mb-1 text-sm font-medium text-gray-600">Sala de examen</label>
+        <input type="text" [(ngModel)]="selectedApplicant.examRoom" name="examRoom"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+      </div>
+
+
+    </form>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="saveApplicant()" class="px-4 py-2 bg-[#548e88] text-white rounded-lg 
+             hover:bg-[#29726b] transition-colors">
+        Guardar
+      </button>
+      <button (click)="closeModal()"
+        class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-colors">
+        Cerrar
+      </button>
+    </div>
   </div>
 </div>
