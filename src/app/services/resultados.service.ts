@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class ResultadosService {
   private endpoint = environment.apiUrl + environment.getresultadosEndpoint;
-
+   private endpointget = environment.apiUrl + environment.getApplicantbyid;
   constructor(private http: HttpClient) {}
 
   getResultados(): Observable<any[]> {
@@ -15,4 +15,25 @@ export class ResultadosService {
     });
     return this.http.get<any[]>(this.endpoint, { headers });
   }
+   getApplicantById(id: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token.replace('Bearer ', '')}` : ''
+    });
+    return this.http.get<any>(`${this.endpointget}/${id}`);
+  }
+  // alumnos.service.ts
+  editApplicantById(id: number, data: any): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({
+    
+      'Authorization': token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json'
+    });
+
+    // aquí mandas el objeto completo
+    return this.http.patch<any>(`${this.endpointget}/${id}`, data, { headers });
+  }
+
+
 }

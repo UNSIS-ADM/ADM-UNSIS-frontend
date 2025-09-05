@@ -10,5 +10,6 @@ export const environment = {
   cambiodecarreraEndpoint: '/api/applicant',
   respuestasolicitudEndpoint: '/api/applicant/change-career/requests',
   accessRestrictionEndpoint: '/api/admin/access-restriction',
-
+  getApplicantbyid : '/api/admin/applicants',
+  
 };
