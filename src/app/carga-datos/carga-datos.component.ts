@@ -43,6 +43,7 @@ export class CargaDatosComponent implements OnInit {
   // 👇 Nuevas propiedades para años
   aniosDisponibles: number[] = [];
   anioSeleccionado: string = '';
+  originalApplicant: any;
 
   constructor(
     private excelService: ExcelServiceApplicants,
@@ -259,7 +260,8 @@ export class CargaDatosComponent implements OnInit {
 openModal(id: number) {
   this.alumnosService.getApplicantById(id).subscribe({
     next: (data) => {
-      this.selectedApplicant = data;  // 👈 guardamos SOLO ese alumno
+        this.selectedApplicant = { ...data }; // datos actuales para editar
+      this.originalApplicant = { ...data };  // 👈 guardamos SOLO ese alumno
       this.showModal = true;
     },
     error: (err) => {
@@ -278,34 +280,33 @@ saveApplicant() {
     return;
   }
 
-  // construyes el body con los campos que quieres enviar:
-  const data = {
-    id: this.selectedApplicant.id,
-    ficha: this.selectedApplicant.ficha,
-    curp: this.selectedApplicant.curp,
-    careerAtResult: this.selectedApplicant.careerAtResult,
-    fullName: this.selectedApplicant.fullName,
-    career: this.selectedApplicant.career,
-    location: this.selectedApplicant.location,
-    examRoom: this.selectedApplicant.examRoom,
-    examDate: this.selectedApplicant.examDate,
-    admissionYear: this.selectedApplicant.admissionYear,
-    lastLogin: this.selectedApplicant.lastLogin,
-    score: this.selectedApplicant.score,
-    resultDate: this.selectedApplicant.resultDate
-  };
+  // compara campo por campo con el original:
+  const updatedData: any = {};
 
-  this.alumnosService.editApplicantById(this.selectedApplicant.id, data)
+  Object.keys(this.selectedApplicant).forEach(key => {
+    if (this.selectedApplicant[key] !== this.originalApplicant[key]) {
+      updatedData[key] = this.selectedApplicant[key];
+    }
+  });
+
+  // si no hay cambios, no hace falta llamar al servicio
+  if (Object.keys(updatedData).length === 0) {
+    console.log('No se realizaron cambios');
+    this.closeModal();
+    return;
+  }
+
+  // agrega id si tu API lo necesita
+  updatedData.id = this.selectedApplicant.id;
+
+  this.alumnosService.editApplicantById(this.selectedApplicant.id, updatedData)
     .subscribe({
       next: (res) => {
         console.log('Aspirante editado correctamente', res);
-        // refresca lista si hace falta
         this.loadAlumnos();
         this.closeModal();
       },
-      error: (err) => {
-        console.error('Error al editar aspirante', err);
-      }
+      error: (err) => console.error('Error al editar aspirante', err)
     });
 }
 
