@@ -15,6 +15,8 @@ import { AlertComponent } from './alert/alert.component';
 import { FooterComponent } from "./footer/footer.component";
 import { NavComponent } from "./nav/nav.component";
 import { CommonModule } from '@angular/common';
+import { AuthService } from './services/auth.service';
+import { SessionModalComponent } from "./session-modal/session-modal.component";
 
 @Component({
   selector: 'app-root',
@@ -33,8 +35,10 @@ import { CommonModule } from '@angular/common';
     MatButtonModule,
     AlertComponent,
     FooterComponent,
-    NavComponent
-  ],
+    NavComponent,
+   
+  SessionModalComponent,
+],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -42,8 +46,10 @@ export class AppComponent implements OnInit {
   title = 'ADM-UNSIS-frontend';
   isLoginPage: boolean = false;
   isDesktop: boolean = true; // Variable para detectar escritorio
-
-  constructor(private router: Router) {
+  showModal = false;
+  warningTime = 0;
+  private tokenInterval: any;
+  constructor(private router: Router , private auth: AuthService) {
     // Detecta cambios de ruta
     this.router.events.subscribe((event: Event) => {
       if (event instanceof NavigationEnd) {
@@ -53,7 +59,10 @@ export class AppComponent implements OnInit {
   }
 
 ngOnInit() {
-  this.checkScreenSize(); // Detecta al iniciar
+  this.checkScreenSize();
+this.startTokenWatcher();
+       
+  // Detecta al iniciar
 }
 
 ngAfterViewInit() {
@@ -72,6 +81,46 @@ checkScreenSize() {
 isLoginRoute(): boolean {
   const url = this.router.url;
   return url.startsWith('/login') || url === '/' || url === '/not-found';
+
 }
 
+startTokenWatcher() {
+  this.tokenInterval = setInterval(() => {
+    if (this.isLoginRoute()) {
+      clearInterval(this.tokenInterval); // detiene el contador
+      return;
+    }
+
+    const timeLeft = this.auth.getTimeLeft();
+    if (timeLeft === null) return;
+
+    console.log(`Tiempo restante: ${Math.floor(timeLeft/1000)}s`);
+
+    if (!this.showModal && timeLeft <= this.warningTime) {
+      this.showModal = true;
+      console.log('Mostrando modal de extensión de sesión');
+    }
+  }, 1000);
+}
+
+  handleExtend() {
+    console.log('Usuario quiere extender sesión');
+    this.auth.refreshToken().subscribe({
+      next: () => {
+        this.showModal = false;
+        console.log('Sesión extendida');
+      },
+      error: () => {
+        console.log('No se pudo extender, cerrando sesión');
+        this.auth.logout();
+        window.location.href = '/login';
+      }
+    });
+  }
+
+  handleCancel() {
+    console.log('Usuario cierra sesión');
+    this.auth.logout();
+    window.location.href = '/login';
+  }
 }

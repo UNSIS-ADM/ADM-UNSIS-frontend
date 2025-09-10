@@ -1,0 +1,10 @@
+<div class="overlay">
+  <div class="modal">
+    <h2>Extender sesión</h2>
+    <p>Tu sesión está por expirar. ¿Quieres extenderla?</p>
+    <div class="actions">
+      <button (click)="cancel.emit()">Salir</button>
+      <button class="primary" (click)="extend.emit()">Extender</button>
+    </div>
+  </div>
+</div>

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { jwtDecode } from 'jwt-decode';
+
 interface LoginResponse {
   token: string;
   type: string;
@@ -10,6 +12,9 @@ interface LoginResponse {
   roles: string[];
   fullName: string;  // ← Cambiado de full_name a fullName
   curp?: string;    // ← Campo adicional que aparece en la respuesta
+}
+interface JwtPayload {
+  exp: number;
 }
 
 @Injectable({
@@ -94,6 +99,44 @@ validarApplicant() {
   //return this.http.get('');
 //>>>>>>> main
 }
+getTokenExpiration(): number | null {
+  const token = this.getToken();
+  if (!token) return null;
+
+  try {
+    const pureToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
+    const decoded = jwtDecode<{exp:number}>(pureToken);
+    return decoded.exp * 1000; // milisegundos
+  } catch(e) {
+    console.error('Error decodificando token:', e);
+    return null;
+  }
+}
 
 
+  getTimeLeft(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp; // exp en segundos
+      const now = Math.floor(Date.now() / 1000);
+      return (exp - now) * 1000; // ms restantes
+    } catch (err) {
+      return null;
+    }
+  }
+
+  refreshToken(): Observable<any> {
+    const url = `${this.apiUrl}/auth/refresh`;
+    return this.http.post(url, {}).pipe(
+      tap((res: any) => {
+        if (res.token) {
+          this.saveToken(`Bearer ${res.token}`);
+          console.log('Token extendido correctamente');
+        }
+      })
+    );
+  }
 }

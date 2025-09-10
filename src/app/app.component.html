@@ -65,3 +65,9 @@
 
   <footer class="h-[60px]"></footer>
 </div>
+
+<app-session-modal 
+  *ngIf="showModal" 
+  (extend)="handleExtend()" 
+  (cancel)="handleCancel()">
+</app-session-modal>
