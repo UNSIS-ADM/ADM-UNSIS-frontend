@@ -1,6 +1,5 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router, Event, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +8,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AlertComponent } from './alert/alert.component';
 import { FooterComponent } from "./footer/footer.component";
@@ -36,87 +35,136 @@ import { SessionModalComponent } from "./session-modal/session-modal.component";
     AlertComponent,
     FooterComponent,
     NavComponent,
-   
-  SessionModalComponent,
-],
+    SessionModalComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'ADM-UNSIS-frontend';
-  isLoginPage: boolean = false;
-  isDesktop: boolean = true; // Variable para detectar escritorio
+  isLoginPage = false;
+  isDesktop = true;
   showModal = false;
-  warningTime = 0;
+  /** tiempo antes de expirar para mostrar modal (ms) */
+  warningTime = 5000; // 5s antes de expirar
+
   private tokenInterval: any;
-  constructor(private router: Router , private auth: AuthService) {
-    // Detecta cambios de ruta
-    this.router.events.subscribe((event: Event) => {
-      if (event instanceof NavigationEnd) {
-        this.isLoginPage = event.url === '/login';
+
+constructor(private router: Router, private auth: AuthService) {
+  // Detecta cambios de ruta
+  this.router.events.subscribe((event: Event) => {
+    if (event instanceof NavigationEnd) {
+      this.isLoginPage = this.isLoginRoute();
+
+      // 🔹 Si no estamos en login y hay token, inicia contador
+      if (!this.isLoginPage && this.auth.getToken()) {
+        this.startTokenWatcher();
       }
-    });
-  }
+    }
+  });
+}
 
 ngOnInit() {
   this.checkScreenSize();
-this.startTokenWatcher();
-       
-  // Detecta al iniciar
+
+  // 🔹 Suscribirse a token$ para iniciar contador al hacer login
+  this.auth.token$.subscribe(token => {
+    if (token && !this.isLoginRoute()) {
+      this.startTokenWatcher();
+    }
+  });
+
+  // 🔹 Detectar cambio de ruta
+  this.router.events.subscribe(event => {
+    if (event instanceof NavigationEnd) {
+      if (!this.isLoginRoute() && this.auth.getToken()) {
+        this.startTokenWatcher();
+      }
+    }
+  });
 }
 
-ngAfterViewInit() {
-  this.checkScreenSize(); // Refuerza detección ya con la vista lista
-}
+  ngOnDestroy() {
+    // Limpia el interval al destruir el componente
+    if (this.tokenInterval) {
+      clearInterval(this.tokenInterval);
+    }
+  }
 
-@HostListener('window:resize')
-onResize() {
-  this.checkScreenSize();
-}
+  ngAfterViewInit() {
+    this.checkScreenSize();
+  }
 
-checkScreenSize() {
-  this.isDesktop = window.innerWidth >= 1024;
-}
+  @HostListener('window:resize')
+  onResize() {
+    this.checkScreenSize();
+  }
 
-isLoginRoute(): boolean {
-  const url = this.router.url;
-  return url.startsWith('/login') || url === '/' || url === '/not-found';
+  checkScreenSize() {
+    this.isDesktop = window.innerWidth >= 1024;
+  }
 
-}
+  isLoginRoute(): boolean {
+    const url = this.router.url;
+    return url.startsWith('/login') || url === '/' || url === '/not-found';
+  }
 
 startTokenWatcher() {
+  if (this.isLoginRoute()){
+    
+    console.log("estas en login",this.isLoginRoute());
+  }else{
+    
+    const exp = this.auth.getTokenExpiration();
+  if (exp === null) {
+    console.error('No se pudo obtener la expiración del token');
+    return;
+  }
+
+  // exp en segundos; Date.now() en ms → dividimos
+  let tiempoRestante = exp - Math.floor(Date.now() / 1000);
+
+  if (this.tokenInterval) clearInterval(this.tokenInterval);
+
   this.tokenInterval = setInterval(() => {
-    if (this.isLoginRoute()) {
-      clearInterval(this.tokenInterval); // detiene el contador
-      return;
-    }
+    tiempoRestante--;
 
-    const timeLeft = this.auth.getTimeLeft();
-    if (timeLeft === null) return;
+    console.log('Tiempo restante:', tiempoRestante + 's');
 
-    console.log(`Tiempo restante: ${Math.floor(timeLeft/1000)}s`);
-
-    if (!this.showModal && timeLeft <= this.warningTime) {
+    if (tiempoRestante === 15 && !this.showModal) {
       this.showModal = true;
       console.log('Mostrando modal de extensión de sesión');
     }
-  }, 1000);
+
+    if (tiempoRestante <= 0) {
+      clearInterval(this.tokenInterval);
+      console.log('Tiempo agotado, cerrando sesión');
+      this.auth.logout();
+      this.showModal=false;
+      this.router.navigate(['/login']);
+    }
+  }, 1000);  }
 }
 
-  handleExtend() {
-    console.log('Usuario quiere extender sesión');
-    this.auth.refreshToken().subscribe({
-      next: () => {
-        this.showModal = false;
-        console.log('Sesión extendida');
-      },
-      error: () => {
-        console.log('No se pudo extender, cerrando sesión');
-        this.auth.logout();
-        window.location.href = '/login';
-      }
-    });
-  }
+renovarSesion() {
+  this.auth.refreshToken().subscribe({
+    next: () => {
+      console.log('Token renovado automáticamente');
+      this.showModal = false;
+      this.startTokenWatcher(); // vuelve a arrancar el contador con el nuevo token
+    },
+    error: (err) => {
+      console.error('Error al refrescar token', err);
+      this.auth.logout();
+      this.router.navigate(['/login']);
+    },
+  });
+}
+
+handleExtend() {
+  console.log('Usuario quiere extender sesión manualmente');
+  this.renovarSesion();
+}
 
   handleCancel() {
     console.log('Usuario cierra sesión');

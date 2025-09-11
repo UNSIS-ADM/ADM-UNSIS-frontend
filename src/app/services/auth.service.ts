@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, catchError } from 'rxjs';
+import { Observable, tap, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 
 interface LoginResponse {
   token: string;
+  refreshToken: string;
   type: string;
   id: number;
   username: string;
@@ -13,44 +14,29 @@ interface LoginResponse {
   fullName: string;  // ← Cambiado de full_name a fullName
   curp?: string;    // ← Campo adicional que aparece en la respuesta
 }
-interface JwtPayload {
-  exp: number;
-}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = environment.apiUrl;
+  private tokenSubject = new BehaviorSubject<string | null>(this.getToken());
+  token$ = this.tokenSubject.asObservable();
 
   constructor(private http: HttpClient) { }
 
-  login(credentials: {username: string, password: string}): Observable<any> {
-    const headers = new HttpHeaders()
-      .set('Content-Type', 'application/json');
-
+  /** LOGIN */
+  login(credentials: { username: string; password: string }): Observable<any> {
     const url = environment.apiUrl + environment.loginEndpoint;
-    console.log('Intentando login en:', url);
-    
-    return this.http.post<LoginResponse>(url, {
-      username: credentials.username,
-      password: credentials.password
-    }, { headers }).pipe(
+    return this.http.post<LoginResponse>(url, credentials).pipe(
       tap(response => {
         console.log('Respuesta del servidor:', response);
         if (response && response.token) {
-          // Guarda el token con el prefijo Bearer si es necesario
+          // guarda accessToken y refreshToken
           this.saveToken(`Bearer ${response.token}`);
-          // Guarda información adicional del usuario si es necesario
+          this.saveRefreshToken(response.refreshToken);
           this.saveUserInfo(response);
-          tap(response => {
-  console.log('Respuesta del servidor:', response); // ← Verifica que full_name esté aquí
-})
         }
-      }),
-      catchError(error => {
-        console.error('Error en autenticación:', error);
-        throw error;
       })
     );
   }
@@ -64,79 +50,79 @@ export class AuthService {
     }));
   }
 
-  // Método para guardar el token en localStorage
   saveToken(token: string): void {
-    localStorage.setItem('token', token);
+     localStorage.setItem('token', token);
+    this.tokenSubject.next(token); // 🔹 avisamos que hay token nuevo
   }
 
-  // Método para obtener el token
   getToken(): string | null {
-    return localStorage.getItem('token');
+   return localStorage.getItem('token');
   }
 
-  // Método para cerrar sesión
+  saveRefreshToken(token: string): void {
+    localStorage.setItem('refreshToken', token);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
   logout(): void {
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user_info');
   }
 
-  isLoggedIn(): boolean {
-    const token = this.getToken();
-    return !!token;
-  }
-
-  getUserInfo(): any {
-    const userInfo = localStorage.getItem('user_info');
-    return userInfo ? JSON.parse(userInfo) : null;
-
-  }
-//<<<<<<< FRON-12-Acceso-restringido
-  // auth.service.ts
-validarApplicant() {
-  // Llamada ligera que hará 403 si el backend está bloqueando applicants
-  return this.http.get(environment.apiUrl + '/api/applicant/me'); // o cualquier endpoint que use ROLE_APPLICANT
-//=======
-  //validarApplicant() {
-  //return this.http.get('');
-//>>>>>>> main
-}
-getTokenExpiration(): number | null {
-  const token = this.getToken();
-  if (!token) return null;
-
-  try {
-    const pureToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
-    const decoded = jwtDecode<{exp:number}>(pureToken);
-    return decoded.exp * 1000; // milisegundos
-  } catch(e) {
-    console.error('Error decodificando token:', e);
-    return null;
-  }
-}
-
-
-  getTimeLeft(): number | null {
+  getTokenExpiration(): number | null {
     const token = this.getToken();
     if (!token) return null;
-
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const exp = payload.exp; // exp en segundos
-      const now = Math.floor(Date.now() / 1000);
-      return (exp - now) * 1000; // ms restantes
-    } catch (err) {
+      const pureToken = token.startsWith('Bearer ')
+        ? token.split(' ')[1]
+        : token;
+      const decoded = jwtDecode<{ exp: number }>(pureToken);
+      return decoded.exp; // en segundos
+    } catch (e) {
+      console.error('Error decodificando token:', e);
       return null;
     }
   }
 
+  getTimeLeft(): number | null {
+    const exp = this.getTokenExpiration();
+    if (!exp) return null;
+    const now = Math.floor(Date.now() / 1000);
+    return (exp - now) * 1000;
+  }
+
   refreshToken(): Observable<any> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      throw new Error('No hay refreshToken almacenado');
+    }
+    const oldAccessToken = this.getToken(); // para mostrar en consola
     const url = `${this.apiUrl}/auth/refresh`;
-    return this.http.post(url, {}).pipe(
+    return this.http.post(url, { refreshToken }).pipe(
       tap((res: any) => {
-        if (res.token) {
-          this.saveToken(`Bearer ${res.token}`);
-          console.log('Token extendido correctamente');
+        if (res.accessToken) {
+          console.log('AccessToken anterior:', oldAccessToken);
+          console.log('AccessToken nuevo:', res.accessToken);
+          // actualiza tokens
+          this.saveToken(`Bearer ${res.accessToken}`);
+          if (res.refreshToken) {
+            this.saveRefreshToken(res.refreshToken);
+          }
         }
       })
     );
+  }
+  validarApplicant() {
+    // Llamada ligera que hará 403 si el backend está bloqueando applicants
+    return this.http.get(environment.apiUrl + '/api/applicant/me'); // o cualquier endpoint que use ROLE_APPLICANT
+
+  }
+  getUserInfo(): any {
+    const userInfo = localStorage.getItem('user_info');
+    return userInfo ? JSON.parse(userInfo) : null;
   }
 }
