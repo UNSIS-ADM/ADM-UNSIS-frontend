@@ -1,0 +1,37 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+
+.modal {
+  background:white;
+  padding:2rem;
+  border-radius:1rem;
+  width:90%;
+  max-width:400px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+.actions {
+  margin-top:1rem;
+  display:flex;
+  justify-content:space-around;
+}
+
+button {
+  padding:0.5rem 1rem;
+  border-radius:0.5rem;
+  border:none;
+  cursor:pointer;
+}
+
+.primary {
+  background:#1976d2;
+  color:white;
+}
