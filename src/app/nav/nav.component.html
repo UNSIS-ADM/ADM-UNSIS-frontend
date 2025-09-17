@@ -35,7 +35,7 @@
           <ul class="py-2">
             <li *ngIf="hasRole('ROLE_ADMIN')">
               <a href="/registrar" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
-                Registrar Usuarios
+                Registrar Secretaria
               </a>
             </li>
             <li>
@@ -108,7 +108,7 @@
             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
       </path>
     </svg>
-    <span class="group-hover:text-[#6a1b1b]">Cargar Alumnos</span>
+    <span class="group-hover:text-[#6a1b1b]">Cargar Aspirantes</span>
   </a>
 </li>
 
@@ -138,7 +138,7 @@
               d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
           </svg>
           <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
-            Alumnos
+            Aspirantes
           </span>
         </a>
       </li>
@@ -155,7 +155,23 @@
             </path>
           </svg>
           <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
-            Resultado
+            Resultado de admisión
+          </span>
+        </a>
+      </li>
+
+      <!-- Cambio Carrera para aspirantes -->
+      <li *ngIf="hasRole('ROLE_APPLICANT')">
+        <a routerLink="/carrera-applicant" (click)="closeMenus()"
+          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
+          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+            </path>
+          </svg>
+          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
+            Solicitar cambio de carrera
           </span>
         </a>
       </li>
@@ -194,24 +210,7 @@
             Fichas de Carreras
           </span>
         </a>
-      </li>
-
-      <!-- Cambio Carrera -->
-      <li *ngIf="hasRole('ROLE_APPLICANT')">
-        <a routerLink="/carrera-applicant"
-        (click)="closeMenus()"
-          class="flex items-center p-2 text-white rounded-lg group hover:bg-white hover:text-[#6a1b1b]">
-          <svg class="w-5 h-5 text-white group-hover:text-[#6a1b1b] flex-shrink-0" fill="none" stroke="currentColor"
-            viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
-            </path>
-          </svg>
-          <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
-            Cambio Carrera
-          </span>
-        </a>
-      </li>
+      </li>      
 
       <!-- Cambios Carrera -->
 
