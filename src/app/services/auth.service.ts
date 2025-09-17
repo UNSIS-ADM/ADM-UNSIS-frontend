@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, throwError, BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { jwtDecode } from 'jwt-decode';
-
 interface LoginResponse {
   token: string;
   refreshToken: string;
@@ -86,6 +84,18 @@ export class AuthService {
       console.error('Error decodificando token:', e);
       return null;
     }
+
+    function jwtDecode<T>(pureToken: string): T {
+      const base64Url = pureToken.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    }
   }
 
   getTimeLeft(): number | null {
@@ -116,13 +126,16 @@ export class AuthService {
       })
     );
   }
+
   validarApplicant() {
     // Llamada ligera que hará 403 si el backend está bloqueando applicants
     return this.http.get(environment.apiUrl + '/api/applicant/me'); // o cualquier endpoint que use ROLE_APPLICANT
 
   }
+
   getUserInfo(): any {
     const userInfo = localStorage.getItem('user_info');
     return userInfo ? JSON.parse(userInfo) : null;
   }
+
 }
