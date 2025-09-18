@@ -11,7 +11,7 @@
         'bg-green-100 text-green-800': restriction.enabled,
         'bg-red-100 text-red-800': !restriction.enabled
       }">
-      {{ restriction.enabled ? 'Activo' : 'Inactivo' }}
+      {{ restriction.enabled ? 'Acceso permitido a aspirantes' : 'Acceso denegado a aspirantes' }}
     </span>
   </h2>
 
@@ -67,7 +67,7 @@
         ? 'bg-red-500 hover:bg-red-600' 
         : 'bg-[#29726b] hover:bg-green-700'" class="px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 
              focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition">
-      {{ restriction.enabled ? 'Desactivar' : 'Activar' }}
+      {{ restriction.enabled ? 'Desactivar acceso' : 'Activar acceso' }}
     </button>
   </div>
 </div>
