@@ -51,53 +51,54 @@ export class AlumnosComponent implements OnInit {
     this.anioSeleccionado = currentYear.toString();
   }
 
-  filtrarPorAnio() {
-    if (!this.anioSeleccionado) {
-      this.filteredData = [...this.alumnos];
-    } else {
-      const year = +this.anioSeleccionado;
-      this.filteredData = this.alumnos.filter(a => a.admissionYear === year);
-    }
-    this.currentPage = 1;
-    this.cdRef.detectChanges();
-  }
+    buscar() {
+  const termino = this.terminoBusqueda.trim();
 
-  buscar() {
-    const termino = this.terminoBusqueda.trim();
-    if (!termino) {
-      this.filtrarPorAnio();
-      this.errorBusqueda = false;
-      this.currentPage = 1;
-      return;
-    }
-
-    this.buscando = true;
+  // 🔹 Si está vacío, muestra todos los datos filtrados solo por año
+  if (!termino) {
+    // primero filtramos por año
+    this.filtrarPorAnio();
     this.errorBusqueda = false;
-
-    let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-    if (/^\d/.test(termino)) tipo = 'ficha';
-    else if (this.alumnos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
-    else tipo = 'fullName';
-
-    setTimeout(() => {
-      this.filtradoService.buscar(termino, tipo).subscribe({
-        next: (resultados) => {
-          this.filteredData = resultados.length > 0 ? resultados : this.filtrarLocalmente(termino, tipo);
-          this.filtrarPorAnio();
-          this.currentPage = 1;
-          this.buscando = false;
-          this.cdRef.detectChanges();
-        },
-        error: () => {
-          this.filtrarLocalmente(termino, tipo);
-          this.filtrarPorAnio();
-          this.buscando = false;
-          this.cdRef.detectChanges();
-        }
-      });
-    }, 300);
+    this.currentPage = 1;
+    return;
   }
 
+  // 🔹 Si hay término sí hacemos búsqueda
+  this.buscando = true;
+  this.errorBusqueda = false;
+
+  let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
+  if (/^\d/.test(termino)) tipo = 'ficha';
+  else if (this.alumnos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
+  else tipo = 'fullName';
+
+  setTimeout(() => {
+    this.filtradoService.buscar(termino, tipo).subscribe({
+      next: (resultados) => {
+        if (resultados.length > 0) this.filteredData = resultados;
+        else this.filtrarLocalmente(termino, tipo);
+        console.log(resultados)
+        this.currentPage = 1;
+        this.buscando = false;
+        this.cdRef.detectChanges();
+      },
+      error: () => {
+        this.filtrarLocalmente(termino, tipo);
+        this.buscando = false;
+        this.cdRef.detectChanges();
+      }
+    });
+  }, 300);
+}
+ filtrarPorAnio() {
+  if (!this.anioSeleccionado) {
+    this.filteredData = [...this.alumnos];
+  } else {
+    const year = +this.anioSeleccionado;
+    this.filteredData = this.alumnos.filter(a => a.admissionYear === year);
+  }
+  this.currentPage = 1;
+}
   private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
     termino = termino.toLowerCase();
     this.filteredData = this.alumnos.filter(alumno => {

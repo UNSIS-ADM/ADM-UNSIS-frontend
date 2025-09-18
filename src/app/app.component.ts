@@ -129,8 +129,6 @@ startTokenWatcher() {
   this.tokenInterval = setInterval(() => {
     tiempoRestante--;
 
-    console.log('Tiempo restante:', tiempoRestante + 's');
-
     if (tiempoRestante === 15 && !this.showModal) {
       this.showModal = true;
       console.log('Mostrando modal de extensión de sesión');

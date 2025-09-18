@@ -59,7 +59,7 @@
     </div>
 
     <!-- 🔹 Paginación estilo “Resultados de aspirantes” -->
-    <div class="px-3 py-3 border-t">
+    <div *ngIf="filteredData.length > 0" class="px-3 py-3 border-t">
       <div class="flex flex-col items-center gap-2">
         <div class="text-sm text-gray-500 text-center">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
