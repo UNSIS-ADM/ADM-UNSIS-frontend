@@ -5,7 +5,7 @@
 
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white rounded-t-lg">
-      <h2 class="text-2xl font-semibold">Resultados de aspirantes</h2>
+      <h2 class="text-2xl font-semibold">Datos de aspirantes</h2>
     </div>
 
     <!-- Barra de búsqueda y carga -->
@@ -115,7 +115,7 @@
     </div>
 
     <!-- Paginación -->
-    <div class="px-3 py-3 border-t">
+     <div *ngIf="filteredData.length > 0" class="px-3 py-3 border-t">
       <div class="flex flex-col items-center gap-2">
         <div class="text-sm text-gray-500 text-center">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}

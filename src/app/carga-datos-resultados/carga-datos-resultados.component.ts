@@ -97,41 +97,46 @@ loadResultados() {
 
 
 
-  buscar() {
-    const termino = this.terminoBusqueda.trim();
-    if (!termino) {
-      this.filteredData = [...this.datos];
-      this.errorBusqueda = false;
-      this.currentPage = 1;
-      return;
-    }
+ buscar() {
+  const termino = this.terminoBusqueda.trim();
 
-    this.buscando = true;
+  // 🔹 Si está vacío, muestra todos los datos filtrados solo por año
+  if (!termino) {
+    // primero filtramos por año
+    this.filtrarPorAnio();
     this.errorBusqueda = false;
-
-    let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-    if (/^\d/.test(termino)) tipo = 'ficha';
-    else if (this.datos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
-    else tipo = 'fullName';
-
-    setTimeout(() => {
-      this.filtradoService.buscar(termino, tipo).subscribe({
-        next: (resultados) => {
-          if (resultados.length > 0) this.filteredData = resultados;
-          else this.filtrarLocalmente(termino, tipo);
-          this.currentPage = 1;
-          this.buscando = false;
-          this.cdRef.detectChanges();
-        },
-        error: () => {
-          this.filtrarLocalmente(termino, tipo);
-          this.buscando = false;
-          this.cdRef.detectChanges();
-        }
-      });
-    }, 300);
-     this.filtrarPorAnio();
+    this.currentPage = 1;
+    return;
   }
+
+  // 🔹 Si hay término sí hacemos búsqueda
+  this.buscando = true;
+  this.errorBusqueda = false;
+
+  let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
+  if (/^\d/.test(termino)) tipo = 'ficha';
+  else if (this.datos.some(a => a.careerAtResult?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
+  else tipo = 'fullName';
+
+  setTimeout(() => {
+    this.filtradoService.buscar(termino, tipo).subscribe({
+      next: (resultados) => {
+        if (resultados.length > 0) this.filteredData = resultados;
+        else this.filtrarLocalmente(termino, tipo);
+        console.log(resultados)
+        this.currentPage = 1;
+        this.buscando = false;
+        this.cdRef.detectChanges();
+      },
+      error: () => {
+        this.filtrarLocalmente(termino, tipo);
+        this.buscando = false;
+        this.cdRef.detectChanges();
+      }
+    });
+  }, 300);
+}
+
 
   private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
     termino = termino.toLowerCase();
@@ -158,11 +163,11 @@ filtrarPorAnio() {
     this.filteredData = [...this.datos];
   } else {
     const year = +this.anioSeleccionado;
-    // 🔹 filtrar usando admissionYear
     this.filteredData = this.datos.filter(a => a.admissionYear === year);
   }
   this.currentPage = 1;
 }
+
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
