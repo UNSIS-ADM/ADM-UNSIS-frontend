@@ -99,14 +99,14 @@
   style="background-color: rgba(0, 0, 0, 0.474);">
   <div class="bg-white p-6 rounded shadow-lg w-96">
     <h3 class="text-lg font-semibold mb-4">Responder solicitud</h3>
-    <textarea [(ngModel)]="comentarioSecretaria" placeholder="Escribe tu comentario"
-      class="w-full p-2 border rounded mb-4"></textarea>
+    <textarea [(ngModel)]="comentarioSecretaria" placeholder="Escribe un comentario a la respuesta   de la solicitud del aspirante" 
+      class="w-full p-2 border rounded mb-4 placeholder-gray-400"></textarea> 
     <div class="flex justify-end gap-2">
       <button (click)="enviarRespuesta('RECHAZADO')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
         Rechazar
       </button>
       <button (click)="enviarRespuesta('ACEPTADO')"
-        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+        class=" bg-[#548e88] text-white rounded hover:bg-[#29726b] px-4 py-2 ">
         Aceptar
       </button>
       <button (click)="cerrarModal()" class="ml-2 text-gray-600 hover:text-gray-900">Cancelar</button>
