@@ -8,10 +8,11 @@
 
       <form (ngSubmit)="registrarFichas()" #fichasForm="ngForm">
         <!-- Encabezados -->
-        <div class="grid grid-cols-6 font-semibold border-b pb-2 mb-2 items-center relative">
+        <div class="grid grid-cols-7 font-semibold border-b pb-2 mb-2 items-center relative">
           <div class="col-span-2">Carrera</div>
           <div *ngIf="hasRole('ROLE_ADMIN')">Nuevo límite</div>
           <div>Límite actual</div>
+          <div>Inscritos</div>
           <div>Disponibles</div>
           <div>Ciclo escolar</div>
         </div>
@@ -34,27 +35,33 @@
 
 
         <!-- Filas -->
-        <div class="grid grid-cols-6 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
+        <div class="grid grid-cols-7 gap-x-8 gap-y-4" *ngFor="let carrera of carreras">
           <!-- Nombre carrera ocupa dos columnas -->
-          <div class="flex items-center col-span-2 ">{{ carrera.label }}</div>
-
+          <div class="flex items-center col-span-2">{{ carrera.label }}</div>
+        
           <!-- Input editable -->
           <input placeholder="0" *ngIf="hasRole('ROLE_ADMIN')" type="number" [id]="carrera.key" name="{{ carrera.key }}"
             [value]="fichas[carrera.key] || ''" (input)="onInputChange($event, carrera.key)" class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-              focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" min="0" />
-
-
+                   focus:outline-none focus:ring-[#6a1b1b] focus:border-[#6a1b1b]" min="0" />
+        
           <!-- Límite actual solo lectura -->
           <input type="number" [value]="limitesActuales[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-      bg-gray-100 text-gray-600 cursor-not-allowed" />
+                   bg-gray-100 text-gray-600 cursor-not-allowed" />
 
+          <!-- Inscritos -->
+          <input type="number" [value]="inscritos[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
+                             bg-gray-100 text-gray-600 cursor-not-allowed" />
+        
           <!-- Disponibles -->
           <input type="number" [value]="disponibles[carrera.key]" readonly class="mt-1 block w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm
-      bg-gray-100 text-gray-600 cursor-not-allowed" />
-
-          <!-- Columna vacía para alinear -->
+                   bg-gray-100 text-gray-600 cursor-not-allowed" />
+        
+          <!-- Columna vacía para alinear ciclo escolar -->
           <div></div>
         </div>
+
+
+
 
 
         <div class="mt-4 text-right text-sm text-gray-600">
