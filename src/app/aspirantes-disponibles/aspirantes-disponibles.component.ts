@@ -97,35 +97,35 @@ export class AspirantesDisponiblesComponent implements OnInit {
     this.carreras.forEach((c) => (this.fichas[c.key] = 0));
   }
 
-  cargarVacantes(anio: number): void {
-    this.registroService.obtenerVacantesPorAnio(anio).subscribe({
-      next: (data) => {
-        this.carreras.forEach((c) => {
-          this.disponibles[c.key] = 0;
-          this.limitesActuales[c.key] = 0;
-          this.inscritos[c.key] = 0;
-        });
+cargarVacantes(anio: number): void {
+  this.registroService.obtenerVacantesPorAnio(anio).subscribe({
+    next: (data) => {
+      // Inicializa todo en 0
+      this.carreras.forEach((c) => {
+        this.disponibles[c.key] = 0;
+        this.limitesActuales[c.key] = 0;
+        this.inscritos[c.key] = 0;
+      });
 
-        data.forEach((item) => {
-          const careerKey = item.career;
-          if (this.disponibles.hasOwnProperty(careerKey)) {
-            this.disponibles[careerKey] = item.availableSlots ?? 0;
-            this.limitesActuales[careerKey] =
-              item.cuposInserted ?? item.limitCount ?? 0;
+      // Cargar datos desde el endpoint
+      data.forEach((item) => {
+        const careerKey = item.career;
+        if (this.disponibles.hasOwnProperty(careerKey)) {
+          this.disponibles[careerKey] = item.availableSlots ?? 0;
+          this.limitesActuales[careerKey] =
+            item.cuposInserted ?? item.limitCount ?? 0;
+          // 🔹 Aquí usamos directamente lo que trae el endpoint:
+          this.inscritos[careerKey] = item.inscritosCount ?? 0;
+        }
+      });
+    },
+    error: (err) => {
+      console.error('Error al obtener vacantes', err);
+      this.alertService.showAlert('Error al obtener vacantes', 'danger');
+    },
+  });
+}
 
-            // calculamos inscritos = límite - disponibles
-            this.inscritos[careerKey] =
-              this.limitesActuales[careerKey] - this.disponibles[careerKey];
-            if (this.inscritos[careerKey] < 0) this.inscritos[careerKey] = 0; // por seguridad
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Error al obtener vacantes', err);
-        this.alertService.showAlert('Error al obtener vacantes', 'danger');
-      },
-    });
-  }
 
   abrirConfirmacion(message: string, callback: () => void) {
     this.confirmMessage = message;
