@@ -82,6 +82,7 @@ export class AspirantesDisponiblesComponent implements OnInit {
       this.fichas[c.key] = 0;
       this.disponibles[c.key] = 0;
       this.limitesActuales[c.key] = 0;
+      this.inscritos[c.key]= 0
     });
 
     // Carga vacantes del año seleccionado (actual por defecto)
