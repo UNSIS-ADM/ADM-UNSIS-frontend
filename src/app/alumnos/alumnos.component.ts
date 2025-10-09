@@ -40,21 +40,25 @@ export class AlumnosComponent implements OnInit {
     private cdRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
-    this.generarAnios();
-    this.alumnosService.getAlumnos().subscribe({
-      next: (data) => {
-        this.alumnos = data;
+ngOnInit(): void {
+  this.generarAnios();
+  this.alumnosService.getAlumnos().subscribe({
+  next: (data) => {
+    this.alumnos = data.map(a => ({
+      ...a,
+      // normaliza el estado: ASISTIO, NP o vacío
+      AttendanceStatus: a.attendanceStatus ? a.attendanceStatus.trim().toUpperCase() : ''
+    }));
 
-        // 🔹 Llenar select de carreras y status disponibles
-        this.carrerasDisponibles = [...new Set(this.alumnos.map(a => a.career).filter(Boolean))].sort();
-        this.statusesDisponibles = [...new Set(this.alumnos.map(a => a.status).filter(Boolean))].sort();
+    // llenar select de carreras y status
+    this.carrerasDisponibles = [...new Set(this.alumnos.map(a => a.career).filter(Boolean))].sort();
+    this.statusesDisponibles = [...new Set(this.alumnos.map(a => a.status).filter(Boolean))].sort();
 
-        this.aplicarFiltros();
-      },
-      error: (err) => console.error('Error al cargar alumnos', err)
-    });
-  }
+    this.aplicarFiltros();
+  },
+  error: (err) => console.error('Error al cargar alumnos', err)
+});
+}
 
   // --- Generar lista de años ---
   generarAnios() {
@@ -140,4 +144,15 @@ export class AlumnosComponent implements OnInit {
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
     return [];
   }
+marcarAsistencia(alumno: any, asistio: boolean): void {
+  const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+  this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
+    next: () => {
+      alumno.attendanceStatus = nuevoEstado;
+      this.cdRef.detectChanges(); // fuerza actualización visual
+    },
+    error: (error) => console.error('Error al actualizar asistencia', error)
+  });
+}
+
 }

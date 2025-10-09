@@ -17,26 +17,33 @@ export class AlumnosService {
     });
     return this.http.get<any[]>(this.endpoint, { headers });
   }
+
   getApplicantById(id: number): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
       'Authorization': token ? `Bearer ${token.replace('Bearer ', '')}` : ''
     });
-    return this.http.get<any>(`${this.endpointget}/${id}`);
+    return this.http.get<any>(`${this.endpointget}/${id}`, { headers });
   }
-  // alumnos.service.ts
+
   editApplicantById(id: number, data: any): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-    
       'Authorization': token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json'
     });
-
-    // aquí mandas el objeto completo
     return this.http.patch<any>(`${this.endpointget}/${id}`, data, { headers });
   }
 
-
+  // ✅ Nueva función para marcar asistencia
+// alumnos.service.ts
+marcarAsistencia(id: number, data: { status: string }): Observable<any> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    'Authorization': token ? `Bearer ${token}` : '',
+    'Content-Type': 'application/json'
+  });
+  return this.http.post<any>(`${this.endpoint}/${id}/attendance`, data, { headers });
+}
 
 }

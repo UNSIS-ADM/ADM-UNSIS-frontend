@@ -10,7 +10,7 @@
 
     <!-- Barra de búsqueda y carga -->
     <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-  <div class="flex flex-wrap gap-3 items-center w-full sm:w-auto">
+      <div class="flex flex-wrap gap-3 items-center w-full sm:w-auto">
 
         <!-- Año -->
         <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
@@ -35,11 +35,11 @@
           <option value="PENDIENTE">Pendiente</option>
         </select>
       </div>
-    
 
-       
-       
-      
+
+
+
+
     </div>
 
     <!-- Mensaje cuando no hay datos -->
@@ -49,7 +49,7 @@
     <div *ngIf="filteredData.length === 0 && terminoBusqueda" class="p-8 text-center text-gray-500">
       No se encontraron resultados para "{{terminoBusqueda}}"
     </div>
-    
+
     <div *ngIf="filteredData.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
@@ -61,6 +61,8 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Asistencia</th>
+
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -80,6 +82,30 @@
                 {{ alumno.status }}
               </span>
             </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <!-- Botones solo si no hay asistencia -->
+              <ng-container *ngIf="!alumno.attendanceStatus || alumno.attendanceStatus === ''">
+                <button (click)="marcarAsistencia(alumno, true)" class="px-2 py-1 border bg-[#548e88] text-white rounded hover:bg-[#29726b]">
+                  Asistió
+                </button>
+                <button (click)="marcarAsistencia(alumno, false)" class="px-2 py-1 border rounded bg-red-600 text-white hover:bg-red-800">
+                  No asistió
+                </button>
+              </ng-container>
+
+              <!-- Mostrar estado si ya se marcó -->
+              <span *ngIf="alumno.attendanceStatus && alumno.attendanceStatus !== ''"
+                [class.text-green-600]="alumno.attendanceStatus === 'ASISTIÓ'"
+                [class.text-red-600]="alumno.attendanceStatus === 'NP'" class="font-semibold">
+                {{ alumno.attendanceStatus }}
+              </span>
+
+            </td>
+
+
+
+
+
           </tr>
           <!-- Filas vacías si faltan -->
           <tr *ngFor="let _ of emptyRows">
