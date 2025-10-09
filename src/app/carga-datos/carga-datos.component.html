@@ -5,11 +5,14 @@
 
     <!-- Encabezado -->
     <div class="p-6 bg-[#24645c] text-white rounded-t-lg">
-
       <h2 class="text-2xl font-semibold">Datos de aspirantes</h2>
     </div>
-    <!-- Barra de búsqueda y carga -->
-    <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+    
+    <!-- Filtros superiores -->
+    <div class="p-4 border-b flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4">
+
+      <!-- Botón de carga -->
       <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
           class="px-3 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
@@ -18,46 +21,38 @@
         <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden">
       </div>
 
-      <div class="flex-1 w-full sm:w-auto max-w-md relative">
-        <div class="relative flex items-center gap-2">
-          <!-- 🔹 Select de año -->
-          <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
-            class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
-            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{anio}}</option>
-          </select>
+      <!-- 🔹 Filtros desplegables -->
+      <div class="flex flex-wrap gap-3 items-center w-full sm:w-auto">
 
-          <!-- 🔹 Buscador -->
-          <div class="relative flex items-center flex-1">
-            <input [(ngModel)]="terminoBusqueda" (input)="buscar()" placeholder="Buscar por ficha, nombre, carrera"
-              class="w-full px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:border-[#6a1b1b]">
+        <!-- Año -->
+        <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
+          <option value="">Todos los años</option>
+          <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+        </select>
 
-            <!-- Loader pequeño de búsqueda -->
-            <div *ngIf="buscando" class="absolute right-2">
-              <svg class="animate-spin h-5 w-5 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
-                viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-              </svg>
-            </div>
+        <!-- Carrera -->
+        <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
+          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
+          <option value="">Todas las carreras</option>
+          <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
+        </select>
 
-            <!-- Botón limpiar búsqueda -->
-            <span *ngIf="terminoBusqueda && !buscando"
-              class="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
-              (click)="terminoBusqueda = ''; buscar()">×</span>
-          </div>
-        </div>
-
-        <!-- Mensaje de error búsqueda -->
-       
+        <!-- Estatus -->
+        <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
+          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
+          <option value="">Todos los estatus</option>
+          <option value="ACEPTADO">Aceptado</option>
+          <option value="RECHAZADO">Rechazado</option>
+          <option value="PENDIENTE">Pendiente</option>
+        </select>
       </div>
     </div>
 
+
     <!-- Mensaje cuando no hay datos -->
-    <div *ngIf="filteredData.length === 0 && !terminoBusqueda" class="p-8 text-center text-gray-500">
-      No hay datos disponibles
-    </div>
-    <div *ngIf="filteredData.length === 0 && terminoBusqueda" class="p-8 text-center text-gray-500">
-      No se encontraron resultados para "{{terminoBusqueda}}"
+    <div *ngIf="filteredData.length === 0" class="p-8 text-center text-gray-500">
+      No hay datos disponibles para el año {{anioSeleccionado}}
     </div>
 
     <!-- Tabla de resultados -->
@@ -91,14 +86,19 @@
 
             <td class="px-3 py-4 whitespace-nowrap">
               <span
-                [ngClass]="{'bg-green-100 text-green-800': alumno.status === 'ACEPTADO', 'bg-red-100 text-red-800': alumno.status === 'RECHAZADO', 'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'}"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
+                  'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
+                  'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'
+                }"
                 class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{alumno.status || 'Cargado'}}
               </span>
             </td>
+
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
-              <button (click)="openModal(alumno.id)" class="px-4 py-2 bg-[#548e88] text-white rounded
-             hover:bg-[#29726b] ">
+              <button (click)="openModal(alumno.id)"
+                class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b]">
                 Editar datos
               </button>
             </td>
@@ -113,7 +113,7 @@
     </div>
 
     <!-- Paginación -->
-     <div *ngIf="filteredData.length > 0" class="px-3 py-3 border-t">
+    <div *ngIf="filteredData.length > 0" class="px-3 py-3 border-t">
       <div class="flex flex-col items-center gap-2">
         <div class="text-sm text-gray-500 text-center">
           Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
@@ -133,9 +133,7 @@
               class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
               {{ page }}
             </button>
-            <ng-template #dots>
-              <span class="px-2">…</span>
-            </ng-template>
+            <ng-template #dots><span class="px-2">…</span></ng-template>
           </ng-container>
 
           <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
@@ -147,7 +145,7 @@
     </div>
 
     <!-- Loader sobrepuesto -->
-    <div *ngIf="isLoading" class="absolute inset-0 z-50 flex items-center justify-center ">
+    <div *ngIf="isLoading" class="absolute inset-0 z-50 flex items-center justify-center">
       <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200 flex items-center gap-3">
         <svg class="animate-spin h-8 w-8 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
           viewBox="0 0 24 24">
@@ -162,71 +160,14 @@
     <app-confirm-dialog *ngIf="showConfirm" [title]="'Confirmar subida'"
       [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
     </app-confirm-dialog>
-
   </div>
 
-  <!-- Modal -->
-  <div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
+ <app-modal-edit-applicant
+  [showModal]="showModal"
+  [selectedApplicant]="selectedApplicant"
+  [currentRoute]="currentRoute"
+  (close)="closeModal()"
+  (save)="saveApplicant()">
+</app-modal-edit-applicant>
 
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl p-6 animate-fade-in 
-              max-h-[80vh] overflow-y-auto"> <!-- 👈 scroll -->
-      <h2 class="text-2xl font-bold mb-6 text-gray-800">Editar Aspirante</h2>
-
-      <!-- Formulario para un solo alumno -->
-      <form *ngIf="selectedApplicant" class="grid grid-cols-6 gap-4">
-
-        <!-- Ficha -->
-        <div class="col-span-2">
-          <label class="block mb-1 text-sm font-medium text-gray-600">Ficha</label>
-          <input type="text" [(ngModel)]="selectedApplicant.ficha" name="ficha"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-        <!-- CURP -->
-        <div class="col-span-4">
-          <label class="block mb-1 text-sm font-medium text-gray-600">CURP</label>
-          <input type="text" [(ngModel)]="selectedApplicant.curp" name="curp"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-        <!-- Nombre -->
-        <div class="col-span-6">
-          <label class="block mb-1 text-sm font-medium text-gray-600">Nombre</label>
-          <input type="text" [(ngModel)]="selectedApplicant.fullName" name="fullName"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-        <!-- Carrera y Ubicación -->
-        <div class="col-span-3">
-          <label class="block mb-1 text-sm font-medium text-gray-600">Carrera</label>
-          <input type="text" [(ngModel)]="selectedApplicant.career" name="career"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-        <div class="col-span-3">
-          <label class="block mb-1 text-sm font-medium text-gray-600">Ubicación</label>
-          <input type="text" [(ngModel)]="selectedApplicant.location" name="location"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-        <!-- Sala y Status -->
-        <div class="col-span-3">
-          <label class="block mb-1 text-sm font-medium text-gray-600">Sala de examen</label>
-          <input type="text" [(ngModel)]="selectedApplicant.examRoom" name="examRoom"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
-        </div>
-
-
-      </form>
-
-      <div class="mt-6 flex justify-end gap-3">
-        <button (click)="saveApplicant()" class="px-4 py-2 bg-[#548e88] text-white rounded-lg 
-             hover:bg-[#29726b] transition-colors">
-          Guardar
-        </button>
-        <button (click)="closeModal()"
-          class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition-colors">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
+</div>

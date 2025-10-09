@@ -9,6 +9,7 @@ import { AlertService } from '../services/alert.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { Router } from '@angular/router';
 import { RegistroFichasService } from '../services/registro-fichas.service';
+import { ModalEditApplicantComponent } from '../applicants/modal-edit-applicant/modal-edit-applicant.component';
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -17,7 +18,8 @@ import { RegistroFichasService } from '../services/registro-fichas.service';
     CommonModule,
     FormsModule,
     TiempoRelativoPipe,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    ModalEditApplicantComponent
   ],
   templateUrl: './carga-datos-resultados.component.html',
   styleUrls: ['./carga-datos-resultados.component.css'],
@@ -32,18 +34,22 @@ export class CargaDatosResultadosComponent implements OnInit {
   filteredData: any[] = [];
   token = localStorage.getItem('token') || '';
   isLoading = false;
-  terminoBusqueda = '';
-  buscando = false;
-  errorBusqueda = false;
+
+  // 🔹 Filtros
+  anioSeleccionado: string = '';
+  carreraSeleccionada: string = '';
+  statusSeleccionado: string = '';
+
+  aniosDisponibles: number[] = [];
+  carrerasDisponibles: string[] = [];
+
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
-  // 👇 agrega estas dos propiedades
- public anioSeleccionado: string = ''; // año actualmente seleccionado
-  public aniosDisponibles: number[] = []; // lista de años únicos disponibles
-showModal: boolean = false;
-  selectedApplicant: any = null; // aquí guardamos el aspirante que se va a editar
-  
+
+  showModal: boolean = false;
+  selectedApplicant: any = null;
+  currentRoute: string = '';
   constructor(
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
@@ -51,123 +57,82 @@ showModal: boolean = false;
     private cdRef: ChangeDetectorRef,
     private alertService: AlertService,
     private router: Router,
-    private registroFichasService: RegistroFichasService  
-  ) { }
+    private registroFichasService: RegistroFichasService, 
+  ) {}
 
   ngOnInit() {
-      this.generarAnios();  
+    this.generarAnios();  
     this.loadResultados();
-  }
-loadResultados() {
-  this.isLoading = true;
-  this.cdRef.detectChanges();
+        this.currentRoute = this.router.url; // guardamos la ruta actual
 
-  this.resultadosService.getResultados().subscribe({
-    next: (resultados) => {
-      this.datos = resultados;
-      this.filteredData = [...this.datos];
-
-      // 🔹 años que vienen del endpoint
-      const yearsFromEndpoint = this.datos.map(a => a.admissionYear);
-
-      // 🔹 años desde el actual hasta 5 atrás
-      const currentYear = new Date().getFullYear();
-      const lastFiveYears = Array.from({length:5},(_,i)=>currentYear - i);
-
-      // 🔹 combinas ambos
-      this.aniosDisponibles = [...new Set([...yearsFromEndpoint, ...lastFiveYears])]
-        .sort((a,b)=>b-a);
-
-      // 🔹 seleccionar año actual automáticamente
-      this.anioSeleccionado = currentYear.toString();
-
-      // 🔹 filtrar para mostrar solo ese año al cargar
-      this.filtrarPorAnio();
-
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    },
-    error: (err) => {
-      this.alertService.showAlert('Error al cargar los datos', 'danger');
-      this.isLoading = false;
-      this.cdRef.detectChanges();
-    }
-  });
-}
-
-
-
- buscar() {
-  const termino = this.terminoBusqueda.trim();
-
-  // 🔹 Si está vacío, muestra todos los datos filtrados solo por año
-  if (!termino) {
-    // primero filtramos por año
-    this.filtrarPorAnio();
-    this.errorBusqueda = false;
-    this.currentPage = 1;
-    return;
   }
 
-  // 🔹 Si hay término sí hacemos búsqueda
-  this.buscando = true;
-  this.errorBusqueda = false;
+  loadResultados() {
+    this.isLoading = true;
+    this.cdRef.detectChanges();
 
-  let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-  if (/^\d/.test(termino)) tipo = 'ficha';
-  else if (this.datos.some(a => a.careerAtResult?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
-  else tipo = 'fullName';
-
-  setTimeout(() => {
-    this.filtradoService.buscar(termino, tipo).subscribe({
+    this.resultadosService.getResultados().subscribe({
       next: (resultados) => {
-        if (resultados.length > 0) this.filteredData = resultados;
-        else this.filtrarLocalmente(termino, tipo);
-        console.log(resultados)
-        this.currentPage = 1;
-        this.buscando = false;
+        this.datos = resultados;
+        this.filteredData = [...this.datos];
+
+        // 🔹 Llenar select de años
+        const yearsFromEndpoint = this.datos.map(a => a.admissionYear);
+        const currentYear = new Date().getFullYear();
+        const lastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+        this.aniosDisponibles = [...new Set([...yearsFromEndpoint, ...lastFiveYears])].sort((a, b) => b - a);
+        this.anioSeleccionado = currentYear.toString();
+
+        // 🔹 Llenar select de carreras
+        this.carrerasDisponibles = [...new Set(this.datos.map(a => a.careerAtResult).filter(Boolean))].sort();
+
+        this.aplicarFiltros();
+
+        this.isLoading = false;
         this.cdRef.detectChanges();
       },
-      error: () => {
-        this.filtrarLocalmente(termino, tipo);
-        this.buscando = false;
+      error: (err) => {
+        this.alertService.showAlert('Error al cargar los datos', 'danger');
+        this.isLoading = false;
         this.cdRef.detectChanges();
       }
     });
-  }, 300);
-}
+  }
 
+  // --- Filtros ---
+  generarAnios() {
+    const currentYear = new Date().getFullYear();
+    this.aniosDisponibles = [];
+    for (let i = 0; i < 5; i++) {
+      this.aniosDisponibles.push(currentYear - i);
+    }
+  }
 
-  private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
-    termino = termino.toLowerCase();
-    this.filteredData = this.datos.filter(alumno => {
-      switch (tipo) {
-        case 'fullName': return alumno.fullName?.toLowerCase().includes(termino);
-        case 'ficha': return alumno.applicantId?.toString().toLowerCase().includes(termino);
-        case 'curp': return alumno.curp?.toLowerCase().includes(termino);
-        case 'career': return alumno.career?.toLowerCase().includes(termino);
-      }
+  aplicarFiltros() {
+    this.filteredData = this.datos.filter(a => {
+      const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
+      const coincideCarrera = !this.carreraSeleccionada || a.careerAtResult == this.carreraSeleccionada;
+      const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
+      return coincideAnio && coincideCarrera && coincideStatus;
     });
-    this.errorBusqueda = this.filteredData.length === 0;
-  }
-  private generarAnios() {
-  const currentYear = new Date().getFullYear();
-  this.aniosDisponibles = [];
-  for (let i = 0; i < 5; i++) {
-    this.aniosDisponibles.push(currentYear - i);
-  }
-}
 
-filtrarPorAnio() {
-  if (!this.anioSeleccionado) {
-    this.filteredData = [...this.datos];
-  } else {
-    const year = +this.anioSeleccionado;
-    this.filteredData = this.datos.filter(a => a.admissionYear === year);
+    this.currentPage = 1;
+    this.cdRef.detectChanges();
   }
-  this.currentPage = 1;
-}
 
+  filtrarPorAnio() {
+    this.aplicarFiltros();
+  }
+
+  filtrarPorCarrera() {
+    this.aplicarFiltros();
+  }
+
+  filtrarPorStatus() {
+    this.aplicarFiltros();
+  }
+
+  // --- Subida de archivo ---
   onFileSelected(evt: Event) {
     const input = evt.target as HTMLInputElement;
     if (input.files && input.files.length) {
@@ -279,57 +244,56 @@ filtrarPorAnio() {
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
     return [];
   }
-  //editar alumnos modal 
-openModal(id: number) {
-  this.resultadosService.getApplicantById(id).subscribe({
-    next: (data) => {
-      this.selectedApplicant = data;  // 👈 guardamos SOLO ese alumno
-      this.showModal = true;
-    },
-    error: (err) => {
-      console.error('Error:', err);
-    }
-  });
-}
+
+  // --- Modal editar aspirante ---
+  openModal(id: number) {
+    this.resultadosService.getApplicantById(id).subscribe({
+      next: (data) => {
+        this.selectedApplicant = data;
+        this.showModal = true;
+      },
+      error: (err) => {
+        console.error('Error:', err);
+      }
+    });
+  }
 
   closeModal() {
     this.showModal = false;
   }
-// componente.ts
-saveApplicant() {
-  if (!this.selectedApplicant?.id) {
-    console.error('No hay aspirante seleccionado');
-    return;
+
+  saveApplicant() {
+    if (!this.selectedApplicant?.id) {
+      console.error('No hay aspirante seleccionado');
+      return;
+    }
+
+    const data = {
+      id: this.selectedApplicant.id,
+      ficha: this.selectedApplicant.ficha,
+      curp: this.selectedApplicant.curp,
+      careerAtResult: this.selectedApplicant.careerAtResult,
+      fullName: this.selectedApplicant.fullName,
+      career: this.selectedApplicant.career,
+      location: this.selectedApplicant.location,
+      examRoom: this.selectedApplicant.examRoom,
+      examDate: this.selectedApplicant.examDate,
+      admissionYear: this.selectedApplicant.admissionYear,
+      lastLogin: this.selectedApplicant.lastLogin,
+      score: this.selectedApplicant.score,
+      resultDate: this.selectedApplicant.resultDate
+    };
+
+    this.resultadosService.editApplicantById(this.selectedApplicant.id, data)
+      .subscribe({
+        next: (res) => {
+          console.log('Aspirante editado correctamente', res);
+          this.loadResultados();
+          this.closeModal();
+        },
+        error: (err) => {
+          console.error('Error al editar aspirante', err);
+        }
+      });
   }
-
-  // construyes el body con los campos que quieres enviar:
-  const data = {
-    id: this.selectedApplicant.id,
-    ficha: this.selectedApplicant.ficha,
-    curp: this.selectedApplicant.curp,
-    careerAtResult: this.selectedApplicant.careerAtResult,
-    fullName: this.selectedApplicant.fullName,
-    career: this.selectedApplicant.career,
-    location: this.selectedApplicant.location,
-    examRoom: this.selectedApplicant.examRoom,
-    examDate: this.selectedApplicant.examDate,
-    admissionYear: this.selectedApplicant.admissionYear,
-    lastLogin: this.selectedApplicant.lastLogin,
-    score: this.selectedApplicant.score,
-    resultDate: this.selectedApplicant.resultDate
-  };
-
-  this.resultadosService.editApplicantById(this.selectedApplicant.id, data)
-    .subscribe({
-      next: (res) => {
-        console.log('Aspirante editado correctamente', res);
-        // refresca lista si hace falta
-        this.loadResultados();
-        this.closeModal();
-      },
-      error: (err) => {
-        console.error('Error al editar aspirante', err);
-      }
-    });
-}
 }

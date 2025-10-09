@@ -15,18 +15,24 @@ import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
 export class AlumnosComponent implements OnInit {
   alumnos: any[] = [];
   filteredData: any[] = [];
+
+  // 🔍 Búsqueda
   terminoBusqueda = '';
   buscando = false;
   errorBusqueda = false;
 
-  // paginación
+  // 🔹 Paginación
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
 
-  // 🔹 nuevo para años
+  // 🔹 Filtros
   aniosDisponibles: number[] = [];
   anioSeleccionado: string = '';
+  carreraSeleccionada: string = '';
+  statusSeleccionado: string = '';
+  carrerasDisponibles: string[] = [];
+  statusesDisponibles: string[] = [];
 
   constructor(
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
@@ -39,95 +45,68 @@ export class AlumnosComponent implements OnInit {
     this.alumnosService.getAlumnos().subscribe({
       next: (data) => {
         this.alumnos = data;
-        this.filtrarPorAnio();
+
+        // 🔹 Llenar select de carreras y status disponibles
+        this.carrerasDisponibles = [...new Set(this.alumnos.map(a => a.career).filter(Boolean))].sort();
+        this.statusesDisponibles = [...new Set(this.alumnos.map(a => a.status).filter(Boolean))].sort();
+
+        this.aplicarFiltros();
       },
       error: (err) => console.error('Error al cargar alumnos', err)
     });
   }
 
-  private generarAnios() {
+  // --- Generar lista de años ---
+  generarAnios() {
     const currentYear = new Date().getFullYear();
     this.aniosDisponibles = Array.from({ length: 5 }, (_, i) => currentYear - i);
     this.anioSeleccionado = currentYear.toString();
   }
 
-    buscar() {
-  const termino = this.terminoBusqueda.trim();
+  // --- Aplicar filtros ---
+  aplicarFiltros() {
+    this.filteredData = this.alumnos.filter(a => {
+      const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
+      const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
+      const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
+      return coincideAnio && coincideCarrera && coincideStatus;
+    });
 
-  // 🔹 Si está vacío, muestra todos los datos filtrados solo por año
-  if (!termino) {
-    // primero filtramos por año
-    this.filtrarPorAnio();
-    this.errorBusqueda = false;
     this.currentPage = 1;
-    return;
+    this.cdRef.detectChanges();
   }
 
-  // 🔹 Si hay término sí hacemos búsqueda
-  this.buscando = true;
-  this.errorBusqueda = false;
-
-  let tipo: 'ficha' | 'curp' | 'fullName' | 'career';
-  if (/^\d/.test(termino)) tipo = 'ficha';
-  else if (this.alumnos.some(a => a.career?.toLowerCase().includes(termino.toLowerCase()))) tipo = 'career';
-  else tipo = 'fullName';
-
-  setTimeout(() => {
-    this.filtradoService.buscar(termino, tipo).subscribe({
-      next: (resultados) => {
-        if (resultados.length > 0) this.filteredData = resultados;
-        else this.filtrarLocalmente(termino, tipo);
-        console.log(resultados)
-        this.currentPage = 1;
-        this.buscando = false;
-        this.cdRef.detectChanges();
-      },
-      error: () => {
-        this.filtrarLocalmente(termino, tipo);
-        this.buscando = false;
-        this.cdRef.detectChanges();
-      }
-    });
-  }, 300);
-}
- filtrarPorAnio() {
-  if (!this.anioSeleccionado) {
-    this.filteredData = [...this.alumnos];
-  } else {
-    const year = +this.anioSeleccionado;
-    this.filteredData = this.alumnos.filter(a => a.admissionYear === year);
-  }
-  this.currentPage = 1;
-}
-  private filtrarLocalmente(termino: string, tipo: 'ficha' | 'curp' | 'fullName' | 'career') {
-    termino = termino.toLowerCase();
-    this.filteredData = this.alumnos.filter(alumno => {
-      switch (tipo) {
-        case 'fullName': return alumno.fullName?.toLowerCase().includes(termino);
-        case 'ficha': return alumno.applicantId?.toString().toLowerCase().includes(termino);
-        case 'curp': return alumno.curp?.toLowerCase().includes(termino);
-        case 'career': return alumno.career?.toLowerCase().includes(termino);
-      }
-    });
-    this.errorBusqueda = this.filteredData.length === 0;
-    return this.filteredData;
+  filtrarPorAnio() {
+    this.aplicarFiltros();
   }
 
-  // paginación
+  filtrarPorCarrera() {
+    this.aplicarFiltros();
+  }
+
+  filtrarPorStatus() {
+    this.aplicarFiltros();
+  }
+
+  // --- Paginación ---
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
     return this.filteredData.slice(start, end);
   }
+
   siguientePagina() {
     if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) this.currentPage++;
   }
+
   paginaAnterior() {
     if (this.currentPage > 1) this.currentPage--;
   }
+
   get totalPages(): number {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
+
   get pages(): (number | string)[] {
     const total = this.totalPages;
     const current = this.currentPage;
@@ -151,9 +130,11 @@ export class AlumnosComponent implements OnInit {
 
     return rangeWithDots;
   }
+
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) this.currentPage = page;
   }
+
   get emptyRows(): any[] {
     const rowsOnPage = this.paginatedData.length;
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
