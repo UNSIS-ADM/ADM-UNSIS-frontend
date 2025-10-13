@@ -4,15 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { AlumnosService } from '../services/alumnos.service';
 import { FiltradoService } from '../services/filtrado.service';
 import { TiempoRelativoPipe } from '../../tiempo-relativo.pipe';
+import { TemplateService } from '../services/template.service';
+import { HttpResponse } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
+import { extractFilename } from '../utils/file--utils';
 
 @Component({
   selector: 'app-alumnos',
   standalone: true,
   imports: [CommonModule, FormsModule, TiempoRelativoPipe],
   templateUrl: './alumnos.component.html',
-  styleUrls: ['./alumnos.component.css']
+  styleUrls: ['./alumnos.component.css'],
 })
 export class AlumnosComponent implements OnInit {
+  downloadingAspirantes = false;
+  downloadingResultados = false;
   alumnos: any[] = [];
   filteredData: any[] = [];
 
@@ -37,42 +43,55 @@ export class AlumnosComponent implements OnInit {
   constructor(
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
     private filtradoService: FiltradoService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private templateService: TemplateService // INYECCIÓN xlsx
   ) {}
 
-ngOnInit(): void {
-  this.generarAnios();
-  this.alumnosService.getAlumnos().subscribe({
-  next: (data) => {
-    this.alumnos = data.map(a => ({
-      ...a,
-      // normaliza el estado: ASISTIO, NP o vacío
-      AttendanceStatus: a.attendanceStatus ? a.attendanceStatus.trim().toUpperCase() : ''
-    }));
+  ngOnInit(): void {
+    this.generarAnios();
+    this.alumnosService.getAlumnos().subscribe({
+      next: (data) => {
+        this.alumnos = data.map((a) => ({
+          ...a,
+          // normaliza el estado: ASISTIO, NP o vacío
+          AttendanceStatus: a.attendanceStatus
+            ? a.attendanceStatus.trim().toUpperCase()
+            : '',
+        }));
 
-    // llenar select de carreras y status
-    this.carrerasDisponibles = [...new Set(this.alumnos.map(a => a.career).filter(Boolean))].sort();
-    this.statusesDisponibles = [...new Set(this.alumnos.map(a => a.status).filter(Boolean))].sort();
+        // llenar select de carreras y status
+        this.carrerasDisponibles = [
+          ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
+        ].sort();
+        this.statusesDisponibles = [
+          ...new Set(this.alumnos.map((a) => a.status).filter(Boolean)),
+        ].sort();
 
-    this.aplicarFiltros();
-  },
-  error: (err) => console.error('Error al cargar alumnos', err)
-});
-}
+        this.aplicarFiltros();
+      },
+      error: (err) => console.error('Error al cargar alumnos', err),
+    });
+  }
 
   // --- Generar lista de años ---
   generarAnios() {
     const currentYear = new Date().getFullYear();
-    this.aniosDisponibles = Array.from({ length: 5 }, (_, i) => currentYear - i);
+    this.aniosDisponibles = Array.from(
+      { length: 5 },
+      (_, i) => currentYear - i
+    );
     this.anioSeleccionado = currentYear.toString();
   }
 
   // --- Aplicar filtros ---
   aplicarFiltros() {
-    this.filteredData = this.alumnos.filter(a => {
-      const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
-      const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
-      const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
+    this.filteredData = this.alumnos.filter((a) => {
+      const coincideAnio =
+        !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
+      const coincideCarrera =
+        !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
+      const coincideStatus =
+        !this.statusSeleccionado || a.status == this.statusSeleccionado;
       return coincideAnio && coincideCarrera && coincideStatus;
     });
 
@@ -100,7 +119,8 @@ ngOnInit(): void {
   }
 
   siguientePagina() {
-    if ((this.currentPage * this.itemsPerPage) < this.filteredData.length) this.currentPage++;
+    if (this.currentPage * this.itemsPerPage < this.filteredData.length)
+      this.currentPage++;
   }
 
   paginaAnterior() {
@@ -120,7 +140,12 @@ ngOnInit(): void {
     let last: number | undefined;
 
     for (let i = 1; i <= total; i++) {
-      if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) range.push(i);
+      if (
+        i === 1 ||
+        i === total ||
+        (i >= current - delta && i <= current + delta)
+      )
+        range.push(i);
     }
 
     for (let i of range) {
@@ -141,18 +166,64 @@ ngOnInit(): void {
 
   get emptyRows(): any[] {
     const rowsOnPage = this.paginatedData.length;
-    if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage) return Array(this.itemsPerPage - rowsOnPage);
+    if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage)
+      return Array(this.itemsPerPage - rowsOnPage);
     return [];
   }
-marcarAsistencia(alumno: any, asistio: boolean): void {
-  const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
-  this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
-    next: () => {
-      alumno.attendanceStatus = nuevoEstado;
-      this.cdRef.detectChanges(); // fuerza actualización visual
-    },
-    error: (error) => console.error('Error al actualizar asistencia', error)
-  });
-}
+  marcarAsistencia(alumno: any, asistio: boolean): void {
+    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+    this.alumnosService
+      .marcarAsistencia(alumno.id, { status: nuevoEstado })
+      .subscribe({
+        next: () => {
+          alumno.attendanceStatus = nuevoEstado;
+          this.cdRef.detectChanges(); // fuerza actualización visual
+        },
+        error: (error) =>
+          console.error('Error al actualizar asistencia', error),
+      });
+  }
 
+  // Descargar formatos XLSX
+  downloadTemplate(key: 'aspirantes' | 'resultados'): void {
+    if (key === 'aspirantes') this.downloadingAspirantes = true;
+    else this.downloadingResultados = true;
+
+    const defaultName = key === 'aspirantes' ? 'Datos de aspirantes.xlsx' : 'Resultados de admisión.xlsx';
+
+    this.templateService
+      .downloadTemplate(key)
+      .pipe(
+        finalize(() => {
+          // Se ejecuta siempre (éxito o error)
+          this.downloadingAspirantes = false;
+          this.downloadingResultados = false;
+        })
+      )
+      .subscribe({
+        next: (res: HttpResponse<Blob>) => {
+          const blob = res.body!;
+          const filename = extractFilename(
+            res.headers.get('content-disposition'),
+            defaultName
+          );
+
+          // Crear enlace de descarga
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Error descargando template', err);
+          alert(
+            'Error al descargar el formato. Revisa permisos o el servidor.'
+          );
+        },
+      });
+  }
 }
