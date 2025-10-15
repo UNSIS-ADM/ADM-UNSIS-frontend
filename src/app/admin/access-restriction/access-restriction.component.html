@@ -73,5 +73,10 @@
 </div>
 
 <!-- Modal de confirmación -->
-<app-confirm-dialog *ngIf="showConfirm" [message]="confirmMessage" (confirm)="onConfirm($event)">
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [message]="confirmMessage"
+  [title]="'Confirmación'"
+  (confirm)="onConfirm(true)"
+  (cancel)="onConfirm(false)">
 </app-confirm-dialog>
