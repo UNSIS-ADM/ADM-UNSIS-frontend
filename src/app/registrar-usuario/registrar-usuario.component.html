@@ -69,10 +69,12 @@
     </form>
   </div>
 </div>
-
-<app-confirm-dialog *ngIf="showConfirmModal"
+<app-confirm-dialog
+  *ngIf="showConfirmModal"
   [message]="confirmMessage"
   [title]="'Confirmación'"
-  (confirm)="handleConfirm($event)">
+  (confirm)="handleConfirm(true)"
+  (cancel)="handleConfirm(false)">
 </app-confirm-dialog>
+
 

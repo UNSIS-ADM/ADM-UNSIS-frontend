@@ -151,10 +151,14 @@
     </div>
 
    <!-- Modal de confirmación -->
-    <app-confirm-dialog *ngIf="showConfirm" [title]="'Confirmar subida'"
-      [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
-    </app-confirm-dialog>
-  </div>
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [title]="'Confirmar subida'"
+  [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
+  (confirm)="onConfirm(true)"
+  (cancel)="showConfirm = false">
+</app-confirm-dialog>
+
 
 <app-modal-edit-applicant
   [showModal]="showModal"
