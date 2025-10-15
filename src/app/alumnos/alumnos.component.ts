@@ -54,12 +54,13 @@ export class AlumnosComponent implements OnInit {
       next: (data) => {
         this.alumnos = data.map((a) => ({
           ...a,
+          
           // normaliza el estado: ASISTIO, NP o vacío
           AttendanceStatus: a.attendanceStatus
             ? a.attendanceStatus.trim().toUpperCase()
             : '',
         }));
-
+        console.log(this.alumnos)
         // llenar select de carreras y status
         this.carrerasDisponibles = [
           ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
