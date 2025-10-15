@@ -8,7 +8,7 @@ import { TemplateService } from '../services/template.service';
 import { HttpResponse } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 import { extractFilename } from '../utils/file--utils';
-
+import { AlertService } from '../services/alert.service';
 @Component({
   selector: 'app-alumnos',
   standalone: true,
@@ -44,7 +44,8 @@ export class AlumnosComponent implements OnInit {
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
-    private templateService: TemplateService // INYECCIÓN xlsx
+    private templateService: TemplateService, // INYECCIÓN xlsx
+    private alertService: AlertService,
   ) {}
 
   ngOnInit(): void {
@@ -171,7 +172,7 @@ export class AlumnosComponent implements OnInit {
     return [];
   }
   marcarAsistencia(alumno: any, asistio: boolean): void {
-    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+    const nuevoEstado = asistio ? 'Asisitió' : 'NP';
     this.alumnosService
       .marcarAsistencia(alumno.id, { status: nuevoEstado })
       .subscribe({
@@ -180,7 +181,7 @@ export class AlumnosComponent implements OnInit {
           this.cdRef.detectChanges(); // fuerza actualización visual
         },
         error: (error) =>
-          console.error('Error al actualizar asistencia', error),
+         this.alertService.showAlert('Error al marcar la asistencia', 'danger')
       });
   }
 

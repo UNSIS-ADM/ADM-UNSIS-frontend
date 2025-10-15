@@ -80,7 +80,10 @@
 <!-- Modal de confirmación -->
 <!-- Modal de confirmación adaptado a tu estándar -->
 <!-- Icono que quieras mostrar -->
-<app-confirm-dialog *ngIf="showConfirmModal" [message]="confirmMessage" [title]="'Confirmación'"
-  (confirm)="confirmCallback && confirmCallback()" (cancel)="showConfirmModal = false">
+<app-confirm-dialog
+  *ngIf="showConfirmModal"
+  [message]="confirmMessage"
+  [title]="'Confirmación'"
+  (confirm)="confirmCallback && confirmCallback()"
+  (cancel)="showConfirmModal = false">
 </app-confirm-dialog>
-<!-- Opcional: spinner si estás procesando -->

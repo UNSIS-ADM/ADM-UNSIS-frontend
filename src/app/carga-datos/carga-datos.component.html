@@ -8,7 +8,7 @@
       <h2 class="text-2xl font-semibold">Datos de aspirantes</h2>
     </div>
 
-    
+
     <!-- Filtros superiores -->
     <div class="p-4 border-b flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4">
 
@@ -83,17 +83,15 @@
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.location}}</td>
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.examRoom}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.resultDate}}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.examDate | date:'dd/MM/yy' }}</td>
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
 
             <td class="px-3 py-4 whitespace-nowrap">
-              <span
-                [ngClass]="{
+              <span [ngClass]="{
                   'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
                   'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
                   'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'
-                }"
-                class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full">
+                }" class="px-3 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{alumno.status || 'Cargado'}}
               </span>
             </td>
@@ -158,18 +156,17 @@
       </div>
     </div>
 
-    <!-- Modal de confirmación -->
-    <app-confirm-dialog *ngIf="showConfirm" [title]="'Confirmar subida'"
-      [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'" (confirm)="onConfirm($event)">
-    </app-confirm-dialog>
-  </div>
+<!-- Modal de confirmación -->
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [title]="'Confirmar subida'"
+  [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
+  (confirm)="onConfirm(true)"
+  (cancel)="showConfirm = false">
+</app-confirm-dialog>
 
- <app-modal-edit-applicant
-  [showModal]="showModal"
-  [selectedApplicant]="selectedApplicant"
-  [currentRoute]="currentRoute"
-  (close)="closeModal()"
-  (save)="saveApplicant()">
-</app-modal-edit-applicant>
+  <app-modal-edit-applicant [showModal]="showModal" [selectedApplicant]="selectedApplicant"
+    [currentRoute]="currentRoute" (close)="closeModal()" (save)="saveApplicant()">
+  </app-modal-edit-applicant>
 
 </div>

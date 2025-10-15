@@ -79,7 +79,7 @@ currentRoute: string = '';
         next: (resultados) => {
         this.datos = resultados;
         this.filteredData = [...this.datos];
-
+          console.log(this.filteredData);
         // 🔹 Llenar select de años
         const yearsFromEndpoint = this.datos.map(a => a.admissionYear);
         const currentYear = new Date().getFullYear();
