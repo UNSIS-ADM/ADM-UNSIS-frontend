@@ -5,8 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { ApplicantService } from '../services/applicant.service';
 import { AlertService } from '../services/alert.service';
-import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // 👈 Importamos servicio de resultados
-import { routes } from '../app.routes';
+import { ResultadosMostrarService } from '../services/resultados-mostrar.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -24,13 +23,13 @@ export class NuevaCarreraApplicantComponent implements OnInit {
     comentario: '',
   };
 
-  carreraActual: string = ''; // 🔹 Guardará la carrera actual del alumno
+  carreraActual: string = '';
 
   constructor(
     private applicantService: ApplicantService,
     private alertService: AlertService,
     private resultadosService: ResultadosMostrarService,
-      private router: Router // 👈 Inyectamos servicio
+    private router: Router
   ) {
     this.carrerasDisponibles.push(
       { nombre: 'LICENCIATURA EN INFORMÁTICA' },
@@ -43,24 +42,22 @@ export class NuevaCarreraApplicantComponent implements OnInit {
     );
   }
 
- ngOnInit(): void {
- 
-  this.resultadosService.getResultadosUsuario().subscribe({
-    next: (data) => {
-      this.carreraActual = (data.career || '').trim().toUpperCase();
-      console.log('Carrera actual:', this.carreraActual);
+  ngOnInit(): void {
+    this.resultadosService.getResultadosUsuario().subscribe({
+      next: (data) => {
+        this.carreraActual = (data.career || '').trim().toUpperCase();
+        console.log('Carrera actual:', this.carreraActual);
 
-      this.carrerasDisponibles = this.carrerasDisponibles.filter(
-        (c) => c.nombre.toUpperCase() !== this.carreraActual
-      );
-    },
-    error: (err) => {
-      console.error('Error al obtener carrera del alumno:', err);
-      this.alertService.showAlert('No se pudo cargar tu carrera actual', 'danger');
-    },
-  });
-}
-
+        this.carrerasDisponibles = this.carrerasDisponibles.filter(
+          (c) => c.nombre.toUpperCase() !== this.carreraActual
+        );
+      },
+      error: (err) => {
+        console.error('Error al obtener carrera del alumno:', err);
+        this.alertService.showAlert('No se pudo cargar tu carrera actual', 'danger');
+      },
+    });
+  }
 
   submitForm(): void {
     if (!this.formData.carrera || !this.formData.comentario) {
@@ -68,25 +65,54 @@ export class NuevaCarreraApplicantComponent implements OnInit {
       return;
     }
 
-    // 🚫 Validar si seleccionó la misma carrera
     if (this.formData.carrera.toUpperCase() === this.carreraActual) {
       this.alertService.showAlert('No puedes seleccionar tu misma carrera', 'danger');
       return;
     }
 
-    this.applicantService
-      .changeCareer(this.formData.carrera, this.formData.comentario)
-      .subscribe({
-        next: () => {
-          this.alertService.showAlert('Solicitud enviada exitosamente', 'success');
-          this.formData = { carrera: '', comentario: '' };
-          this.router.navigate(['/respsolicitud']);
-        },
-        error: (err) => {
-           console.error('❌ Error devuelto por el backend:', err);
-          this.alertService.showAlert('Ya tienes una solicitud en el sistema', 'danger');
-          this.router.navigate(['/respsolicitud']);
-        },
-      });
+    // 🟡 NUEVO: Validar fichas disponibles antes de enviar solicitud
+    this.applicantService.getVacantesDisponibles().subscribe({
+      next: (vacantes: any[]) => {
+        const carreraSeleccionada = vacantes.find(
+          (v) => v.career === this.formData.carrera
+        );
+
+        if (!carreraSeleccionada) {
+          this.alertService.showAlert('Carrera no encontrada en el sistema', 'danger');
+          return;
+        }
+
+        if (carreraSeleccionada.availableSlots === 0) {
+          this.alertService.showAlert(
+            'No hay fichas disponibles en esta carrera',
+            'danger'
+          );
+          return;
+        }
+
+        // ✅ Si hay fichas disponibles, enviar la solicitud
+        this.applicantService
+          .changeCareer(this.formData.carrera, this.formData.comentario)
+          .subscribe({
+            next: () => {
+              this.alertService.showAlert('Solicitud enviada exitosamente', 'success');
+              this.formData = { carrera: '', comentario: '' };
+              this.router.navigate(['/respsolicitud']);
+            },
+            error: (err) => {
+              console.error('❌ Error devuelto por el backend:', err);
+              this.alertService.showAlert(
+                'Ya tienes una solicitud en el sistema',
+                'danger'
+              );
+              this.router.navigate(['/respsolicitud']);
+            },
+          });
+      },
+      error: (err) => {
+        console.error('Error al obtener vacantes disponibles:', err);
+        this.alertService.showAlert('Error al verificar las vacantes', 'danger');
+      },
+    });
   }
 }

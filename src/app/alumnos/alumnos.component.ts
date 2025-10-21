@@ -193,7 +193,7 @@ export class AlumnosComponent implements OnInit {
    * Llama al backend y actualiza la tabla.
    */
   marcarAsistencia(alumno: any, asistio: boolean): void {
-    const nuevoEstado = asistio ? 'Asisitió' : 'NP';
+    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
     this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
       next: () => {
         alumno.attendanceStatus = nuevoEstado;
