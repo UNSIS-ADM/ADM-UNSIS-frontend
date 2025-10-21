@@ -1,3 +1,11 @@
+/**
+ * Componente: AlumnosComponent
+ * Descripción:
+ * Este componente muestra y gestiona los datos de los aspirantes (alumnos).
+ * Permite filtrar por año, carrera y estatus, marcar asistencia, paginar resultados
+ * y descargar plantillas XLSX con los datos o resultados de admisión.
+ */
+
 import { Component, OnInit, Inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +17,7 @@ import { HttpResponse } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 import { extractFilename } from '../utils/file--utils';
 import { AlertService } from '../services/alert.service';
+
 @Component({
   selector: 'app-alumnos',
   standalone: true,
@@ -17,22 +26,25 @@ import { AlertService } from '../services/alert.service';
   styleUrls: ['./alumnos.component.css'],
 })
 export class AlumnosComponent implements OnInit {
+  // --- Estado de descarga de archivos ---
   downloadingAspirantes = false;
   downloadingResultados = false;
-  alumnos: any[] = [];
-  filteredData: any[] = [];
 
-  // 🔍 Búsqueda
+  // --- Listas de datos ---
+  alumnos: any[] = [];         // Lista completa de alumnos desde el backend
+  filteredData: any[] = [];    // Lista filtrada según los selects
+
+  // --- Búsqueda (no implementada completamente) ---
   terminoBusqueda = '';
   buscando = false;
   errorBusqueda = false;
 
-  // 🔹 Paginación
+  // --- Paginación ---
   currentPage = 1;
   itemsPerPage = 5;
-  Math = Math;
+  Math = Math; // Permite usar Math en el template
 
-  // 🔹 Filtros
+  // --- Filtros disponibles y seleccionados ---
   aniosDisponibles: number[] = [];
   anioSeleccionado: string = '';
   carreraSeleccionada: string = '';
@@ -44,76 +56,77 @@ export class AlumnosComponent implements OnInit {
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
-    private templateService: TemplateService, // INYECCIÓN xlsx
+    private templateService: TemplateService, // Servicio para descarga de XLSX
     private alertService: AlertService,
   ) {}
 
+  /**
+   * Inicializa el componente:
+   * - Genera lista de años
+   * - Obtiene alumnos desde el servicio
+   * - Llena listas de carreras y estatus
+   */
   ngOnInit(): void {
     this.generarAnios();
+
     this.alumnosService.getAlumnos().subscribe({
       next: (data) => {
+        // Normaliza datos obtenidos
         this.alumnos = data.map((a) => ({
           ...a,
-          
-          // normaliza el estado: ASISTIO, NP o vacío
           AttendanceStatus: a.attendanceStatus
             ? a.attendanceStatus.trim().toUpperCase()
             : '',
         }));
-        console.log(this.alumnos)
-        // llenar select de carreras y status
+
+        console.log(this.alumnos);
+
+        // Llena selects únicos de carrera y estatus
         this.carrerasDisponibles = [
           ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
         ].sort();
+
         this.statusesDisponibles = [
           ...new Set(this.alumnos.map((a) => a.status).filter(Boolean)),
         ].sort();
 
+        // Aplica filtros iniciales
         this.aplicarFiltros();
       },
       error: (err) => console.error('Error al cargar alumnos', err),
     });
   }
 
-  // --- Generar lista de años ---
+  /**
+   * Genera los últimos 5 años para el filtro "Año de admisión".
+   */
   generarAnios() {
     const currentYear = new Date().getFullYear();
-    this.aniosDisponibles = Array.from(
-      { length: 5 },
-      (_, i) => currentYear - i
-    );
+    this.aniosDisponibles = Array.from({ length: 5 }, (_, i) => currentYear - i);
     this.anioSeleccionado = currentYear.toString();
   }
 
-  // --- Aplicar filtros ---
+  /**
+   * Aplica filtros activos a la lista de alumnos.
+   */
   aplicarFiltros() {
     this.filteredData = this.alumnos.filter((a) => {
-      const coincideAnio =
-        !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
-      const coincideCarrera =
-        !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
-      const coincideStatus =
-        !this.statusSeleccionado || a.status == this.statusSeleccionado;
+      const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
+      const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
+      const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
       return coincideAnio && coincideCarrera && coincideStatus;
     });
 
-    this.currentPage = 1;
-    this.cdRef.detectChanges();
+    this.currentPage = 1; // Reinicia paginación
+    this.cdRef.detectChanges(); // Actualiza vista
   }
 
-  filtrarPorAnio() {
-    this.aplicarFiltros();
-  }
+  filtrarPorAnio() { this.aplicarFiltros(); }
+  filtrarPorCarrera() { this.aplicarFiltros(); }
+  filtrarPorStatus() { this.aplicarFiltros(); }
 
-  filtrarPorCarrera() {
-    this.aplicarFiltros();
-  }
+  // --- Métodos de paginación ---
 
-  filtrarPorStatus() {
-    this.aplicarFiltros();
-  }
-
-  // --- Paginación ---
   get paginatedData() {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
@@ -133,6 +146,9 @@ export class AlumnosComponent implements OnInit {
     return Math.ceil(this.filteredData.length / this.itemsPerPage);
   }
 
+  /**
+   * Genera los números de página visibles (con puntos suspensivos).
+   */
   get pages(): (number | string)[] {
     const total = this.totalPages;
     const current = this.currentPage;
@@ -142,18 +158,14 @@ export class AlumnosComponent implements OnInit {
     let last: number | undefined;
 
     for (let i = 1; i <= total; i++) {
-      if (
-        i === 1 ||
-        i === total ||
-        (i >= current - delta && i <= current + delta)
-      )
+      if (i === 1 || i === total || (i >= current - delta && i <= current + delta))
         range.push(i);
     }
 
     for (let i of range) {
       if (last !== undefined && typeof i === 'number') {
-        if ((i as number) - last === 2) rangeWithDots.push(last + 1);
-        else if ((i as number) - last > 2) rangeWithDots.push('...');
+        if (i - last === 2) rangeWithDots.push(last + 1);
+        else if (i - last > 2) rangeWithDots.push('...');
       }
       rangeWithDots.push(i);
       last = i as number;
@@ -166,38 +178,46 @@ export class AlumnosComponent implements OnInit {
     if (page >= 1 && page <= this.totalPages) this.currentPage = page;
   }
 
+  /**
+   * Rellena filas vacías para mantener tamaño visual de la tabla.
+   */
   get emptyRows(): any[] {
     const rowsOnPage = this.paginatedData.length;
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage)
       return Array(this.itemsPerPage - rowsOnPage);
     return [];
   }
+
+  /**
+   * Marca la asistencia de un alumno como "Asistió" o "NP".
+   * Llama al backend y actualiza la tabla.
+   */
   marcarAsistencia(alumno: any, asistio: boolean): void {
     const nuevoEstado = asistio ? 'Asisitió' : 'NP';
-    this.alumnosService
-      .marcarAsistencia(alumno.id, { status: nuevoEstado })
-      .subscribe({
-        next: () => {
-          alumno.attendanceStatus = nuevoEstado;
-          this.cdRef.detectChanges(); // fuerza actualización visual
-        },
-        error: (error) =>
-         this.alertService.showAlert('Error al marcar la asistencia', 'danger')
-      });
+    this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
+      next: () => {
+        alumno.attendanceStatus = nuevoEstado;
+        this.cdRef.detectChanges();
+      },
+      error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
+    });
   }
 
-  // Descargar formatos XLSX
+  /**
+   * Descarga los formatos XLSX desde el servidor.
+   * @param key Tipo de archivo a descargar ('aspirantes' o 'resultados')
+   */
   downloadTemplate(key: 'aspirantes' | 'resultados'): void {
     if (key === 'aspirantes') this.downloadingAspirantes = true;
     else this.downloadingResultados = true;
 
-    const defaultName = key === 'aspirantes' ? 'Datos de aspirantes.xlsx' : 'Resultados de admisión.xlsx';
+    const defaultName =
+      key === 'aspirantes' ? 'Datos de aspirantes.xlsx' : 'Resultados de admisión.xlsx';
 
     this.templateService
       .downloadTemplate(key)
       .pipe(
         finalize(() => {
-          // Se ejecuta siempre (éxito o error)
           this.downloadingAspirantes = false;
           this.downloadingResultados = false;
         })
@@ -210,7 +230,7 @@ export class AlumnosComponent implements OnInit {
             defaultName
           );
 
-          // Crear enlace de descarga
+          // Crea un enlace invisible para descargar el archivo
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -222,9 +242,7 @@ export class AlumnosComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error descargando template', err);
-          alert(
-            'Error al descargar el formato. Revisa permisos o el servidor.'
-          );
+          alert('Error al descargar el formato. Revisa permisos o el servidor.');
         },
       });
   }

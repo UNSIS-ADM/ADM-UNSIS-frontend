@@ -7,6 +7,10 @@ import { Router } from '@angular/router';
 import { AlertService } from '../../services/alert.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 
+/**
+ * Componente para gestionar las restricciones de acceso de los aspirantes.
+ * Permite configurar fechas y horas de activación, así como habilitar/deshabilitar la restricción.
+ */
 @Component({
   selector: 'app-access-restriction',
   standalone: true,
@@ -15,25 +19,45 @@ import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.comp
   styleUrls: ['./access-restriction.component.css'],
 })
 export class AccessRestrictionComponent implements OnInit {
-  // Inicializamos con objeto por defecto (campos null) para mostrar siempre los inputs
+  
+  /** Objeto que contiene los datos de la restricción actual */
   restriction: AccessRestriction = this.defaultRestriction();
+  
+  /** Bandera que indica si se está guardando la restricción */
   saving = false;
 
-  // Para el modal de confirmación
+  /** Bandera para mostrar/ocultar el diálogo de confirmación */
   showConfirm = false;
+  
+  /** Mensaje a mostrar en el diálogo de confirmación */
   confirmMessage = '';
+  
+  /** Función a ejecutar cuando se confirma la acción */
   confirmAction: (() => void) | null = null;
 
+  /**
+   * Crea una instancia del componente AccessRestrictionComponent
+   * @param restrictionService Servicio para gestionar las restricciones
+   * @param router Servicio de enrutamiento
+   * @param alertService Servicio para mostrar alertas
+   */
   constructor(
     private restrictionService: AccessRestrictionService,
     private router: Router,
     private alertService: AlertService
   ) {}
 
+  /**
+   * Carga la restricción al inicializar el componente
+   */
   ngOnInit(): void {
     this.loadRestriction();
   }
 
+  /**
+   * Crea un objeto AccessRestriction con valores por defecto
+   * @returns AccessRestriction con valores iniciales
+   */
   private defaultRestriction(): AccessRestriction {
     return {
       id: null,
@@ -45,6 +69,9 @@ export class AccessRestrictionComponent implements OnInit {
     };
   }
 
+  /**
+   * Carga la restricción actual desde el servidor
+   */
   loadRestriction() {
     this.restrictionService.getRestriction().subscribe({
       next: (res) => {
@@ -63,6 +90,9 @@ export class AccessRestrictionComponent implements OnInit {
   }
 
   // ===================== TOGGLE =====================
+  /**
+   * Muestra el diálogo de confirmación para habilitar/deshabilitar la restricción
+   */
   confirmToggle() {
     if (!this.restriction) return;
 
@@ -74,6 +104,10 @@ export class AccessRestrictionComponent implements OnInit {
     this.showConfirm = true;
   }
 
+  /**
+   * Cambia el estado de habilitación de la restricción
+   * @private
+   */
   private toggleEnabled() {
     if (!this.restriction || !this.restriction.id) {
       // Si no existe id y quieres crear la regla al activar, podrías hacerlo aquí.
@@ -116,12 +150,19 @@ export class AccessRestrictionComponent implements OnInit {
   }
 
   // ===================== SAVE =====================
+  /**
+   * Muestra el diálogo de confirmación para guardar la restricción
+   */
   confirmSaveRestriction() {
     this.confirmMessage = '¿Quieres guardar esta regla?';
     this.confirmAction = () => this.saveRestriction();
     this.showConfirm = true;
   }
 
+  /**
+   * Guarda la restricción en el servidor
+   * @private
+   */
   private saveRestriction() {
     if (!this.restriction) return;
 
@@ -152,6 +193,10 @@ export class AccessRestrictionComponent implements OnInit {
   }
 
   // ===================== CONFIRM DIALOG HANDLER =====================
+  /**
+   * Maneja la respuesta del diálogo de confirmación
+   * @param result true si se confirmó la acción, false si se canceló
+   */
   onConfirm(result: boolean) {
     this.showConfirm = false;
     if (result && this.confirmAction) {
