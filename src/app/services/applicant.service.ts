@@ -12,24 +12,35 @@ export class ApplicantService {
 
   constructor(private http: HttpClient) { }
 
+  // 🔹 Método para obtener headers con token
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token'); // o sessionStorage según tu caso
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  // ✅ Enviar solicitud de cambio de carrera
   changeCareer(newCareer: string, requestComment: string): Observable<any> {
     const body = {
       newCareer: newCareer,
       requestComment: requestComment
     };
 
-    // Obtén el token del localStorage (o sessionStorage según tu app)
-    const token = localStorage.getItem('token');
+    console.log(this.apiUrl);
+    console.log("nueva carrera", newCareer);
 
-    // Configura headers con autorización
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+    return this.http.post(`${this.apiUrl}/change-career`, body, {
+      headers: this.getAuthHeaders(),
     });
+  }
 
-    console.log(this.apiUrl); // Para depurar
-    console.log("nueva carrera",newCareer);
-    // Envía la petición con los headers
-    return this.http.post(`${this.apiUrl}/change-career`, body, { headers });
+  // ✅ Obtener vacantes disponibles con token
+  getVacantesDisponibles(): Observable<any[]> {
+    const url = 'http://localhost:1200/api/admin/vacancies/available';
+    return this.http.get<any[]>(url, {
+      headers: this.getAuthHeaders(),
+    });
   }
 }
