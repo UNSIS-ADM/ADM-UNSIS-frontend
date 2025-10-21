@@ -59,11 +59,6 @@
           <!-- Columna vacía para alinear ciclo escolar -->
           <div></div>
         </div>
-
-
-
-
-
         <div class="mt-4 text-right text-sm text-gray-600">
           Año seleccionado: <span class="font-semibold text-[#6a1b1b]">{{ anioSeleccionado }}</span>
         </div>
@@ -92,8 +87,6 @@
 </div>
 
 <!-- Modal de confirmación -->
-<!-- Modal de confirmación adaptado a tu estándar -->
-<!-- Icono que quieras mostrar -->
 <app-confirm-dialog *ngIf="showConfirmModal" [message]="confirmMessage" [title]="'Confirmación'"
   (confirm)="confirmCallback && confirmCallback()" (cancel)="showConfirmModal = false">
 </app-confirm-dialog>

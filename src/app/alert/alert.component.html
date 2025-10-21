@@ -1,13 +1,27 @@
 <div class="alert-container">
+  
+  <!-- Itera sobre el array de alertas usando *ngFor -->
+  <!-- Aplica clases dinámicamente basadas en el tipo de alerta y estado de visualización -->
   <div *ngFor="let alert of alerts" 
        [ngClass]="alert.type + (alert.show ? ' show' : ' hide')">
+    
+    <!-- Contenedor del icono de la alerta -->
+    <!-- Muestra diferentes símbolos Unicode según el tipo de alerta -->
     <span class="alert-icon">
-      <!-- Iconos Unicode simples -->
+      <!-- Icono para alertas de éxito (✔) -->
       {{ alert.type === 'success' ? '✔' : '' }}
+      
+      <!-- Icono para alertas de error (✖) -->
       {{ alert.type === 'danger' ? '✖' : '' }}
+      
+      <!-- Icono para alertas informativas (ℹ) -->
       {{ alert.type === 'info' ? 'ℹ' : '' }}
+      
+      <!-- Icono para alertas de advertencia (⚠) -->
       {{ alert.type === 'warning' ? '⚠' : '' }}
     </span>
+
+    <!-- Mensaje de la alerta -->
     {{ alert.message }}
   </div>
 </div>
