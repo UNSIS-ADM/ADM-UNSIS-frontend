@@ -10,6 +10,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 import { Router } from '@angular/router';
 import { RegistroFichasService } from '../services/registro-fichas.service';
 import { ModalEditApplicantComponent } from '../applicants/modal-edit-applicant/modal-edit-applicant.component';
+import { AlumnosService } from '../services/alumnos.service'; // Importa el service
+import { saveAs } from 'file-saver'; // Para descargar el PDF (npm install file-saver)
 
 @Component({
   selector: 'app-carga-datos-resultados',
@@ -51,6 +53,7 @@ export class CargaDatosResultadosComponent implements OnInit {
   selectedApplicant: any = null;
   currentRoute: string = '';
   constructor(
+    private alumnosService: AlumnosService,
     private excelService: ExcelServiceResultados,
     private resultadosService: ResultadosService,
     private filtradoService: FiltradoService,
@@ -295,5 +298,25 @@ export class CargaDatosResultadosComponent implements OnInit {
           console.error('Error al editar aspirante', err);
         }
       });
+  }
+  generarReportePdf() {
+    this.isLoading = true;
+    this.cdRef.detectChanges();
+
+    this.alumnosService.generatePdfReport().subscribe({
+      next: (blob) => {
+        const fileName = 'reporte_aspirantes.pdf';
+        saveAs(blob, fileName); // Descarga el PDF
+        this.isLoading = false;
+        this.alertService.showAlert('Reporte generado correctamente', 'success');
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        this.isLoading = false;
+        this.alertService.showAlert('Error al generar el reporte', 'danger');
+        this.cdRef.detectChanges();
+      }
+    });
   }
 }
