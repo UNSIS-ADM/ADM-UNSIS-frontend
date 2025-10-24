@@ -1,0 +1,3 @@
+<div *ngIf="loading" class="text-center">Cargando contenido…</div>
+<div *ngIf="error" class="text-red-600">{{ error }}</div>
+<div *ngIf="!loading && !error && safeHtml" [innerHTML]="safeHtml"></div>
