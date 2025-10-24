@@ -94,9 +94,9 @@ export const routes: Routes = [
         './solicitudes-nuevas-carreras/solicitudes-nuevas-carreras.component'
       ).then((m) => m.SolicitudesNuevasCarrerasComponent),
     canActivate: [RoleGuard],
-    data: { roles: ['ROLE_ADMIN','ROLE_USER'] }
-  },   
-    {
+    data: { roles: ['ROLE_ADMIN', 'ROLE_USER'] },
+  },
+  {
     path: 'respsolicitud',
     loadComponent: () =>
       import('./solicitud/solicitud.component').then(
@@ -122,5 +122,12 @@ export const routes: Routes = [
       ),
     canActivate: [RoleGuard],
     data: { roles: ['ROLE_APPLICANT'] },
+  },
+  {
+    path: 'admin/contents',
+    loadComponent: () =>
+      import('./admin/content-admin/content-admin.component').then(
+        (m) => m.ContentAdminComponent
+      ),
   },
 ];
