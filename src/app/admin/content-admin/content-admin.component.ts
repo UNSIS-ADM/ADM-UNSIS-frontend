@@ -12,11 +12,12 @@ import { ContentDTO, ContentPartDTO } from '../../models/content.model';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { RouterModule } from '@angular/router';
+import { QuillModule } from 'ngx-quill';
 
 @Component({
   selector: 'app-content-admin',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, QuillModule],
   templateUrl: './content-admin.component.html',
   styleUrls: ['./content-admin.component.css'],
 })
@@ -28,6 +29,23 @@ export class ContentAdminComponent implements OnInit {
   previewSafeHtml: SafeHtml | null = null;
   saving = false;
   message = '';
+
+  quillConfig = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      ['blockquote', 'code-block'],
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['clean']
+    ],
+    theme: 'snow',
+    formats: [
+      'bold', 'italic', 'underline', 'strike',
+      'blockquote', 'code-block', 'header',
+      'list', 'bullet', 'align'
+    ]
+  };
 
   constructor(
     private contentService: ContentService,
@@ -108,7 +126,12 @@ export class ContentAdminComponent implements OnInit {
   updatePreview() {
     // show combined preview
     const html = (this.partsArray.getRawValue() as ContentPartDTO[])
-      .map((p) => p.htmlContent)
+      .map((p) => {
+        // Si el contenido HTML está vacío, devolver una cadena vacía
+        if (!p.htmlContent) return '';
+        // Si el contenido ya es HTML (desde Quill), usarlo directamente
+        return p.htmlContent;
+      })
       .join('\n');
     this.previewSafeHtml = this.dom.bypassSecurityTrustHtml(html);
   }
@@ -122,6 +145,10 @@ export class ContentAdminComponent implements OnInit {
     const key = this.form.get('keyName')!.value;
     // getRawValue to include disabled partKey
     const parts = this.partsArray.getRawValue() as ContentPartDTO[];
+    
+    // Debug: Verificar el contenido HTML antes de enviar
+    console.log('Contenido HTML a enviar:', parts.map(p => p.htmlContent));
+    
     this.contentService
       .upsertParts(key, parts)
       .pipe(
