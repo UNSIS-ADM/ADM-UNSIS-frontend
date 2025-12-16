@@ -38,6 +38,11 @@
                 Registrar Secretaria
               </a>
             </li>
+              <li *ngIf="hasRole('ROLE_ADMIN')">
+                <a href="/admin/users" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
+                  Registrar Administrador
+                </a>
+              </li> 
             <li>
               <a (click)="logout()" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
                 Cerrar Sesión
@@ -259,7 +264,7 @@
             </path>
           </svg>
           <span [ngClass]="{'hidden': !isSidebarOpen, 'ms-3': isSidebarOpen}" class="group-hover:text-[#6a1b1b]">
-            Texto
+            Contenido
           </span>
         </a>
       </li>
