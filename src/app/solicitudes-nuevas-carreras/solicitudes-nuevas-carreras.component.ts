@@ -7,7 +7,7 @@ import { AlertService } from '../services/alert.service';
 @Component({
   selector: 'app-solicitudes-nuevas-carreras',
   standalone: true,
-  imports: [ CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './solicitudes-nuevas-carreras.component.html',
   styleUrls: ['./solicitudes-nuevas-carreras.component.css']
 })
@@ -18,6 +18,9 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
   currentPage = 1;
   itemsPerPage = 5;
   Math = Math;
+  LONGITUD_RENGLON = 20;
+  MAX_RENGLONES = 2;
+
 
   // Modal
   modalVisible = false;
@@ -154,5 +157,36 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
     }
     return [];
   }
+  formatearComentario(texto: string): string {
+  if (!texto) return '';
+
+  let resultado = '';
+  for (let i = 0; i < texto.length; i += this.LONGITUD_RENGLON) {
+    resultado += texto.substring(i, i + this.LONGITUD_RENGLON) + '\n';
+  }
+  return resultado.trim();
+}
+
+obtenerTextoVisible(solicitud: any): string {
+  const textoFormateado = this.formatearComentario(solicitud.comentario);
+
+  if (solicitud.verMas) {
+    return textoFormateado;
+  }
+
+  return textoFormateado
+    .split('\n')
+    .slice(0, this.MAX_RENGLONES)
+    .join('\n');
+}
+
+tieneMasDeDosRenglones(texto: string): boolean {
+  if (!texto) return false;
+  return Math.ceil(texto.length / this.LONGITUD_RENGLON) > this.MAX_RENGLONES;
+}
+
+toggleVerMas(solicitud: any): void {
+  solicitud.verMas = !solicitud.verMas;
+}
 
 }

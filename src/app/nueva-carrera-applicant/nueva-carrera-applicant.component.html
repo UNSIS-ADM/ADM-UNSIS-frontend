@@ -14,12 +14,21 @@
 
     <!-- Comentario -->
     <div>
-      <label for="comentario" class="block mb-2 text-sm font-medium text-gray-700">Motivo del cambio</label>
-      <textarea [(ngModel)]="formData.comentario" name="comentario" id="comentario" required rows="4"
-        class="block w-full p-2.5 border border-gray-300 rounded-lg focus:ring-[#6a1b1b] focus:border-[#6a1b1b] text-gray-600"
+      <label for="comentario" class="block mb-2 text-sm font-medium text-gray-700">
+        Motivo del cambio
+      </label>
+
+      <textarea [(ngModel)]="formData.comentario" name="comentario" id="comentario" required rows="4" maxlength="200"
+        class="block w-full p-2.5 border border-gray-300 rounded-lg
+           focus:ring-[#6a1b1b] focus:border-[#6a1b1b] text-gray-600"
         placeholder="Explica brevemente por qué deseas cambiarte de carrera...">
-</textarea>
+  </textarea>
+
+      <p class="text-xs text-gray-500 mt-1">
+        Máximo 200 caracteres
+      </p>
     </div>
+
 
     <!-- Botón -->
     <button type="submit" class="w-full bg-[#548e88] text-white py-2 px-4  shadow-md hover:bg-[#2a815c] transition">

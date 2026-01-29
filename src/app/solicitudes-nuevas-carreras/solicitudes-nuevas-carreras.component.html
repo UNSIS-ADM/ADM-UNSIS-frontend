@@ -18,9 +18,12 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Id</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del aspirante</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera adscrita
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera Solicitada
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentario del
+              aspirante</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estado</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
@@ -32,7 +35,16 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.ficha }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.antiguacarrera }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.nuevaCarrera }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ solicitud.comentario }}</td>
+            <td class="px-6 py-4 text-sm text-gray-900 whitespace-pre-line">
+              {{ obtenerTextoVisible(solicitud) }}
+
+              <button *ngIf="tieneMasDeDosRenglones(solicitud.comentario)" (click)="toggleVerMas(solicitud)"
+                class="text-blue-600 text-xs mt-1 block hover:underline">
+                {{ solicitud.verMas ? 'Ver menos' : 'Ver más' }}
+              </button>
+            </td>
+
+
             <td class="px-6 py-4 whitespace-nowrap">
               <span [ngClass]="{
                 'bg-green-100 text-green-800': solicitud.estado === 'Aprobada',
@@ -99,8 +111,9 @@
   style="background-color: rgba(0, 0, 0, 0.474);">
   <div class="bg-white p-6 rounded shadow-lg w-96">
     <h3 class="text-lg font-semibold mb-4">Responder solicitud</h3>
-    <textarea [(ngModel)]="comentarioSecretaria" placeholder="Escribe un comentario a la respuesta   de la solicitud del aspirante" 
-      class="w-full p-2 border rounded mb-4 placeholder-gray-400"></textarea> 
+    <textarea [(ngModel)]="comentarioSecretaria"
+      placeholder="Escribe un comentario a la respuesta   de la solicitud del aspirante"
+      class="w-full p-2 border rounded mb-4 placeholder-gray-400"></textarea>
     <div class="flex justify-end gap-2">
       <button (click)="enviarRespuesta('RECHAZADO')" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
         Rechazar
