@@ -1,23 +1,26 @@
 <div class="p-4 max-w-6xl mx-auto">
-<div class="p-6 bg-[#24645c] text-white rounded-t-lg text-2xl font-semibold">
-  Administrador de contenidos
-</div>
+    <div class="p-6 bg-[#24645c] text-white rounded-t-lg text-2xl font-semibold">
+        Administrador de contenidos
+    </div>
 
     <div class="flex gap-6">
         <!-- LEFT: lista -->
         <div class="w-1/3 border p-3 rounded bg-white" [style.borderColor]="'#14645c'">
+            <!--
             <div class="flex justify-between items-center mb-2">
                 <strong>Contenidos</strong>
                 <button (click)="select()" class="px-2 py-1 bg-[#14645c] text-white rounded">Nuevo</button>
             </div>
+        -->
             <div *ngIf="loadingList">Cargando...</div>
             <ul *ngIf="!loadingList" class="space-y-2 max-h-[60vh] overflow-auto">
-                <li *ngFor="let item of list"
-                    class="p-2 border rounded bg-white cursor-pointer transform transition-shadow duration-150 ease-in-out hover:shadow-md hover:-translate-y-0.5"
-                    (click)="select(item)">
-                    <div class="font-medium">{{ item.keyName }}</div>
-                    <div class="text-sm text-gray-600">{{ item.title }}</div>
+                <li *ngFor="let item of list" class="p-2 border rounded cursor-pointer
+                           bg-[#14645c] text-white
+                           transition-all duration-150 ease-in-out
+                           hover:bg-[#0f4f48] hover:shadow-md hover:-translate-y-0.5" (click)="select(item)">
+                    <div class="font-medium">{{ item.title }}</div>
                 </li>
+
             </ul>
         </div>
 
@@ -32,12 +35,6 @@
                             class="border p-1 rounded w-64 bg-white transition-shadow duration-150 focus:shadow-md focus:outline-none"
                             readonly />
                     </div>
-
-                    <!-- Activo -->
-                    <div>
-                        <label class="block text-sm">Activo</label>
-                        <input type="checkbox" formControlName="active" class="accent-[#14645c]" />
-                    </div>
                 </div>
 
                 <!-- Title: visible pero no editable -->
@@ -48,31 +45,12 @@
                     </div>
                 </div>
 
-                <!-- Datos de contacto (editables) -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm">Teléfono</label>
-                        <input type="text" formControlName="phone"
-                            class="border p-1 rounded w-full bg-white transition-shadow duration-150 focus:shadow-md focus:outline-none hover:shadow-sm" />
-                    </div>
-                    <div>
-                        <label class="block text-sm">Email de contacto</label>
-                        <input type="email" formControlName="email"
-                            class="border p-1 rounded w-full bg-white transition-shadow duration-150 focus:shadow-md focus:outline-none hover:shadow-sm" />
-                    </div>
-                </div>
-
                 <!-- Partes -->
                 <div formArrayName="parts" class="mt-3">
                     <div *ngFor="let partCtrl of partsArray.controls; let i = index" [formGroupName]="i"
                         class="mb-4 border p-2 rounded bg-white transform transition-all duration-150 hover:shadow-md hover:-translate-y-0.5"
                         [style.borderLeft]="'4px solid ' + (i % 2 === 0 ? '#14645c' : '#6a1b1b')">
                         <div class="flex justify-between items-center mb-2">
-                            <div>
-                                <label class="block text-xs font-semibold">Clave</label>
-                                <div class="text-sm">{{ partCtrl.get('partKey')?.value }}</div>
-                            </div>
-
                             <!-- Orden oculto -->
                             <div class="hidden">
                                 <label class="block text-xs">Orden</label>
@@ -81,13 +59,14 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm">Título sección</label>
-                            <input formControlName="title"
-                                class="border p-1 w-full bg-white transition-shadow duration-150 focus:shadow-md focus:outline-none" />
+                            <label class="block font-semibold">Sección:{{ partCtrl.get('title')?.value || '—' }}</label>
+                            <!-- Valor visible no editable -->
+
+                            <!-- Hidden input para que el título se incluya en form.value al guardar -->
+                            <input type="hidden" formControlName="title" />
                         </div>
 
                         <div class="mt-2">
-                            <label class="block text-sm">HTML (editar)</label>
                             <textarea formControlName="htmlContent" rows="6"
                                 class="border p-2 w-full bg-white transition-shadow duration-150 focus:shadow-md focus:outline-none"
                                 (input)="updatePreview()"></textarea>

@@ -33,14 +33,16 @@
             <p class="text-sm text-[#6a1b1b] font-semibold">{{username}}</p>
           </div>
           <ul class="py-2">
+            <!--  
             <li *ngIf="hasRole('ROLE_ADMIN')">
               <a href="/registrar" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
                 Registrar Secretaria
               </a>
             </li>
+          -->
             <li *ngIf="hasRole('ROLE_ADMIN')">
               <a href="/admin/users" class="block px-4 py-2 text-sm text-[#6a1b1b] hover:bg-[#6a1b1b] hover:text-white">
-                Registrar Administrador
+                Nuevo usuario
               </a>
             </li>
             <li>
