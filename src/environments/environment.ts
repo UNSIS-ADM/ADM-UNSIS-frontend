@@ -1,6 +1,6 @@
 export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:1200',
+  production: true,
+  apiUrl: 'http://132.18.44.252:1200',
   getalumnosEndpoint: '/api/applicants',
   loginEndpoint: '/auth/login',
   getresultadosEndpoint: '/api/admin/results',

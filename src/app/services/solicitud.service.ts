@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class SolicitudService {
 
-  private baseUrl = 'http://localhost:1200/api/admin/change-career/requests';
+  private baseUrl = 'http://132.18.44.252:1200/api/admin/change-career/requests';
 
   constructor(private http: HttpClient) {}
 
