@@ -139,85 +139,96 @@ cargarVacantes(anio: number): void {
     this.fichas[key] = input.value ? Number(input.value) : 0;
   }
 
- registrarFichas(): void {
-  const totalFichas = Object.values(this.fichas).reduce((a, b) => a + b, 0);
+registrarFichas(): void {
+  const carrerasValidas: any[] = [];
+  const erroresValidacion: string[] = [];
 
-  // Si todas las fichas son 0, mostrar mensaje y salir
-  if (totalFichas === 0) {
-    this.alertService.showAlert('No hay fichas para registrar.', 'warning');
+  // 1. Separar lo que sirve de lo que tiene error
+  this.carreras.forEach((carrera) => {
+    const nuevoLimite = this.fichas[carrera.key] || 0;
+    const limiteActual = this.limitesActuales[carrera.key] || 0;
+
+    // Solo procesamos si el usuario escribió algo > 0
+    if (nuevoLimite > 0) {
+      if (nuevoLimite < limiteActual) {
+        // ERROR: El usuario intentó bajar el límite
+        erroresValidacion.push(`${carrera.label} Mínimo requerido: ${limiteActual}`);
+      } else {
+        // VÁLIDO: Se agrega a la lista para enviar al servidor
+        carrerasValidas.push({
+          key: carrera.key,
+          label: carrera.label,
+          cantidad: nuevoLimite
+        });
+      }
+    }
+  });
+
+  // 2. Si hay errores, avisamos de inmediato pero NO detenemos el proceso de las demás
+  if (erroresValidacion.length > 0) {
+    this.alertService.showAlert(
+      `No se actualizaron: ${erroresValidacion.join(', ')} por ser menores al límite actual.`,
+      'danger'
+    );
+  }
+
+  // 3. Si no hay ninguna carrera válida para mandar, terminamos aquí
+  if (carrerasValidas.length === 0) {
+    if (erroresValidacion.length === 0) {
+      this.alertService.showAlert('No hay fichas nuevas para registrar.', 'warning');
+    }
     return;
   }
 
+  // 4. Confirmación solo para las que SÍ son válidas
+  const nombresValidos = carrerasValidas.map(c => c.label).join(', ');
   this.abrirConfirmacion(
-    `¿Estás seguro de registrar estas fichas para el año ${this.anioSeleccionado}?`,
+    `¿Confirmas el registro para: ${nombresValidos} en el año ${this.anioSeleccionado}?`,
     () => {
       this.showConfirmModal = false;
       this.cargando = true;
 
-      // 🔹 Filtramos solo las carreras con fichas > 0
-      const carrerasConFichas = this.carreras.filter(
-        (c) => (this.fichas[c.key] ?? 0) > 0
-      );
-
-      // 🔹 Crear array de observables solo con las que tienen fichas > 0
-      const requests = carrerasConFichas.map((carrera) => {
-        const cantidad = this.fichas[carrera.key];
+      const requests = carrerasValidas.map((c) => {
         return this.registroService
-          .registrar(carrera.key, this.anioSeleccionado, cantidad)
+          .registrar(c.key, this.anioSeleccionado, c.cantidad)
           .pipe(
-            map(() => ({ label: carrera.label, cantidad, success: true })),
+            map(() => ({ label: c.label, cantidad: c.cantidad, success: true })),
             catchError((err) => {
-              console.error(`Error al registrar ${carrera.key}`, err);
-              return of({ label: carrera.label, cantidad, success: false });
+              console.error(`Error al registrar ${c.key}`, err);
+              return of({ label: c.label, cantidad: c.cantidad, success: false });
             })
           );
       });
 
-      // 🔹 Si no hay solicitudes válidas, salir
-      if (requests.length === 0) {
-        this.alertService.showAlert('No hay fichas válidas para registrar.', 'warning');
-        this.cargando = false;
-        return;
-      }
-
-      // 🔹 Ejecutar todos en paralelo
       forkJoin(requests).subscribe({
         next: (resultados) => {
           let delay = 0;
           resultados.forEach((res) => {
             setTimeout(() => {
               if (res.success) {
-                this.alertService.showAlert(
-                  `${res.label}: ${res.cantidad} fichas registradas`,
-                  'success'
-                );
+                this.alertService.showAlert(`${res.label}: ${res.cantidad} fichas registradas`, 'success');
               } else {
-                this.alertService.showAlert(
-                  `${res.label}: error al registrar las fichas`,
-                  'danger'
-                );
+                this.alertService.showAlert(`${res.label}: Error en el servidor`, 'danger');
               }
             }, delay);
             delay += 1000;
           });
 
-          // 🔹 Limpiar inputs y recargar vacantes
+          // Limpiar solo lo que se envió con éxito y recargar
           setTimeout(() => {
             this.cargando = false;
-            this.carreras.forEach((c) => (this.fichas[c.key] = 0));
+            carrerasValidas.forEach(c => this.fichas[c.key] = 0);
             this.cargarVacantes(this.anioSeleccionado);
           }, delay);
         },
-        error: (err) => {
-          console.error('Error general al registrar fichas', err);
-          this.alertService.showAlert('No se pudieron registrar las fichas', 'danger');
+        error: () => {
           this.cargando = false;
-        },
+          this.alertService.showAlert('Error crítico al procesar la solicitud.', 'danger');
+        }
       });
     }
   );
 }
-
   hasRole(role: string): boolean {
     return this.roles.includes(role);
   }

@@ -130,4 +130,13 @@ export const routes: Routes = [
         (m) => m.ContentAdminComponent
       ),
   },
+  {
+    path: 'admin/users',
+    loadComponent: () =>
+      import('./gestion-usuarios/gestion-usuarios.component').then(
+        (m) => m.GestionUsuariosComponent
+      ),
+    canActivate: [RoleGuard],
+    data: { roles: ['ROLE_ADMIN'] },
+  },
 ];

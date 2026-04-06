@@ -39,7 +39,7 @@
       <!-- Si es reprobado -->
       <ng-container *ngIf="esReprobado && rejectedContent">
         <div class="mt-6 text-justify text-gray-800 space-y-3">
-          <p class="text-center font-semibold text-[#14645c]">¡Felicidades!</p>
+          
 
           <ng-container *ngFor="let p of rejectedContent.parts; let i = index">
             <div [innerHTML]="rejectedPartsSafe[i] || ''"></div>
