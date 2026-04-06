@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RegistroFichasService {
-  private baseUrl = 'http://localhost:1200/api/admin/vacancies';
+  private baseUrl = 'http://132.18.44.252:1200/api/admin/vacancies';
 
   constructor(private http: HttpClient) {}
 

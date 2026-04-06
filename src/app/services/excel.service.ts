@@ -15,7 +15,7 @@ export interface ExcelUploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceApplicants {
-  private apiUrl = 'http://localhost:1200/api/admin/upload-applicants';
+  private apiUrl = 'http://132.18.44.252:1200/api/admin/upload-applicants';
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +33,7 @@ export class ExcelServiceApplicants {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceResultados {
-  private apiUrl = 'http://localhost:1200/api/admin/upload-results';
+  private apiUrl = 'http://132.18.44.252:1200/api/admin/upload-results';
 
   constructor(private http: HttpClient) {}
 

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateService {
-  private base = 'http://localhost:1200/api/templates';
+  private base = 'http://132.18.44.252:1200/api/templates';
 
   constructor(private http: HttpClient) {}
 
