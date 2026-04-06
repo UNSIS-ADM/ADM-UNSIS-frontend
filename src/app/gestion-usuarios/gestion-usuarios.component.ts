@@ -401,4 +401,10 @@ export class GestionUsuariosComponent implements OnInit {
     this.dialogVisible = false;
     this.dialogConfirmCallback = null;
   }
+  
+roleLabels: { [key: string]: string } = {
+  'ROLE_ADMIN': 'Administrador',
+  'ROLE_APPLICANT': 'Aspirante',
+  'ROLE_USER': 'Secretaria'
+};
 }
