@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateService {
-  private base = 'http://132.18.44.252:1200/api/templates';
+  private base = environment.templates;
 
   constructor(private http: HttpClient) {}
 

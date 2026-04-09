@@ -101,17 +101,16 @@ export class ResultadoComponent implements OnInit {
   }
 
   /** Carga desde backend los mensajes (aceptado / reprobado) */
-  // dentro de ResultadoComponent (asegúrate imports: DomSanitizer, SafeHtml, ContentService)
   private renderPartHtml(rawHtml: string): string {
     if (!rawHtml) return '';
     let html = rawHtml;
 
     // tokens básicos
     html = html.replace(
-      /%EMAIL_CONTACT%/g,
+      / %EMAIL_CONTACT% /g,
       this.emailContacto || 'admision.unsis@gmail.com'
     );
-    html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
+    html = html.replace(/ %PHONE% /g, '9515724100 Ext. 1203, 1204');
 
     // reemplazar lista dinámica de carreras
     if (html.includes('%CARRERAS_LIST%')) {
@@ -138,7 +137,7 @@ export class ResultadoComponent implements OnInit {
   private loadContentMessages() {
     // mensaje aceptado
     if (this.esAceptado) {
-      this.contentService.getByKey('mensaje_aceptado_2025').subscribe({
+      this.contentService.getByKey('Mensaje_aceptado').subscribe({
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -153,7 +152,7 @@ export class ResultadoComponent implements OnInit {
     // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
-      this.contentService.getByKey('mensaje_reprobado_2025').subscribe({
+      this.contentService.getByKey('Mensaje_reprobado').subscribe({
         next: (dto) => {
           this.rejectedContent = dto;
           this.rejectedPartsSafe = (dto.parts || []).map((p) => {
