@@ -100,20 +100,17 @@ export class ResultadoComponent implements OnInit {
     );
   }
 
-private renderPartHtml(rawHtml: string): string {
-  if (!rawHtml) return '';
-  let html = rawHtml;
+  /** Carga desde backend los mensajes (aceptado / reprobado) */
+  private renderPartHtml(rawHtml: string): string {
+    if (!rawHtml) return '';
+    let html = rawHtml;
 
-  // Reemplazar la carrera del alumno usando la propiedad correcta
-  if (html.includes('%CARRERA_ALUMNO%')) {
-    // CAMBIO AQUÍ: Usamos careerAtResult que es el que funciona en tu HTML
-    const carreraNombre = this.alumno?.careerAtResult || 'la licenciatura seleccionada';
-    html = html.replace(/%CARRERA_ALUMNO%/g, `<strong>${this.escapeHtml(carreraNombre)}</strong>`);
-  }
-
-  // Reemplazar tokens de contacto
-  html = html.replace(/%EMAIL_CONTACT%/g, this.emailContacto || 'admision.unsis@gmail.com');
-  html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
+    // tokens básicos
+    html = html.replace(
+      / %EMAIL_CONTACT% /g,
+      this.emailContacto || 'admision.unsis@gmail.com'
+    );
+    html = html.replace(/ %PHONE% /g, '9515724100 Ext. 1203, 1204');
 
   // Reemplazar lista dinámica de carreras
   if (html.includes('%CARRERAS_LIST%')) {
@@ -140,11 +137,7 @@ private renderPartHtml(rawHtml: string): string {
   private loadContentMessages() {
     // mensaje aceptado
     if (this.esAceptado) {
-<<<<<<< HEAD
-      this.contentService.getByKey('mensaje_aceptado').subscribe({
-=======
       this.contentService.getByKey('Mensaje_aceptado').subscribe({
->>>>>>> f5ceab5 (si 2)
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -159,11 +152,7 @@ private renderPartHtml(rawHtml: string): string {
     // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
-<<<<<<< HEAD
-      this.contentService.getByKey('mensaje_reprobado').subscribe({
-=======
       this.contentService.getByKey('Mensaje_reprobado').subscribe({
->>>>>>> f5ceab5 (si 2)
         next: (dto) => {
           this.rejectedContent = dto;
           this.rejectedPartsSafe = (dto.parts || []).map((p) => {
