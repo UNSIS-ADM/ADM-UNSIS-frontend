@@ -138,7 +138,7 @@ export class ResultadoComponent implements OnInit {
   private loadContentMessages() {
     // mensaje aceptado
     if (this.esAceptado) {
-      this.contentService.getByKey('mensaje_aceptado_2025').subscribe({
+      this.contentService.getByKey('mensaje_aceptado').subscribe({
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -153,7 +153,7 @@ export class ResultadoComponent implements OnInit {
     // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
-      this.contentService.getByKey('mensaje_reprobado_2025').subscribe({
+      this.contentService.getByKey('mensaje_reprobado').subscribe({
         next: (dto) => {
           this.rejectedContent = dto;
           this.rejectedPartsSafe = (dto.parts || []).map((p) => {
