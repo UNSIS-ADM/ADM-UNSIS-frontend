@@ -99,7 +99,7 @@ export class ContentAdminComponent implements OnInit {
         orderIndex: [p.orderIndex || 0],
       });
 
-      // ✅ Deshabilitar campos no editables
+      // Deshabilitar campos no editables
       if (p.partKey === 'suggested_programs') {
         group.get('htmlContent')?.disable();
       }
