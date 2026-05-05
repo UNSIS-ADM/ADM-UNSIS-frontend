@@ -17,11 +17,8 @@
     <!-- Texto arriba del carrusel -->
     <div class="absolute top-16 z-30 w-full text-center px-6">
       <h2 class="text-3xl font-semibold text-[#680404] drop-shadow-md">
-        Bienvenido a la plataforma
+        Bienvenido al sistema de aspirantes UNSIS
       </h2>
-      <p class="mt-2 text-shadow text-black/90 drop-shadow-md">
-        Accede con tu usuario para continuar. Si tienes problemas contacta a servicios escolares.
-      </p>
     </div>
 
     <!-- Slides -->
@@ -76,7 +73,7 @@
             <input id="usuario" name="username" type="text" [(ngModel)]="credentials.username" required
               autocomplete="username"
               class="w-full bg-transparent focus:outline-none placeholder-gray-400 text-gray-700"
-              placeholder="usuario de aspirante" aria-label="Usuario" />
+              placeholder="FICHA" aria-label="Usuario" />
           </div>
         </div>
 
@@ -93,7 +90,7 @@
             <input id="password" name="password" [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="credentials.password" required autocomplete="current-password"
               class="w-full bg-transparent focus:outline-none placeholder-gray-400 text-gray-700 pr-10"
-              placeholder="Ingresa tu contraseña" aria-label="Contraseña" />
+              placeholder="CURP" aria-label="Contraseña" />
 
             <!-- Botón show/hide -->
             <button type="button" (click)="toggleShowPassword()"
