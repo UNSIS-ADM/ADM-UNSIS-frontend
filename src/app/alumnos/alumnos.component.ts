@@ -51,14 +51,17 @@ export class AlumnosComponent implements OnInit {
   statusSeleccionado: string = '';
   carrerasDisponibles: string[] = [];
   statusesDisponibles: string[] = [];
-
+  roles: string[] = [];
   constructor(
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
     private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
     private templateService: TemplateService, // Servicio para descarga de XLSX
     private alertService: AlertService,
-  ) {}
+  ) {
+    const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+    this.roles = user.roles || [];
+  }
 
   /**
    * Inicializa el componente:
@@ -152,7 +155,7 @@ export class AlumnosComponent implements OnInit {
   get pages(): (number | string)[] {
     const total = this.totalPages;
     const current = this.currentPage;
-    const delta = 1;
+    const delta = 3;
     const range: (number | string)[] = [];
     const rangeWithDots: (number | string)[] = [];
     let last: number | undefined;
@@ -192,16 +195,52 @@ export class AlumnosComponent implements OnInit {
    * Marca la asistencia de un alumno como "Asistió" o "NP".
    * Llama al backend y actualiza la tabla.
    */
-  marcarAsistencia(alumno: any, asistio: boolean): void {
-    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
-    this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
-      next: () => {
-        alumno.attendanceStatus = nuevoEstado;
-        this.cdRef.detectChanges();
-      },
-      error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
-    });
+ marcarAsistencia(alumno: any, asistio: boolean): void {
+  const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+
+  this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
+    next: () => {
+      alumno.attendanceStatus = nuevoEstado;
+      alumno.showReset = true; // Mostramos la X
+
+      // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
+      if (alumno.timerRef) {
+        clearTimeout(alumno.timerRef);
+      }
+
+      // CONFIGURACIÓN DEL TIMER: 5 minutos
+      alumno.timerRef = setTimeout(() => {
+        alumno.showReset = false;
+        this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
+      }, 300000); 
+
+      this.cdRef.detectChanges();
+    },
+    error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
+  });
+}
+
+resetearAsistencia(alumno: any): void {
+  // Limpiamos el timer antes de hacer nada para evitar colisiones
+  if (alumno.timerRef) {
+    clearTimeout(alumno.timerRef);
+    alumno.timerRef = null;
   }
+
+  this.alumnosService.marcarAsistencia(alumno.id, { status: '' }).subscribe({
+    next: () => {
+      alumno.attendanceStatus = '';
+      alumno.showReset = false;
+      this.cdRef.detectChanges();
+    },
+    error: () => {
+      // Si falla el servidor, igual reseteamos local para que no se trabe la UI
+      alumno.attendanceStatus = '';
+      alumno.showReset = false;
+      this.cdRef.detectChanges();
+    }
+  });
+}
 
   /**
    * Descarga los formatos XLSX desde el servidor.
@@ -245,5 +284,13 @@ export class AlumnosComponent implements OnInit {
           alert('Error al descargar el formato. Revisa permisos o el servidor.');
         },
       });
+
+
   }
+  hasRole(role: string): boolean {
+    return this.roles.includes(role);
+    console.log(this.roles);
+  }
+  
 }
+

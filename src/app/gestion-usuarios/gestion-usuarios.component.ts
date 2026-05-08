@@ -41,7 +41,9 @@ export class GestionUsuariosComponent implements OnInit {
     active: true,
   };*/
 
-  constructor(private adminUserService: AdminUserService) {}
+  constructor(private adminUserService: AdminUserService) {
+    
+  }
 
   ngOnInit(): void {
     this.loadUsers();

@@ -92,54 +92,94 @@
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">N°</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
+             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Asistencia</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">CURP</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Calificación Final</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
+            <th *ngIf="hasRole('ROLE_ADMIN')" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
+            <th *ngIf="hasRole('ROLE_ADMIN')" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Calificación Final</th>
+            <th *ngIf="hasRole('ROLE_ADMIN')" class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Asistencia</th>
+           
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let alumno of paginatedData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+  <div class="flex items-center space-x-2 min-h-[40px]">
+    
+    <!-- MODO EDICIÓN: Si no hay estatus, mostrar botones -->
+    <ng-container *ngIf="!alumno.attendanceStatus">
+      <button 
+        (click)="marcarAsistencia(alumno, true)" 
+        class="px-4 py-1.5 bg-[#548e88] text-white text-xs font-bold rounded-full hover:bg-[#29726b] transition-all active:scale-95 shadow-sm">
+        ✓ Asistió
+      </button>
+
+      <button 
+        (click)="marcarAsistencia(alumno, false)" 
+        class="px-4 py-1.5 border border-red-200 bg-red-50 text-red-600 text-xs font-bold rounded-full hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-sm">
+        ✕ No asistió
+      </button>
+    </ng-container>
+
+    <!-- MODO LECTURA: Mostrar el resultado con la opción de reset temporal -->
+    <div *ngIf="alumno.attendanceStatus" class="flex items-center">
+      <span 
+        [ngClass]="{
+          'bg-green-100 text-green-700 ring-green-600/20': alumno.attendanceStatus === 'ASISTIÓ',
+          'bg-red-100 text-red-700 ring-red-600/20': alumno.attendanceStatus === 'NP'
+        }" 
+        class="inline-flex items-center rounded-md px-3 py-1 text-xs font-bold ring-1 ring-inset uppercase shadow-sm">
+        
+        {{ alumno.attendanceStatus }}
+
+        <!-- La X solo aparece si showReset es true (durante 5 min) -->
+        <button 
+          *ngIf="alumno.showReset"
+          (click)="resetearAsistencia(alumno)"
+          class="ml-2 p-0.5 rounded-full hover:bg-black/10 transition-colors text-current"
+          title="Corregir asistencia">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </span>
+    </div>
+
+  </div>
+</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.curp}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.fullName}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.career}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.score}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.finalGrade}}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span [ngClass]="{
-                  'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
-                  'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
-                  'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'
-                }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
-                {{ alumno.status }}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <!-- Botones solo si no hay asistencia -->
-              <ng-container *ngIf="!alumno.attendanceStatus || alumno.attendanceStatus === ''">
-                <button (click)="marcarAsistencia(alumno, true)" class="px-2 py-1 border bg-[#548e88] text-white rounded hover:bg-[#29726b]">
-                  Asistió
-                </button>
-                <button (click)="marcarAsistencia(alumno, false)" class="px-2 py-1 border rounded bg-red-600 text-white hover:bg-red-800">
-                  No asistió
-                </button>
-              </ng-container>
+           <!-- Puntaje: Oculto para ROLE_USER -->
+<td  *ngIf="hasRole('ROLE_ADMIN')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+  {{alumno.score}}
+</td>
 
-              <!-- Mostrar estado si ya se marcó -->
-              <span *ngIf="alumno.attendanceStatus && alumno.attendanceStatus !== ''"
-                [class.text-green-600]="alumno.attendanceStatus === 'ASISTIÓ'"
-                [class.text-red-600]="alumno.attendanceStatus === 'NP'" class="font-semibold">
-                {{ alumno.attendanceStatus }}
-              </span>
+<!-- Calificación Final: Oculto para ROLE_USER -->
+<td  *ngIf="hasRole('ROLE_ADMIN')" class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+  {{alumno.finalGrade}}
+</td>
 
-            </td>
+<!-- Último Login: Oculto para ROLE_USER -->
+<td  *ngIf="hasRole('ROLE_ADMIN')"  class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+  {{ alumno.lastLogin | tiempoRelativo }}
+</td>
+
+<!-- El Estatus se mantiene visible (según tu petición, solo los 3 anteriores se ocultan) -->
+<td class="px-6 py-4 whitespace-nowrap">
+  <span [ngClass]="{
+      'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
+      'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
+      'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'
+    }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+    {{ alumno.status }}
+  </span>
+</td>
+          
 
 
 
@@ -155,43 +195,66 @@
     </div>
 
     <!-- Paginación -->
-    <div *ngIf="filteredData.length > 0" class="px-3 py-3 border-t">
-      <div class="flex flex-col items-center gap-2">
-        <!-- Texto de info -->
-        <div class="text-sm text-gray-500 text-center">
-          Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }}
-          a {{ Math.min(currentPage * itemsPerPage, filteredData.length) }}
-          de {{ filteredData.length }} resultados
-        </div>
-
-        <!-- Controles de paginación centrados -->
-        <div class="flex gap-1 items-center justify-center">
-          <!-- Botón Anterior -->
-          <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
-            Anterior
-          </button>
-
-          <!-- Botones de páginas -->
-          <ng-container *ngFor="let page of pages">
-            <button *ngIf="page !== '...'; else dots" (click)="goToPage(+page)"
-              [class.bg-[#14645c]]="page === currentPage" [class.text-white]="page === currentPage"
-              class="px-3 py-1 border rounded hover:bg-[#f3f4f6]">
-              {{ page }}
-            </button>
-            <ng-template #dots>
-              <span class="px-2">…</span>
-            </ng-template>
-          </ng-container>
-
-          <!-- Botón Siguiente -->
-          <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
-            class="px-3 py-1 border rounded text-[#14645c] hover:bg-[#f3f4f6] disabled:opacity-50">
-            Siguiente
-          </button>
-        </div>
-      </div>
+<div *ngIf="filteredData.length > 0" class="px-4 py-4 border-t border-gray-100 bg-gray-50/50">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- Info Text: Alineado a la izquierda en pantallas grandes -->
+    <div class="text-sm text-gray-600 font-medium">
+      Mostrando 
+      <span class="text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+      a 
+      <span class="text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredData.length) }}</span>
+      de 
+      <span class="text-gray-900">{{ filteredData.length }}</span> resultados
     </div>
+
+    <!-- Controles de Paginación -->
+    <nav class="flex items-center -space-x-px shadow-sm rounded-md" aria-label="Pagination">
+      
+      <!-- Botón Anterior -->
+      <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
+        class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+        <span class="sr-only">Anterior</span>
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      <!-- Números de Página -->
+      <ng-container *ngFor="let page of pages">
+        <!-- Botón Numérico -->
+        <button *ngIf="page !== '...'; else dots" 
+          (click)="goToPage(+page)"
+          [class.z-20]="page === currentPage"
+          [class.bg-[#14645c]]="page === currentPage"
+          [class.text-white]="page === currentPage"
+          [class.border-[#14645c]]="page === currentPage"
+          [class.bg-white]="page !== currentPage"
+          [class.text-gray-600]="page !== currentPage"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-semibold hover:bg-gray-100 focus:z-10 transition-colors min-w-[40px] justify-center">
+          {{ page }}
+        </button>
+
+        <!-- Puntos Suspensivos -->
+        <ng-template #dots>
+          <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            ...
+          </span>
+        </ng-template>
+      </ng-container>
+
+      <!-- Botón Siguiente -->
+      <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
+        class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+        <span class="sr-only">Siguiente</span>
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+    </nav>
+  </div>
+</div>
     <!--TERMINA PAGINACION-->
   </div>
 </div>
