@@ -113,16 +113,36 @@ currentRoute: string = '';
     }
   }
 
-  aplicarFiltros() {
-    this.filteredData = this.datos.filter(a => {
+   aplicarFiltros() {
+    const busqueda = this.terminoBusqueda.toLowerCase().trim();
+
+    this.filteredData = this.datos.filter((a) => {
+      // Filtros de Select
       const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
-      const coincideCarrera = !this.carreraSeleccionada || a.careerAtResult == this.carreraSeleccionada;
+      const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
       const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
-      return coincideAnio && coincideCarrera && coincideStatus;
+
+      // Filtro de Buscador (Nombre, CURP o Ficha)
+      const coincideBusqueda = !busqueda || 
+        (a.fullName && a.fullName.toLowerCase().includes(busqueda)) ||
+        (a.curp && a.curp.toLowerCase().includes(busqueda)) ||
+        (a.ficha && a.ficha.toString().includes(busqueda));
+
+      return coincideAnio && coincideCarrera && coincideStatus && coincideBusqueda;
     });
 
-    this.currentPage = 1;
+    this.currentPage = 1; // Reinicia paginación al filtrar
     this.cdRef.detectChanges();
+  }
+
+  // Método para el evento input del buscador
+  onSearch() {
+    this.aplicarFiltros();
+  }
+
+  limpiarBusqueda() {
+    this.terminoBusqueda = '';
+    this.aplicarFiltros();
   }
 
   filtrarPorAnio() {

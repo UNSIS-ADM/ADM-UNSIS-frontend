@@ -45,39 +45,56 @@
     </div>
 
     <!-- Barra de búsqueda y carga -->
-    <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div class="flex flex-wrap gap-3 items-center w-full sm:w-auto">
-
-        <!-- Año -->
-        <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todos los años</option>
-          <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
-        </select>
-
-        <!-- Carrera -->
-        <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todas las carreras</option>
-          <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
-        </select>
-
-        <!-- Estatus -->
-        <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todos los estatus</option>
-          <option value="ACEPTADO">Aceptado</option>
-          <option value="RECHAZADO">Rechazado</option>
-          <option value="PENDIENTE">Pendiente</option>
-        </select>
-      </div>
-
-
-
-
-
+    <!-- Barra de búsqueda y filtros -->
+<div class="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50/50">
+  
+  <!-- BUSCADOR POR TEXTO -->
+  <div class="relative w-full md:w-80">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
     </div>
+    <input 
+      type="text" 
+      [(ngModel)]="terminoBusqueda"
+      (input)="onSearch()"
+      placeholder="Buscar por nombre, CURP o ficha..."
+      class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] bg-white text-sm transition-all"
+    >
+    <!-- Botón para limpiar (solo se ve si hay texto) -->
+    <button *ngIf="terminoBusqueda" (click)="limpiarBusqueda()" 
+      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
+  <!-- SELECTORES DE FILTRADO (Tus selects actuales) -->
+  <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+    <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los años</option>
+      <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+    </select>
+
+    <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todas las carreras</option>
+      <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
+    </select>
+
+    <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los estatus</option>
+      <option value="ACEPTADO">Aceptado</option>
+      <option value="RECHAZADO">Rechazado</option>
+      <option value="PENDIENTE">Pendiente</option>
+    </select>
+  </div>
+
+</div>
     <!-- Mensaje cuando no hay datos -->
     <div *ngIf="filteredData.length === 0 && !terminoBusqueda" class="p-8 text-center text-gray-500">
       No hay datos disponibles
@@ -107,47 +124,66 @@
           <tr *ngFor="let alumno of paginatedData">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.id}}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{alumno.ficha}}</td>
-        <td class="px-6 py-4 whitespace-nowrap">
+       <td class="px-6 py-4 whitespace-nowrap">
   <div class="flex items-center space-x-2 min-h-[40px]">
     
-    <!-- MODO EDICIÓN: Si no hay estatus, mostrar botones -->
-    <ng-container *ngIf="!alumno.attendanceStatus">
-      <button 
-        (click)="marcarAsistencia(alumno, true)" 
-        class="px-4 py-1.5 bg-[#548e88] text-white text-xs font-bold rounded-full hover:bg-[#29726b] transition-all active:scale-95 shadow-sm">
-        ✓ Asistió
-      </button>
+    <ng-container *ngIf="hasRole('ROLE_ADMIN')">
+      <div *ngIf="alumno.attendanceStatus === 'ASISTIÓ' || alumno.attendanceStatus === 'NP'" class="flex items-center">
+        <span 
+          [ngClass]="{
+            'bg-green-100 text-green-700 ring-green-600/20': alumno.attendanceStatus === 'ASISTIÓ',
+            'bg-red-100 text-red-700 ring-red-600/20': alumno.attendanceStatus === 'NP'
+          }" 
+          class="inline-flex items-center rounded-md px-3 py-1 text-xs font-bold ring-1 ring-inset uppercase shadow-sm">
+          {{ alumno.attendanceStatus }}
+        </span>
+      </div>
 
-      <button 
-        (click)="marcarAsistencia(alumno, false)" 
-        class="px-4 py-1.5 border border-red-200 bg-red-50 text-red-600 text-xs font-bold rounded-full hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-sm">
-        ✕ No asistió
-      </button>
+      <span *ngIf="!alumno.attendanceStatus || alumno.attendanceStatus === 'PENDIENTE'" 
+        class="text-xs font-medium text-gray-400 italic">
+        En espera...
+      </span>
     </ng-container>
 
-    <!-- MODO LECTURA: Mostrar el resultado con la opción de reset temporal -->
-    <div *ngIf="alumno.attendanceStatus" class="flex items-center">
-      <span 
-        [ngClass]="{
-          'bg-green-100 text-green-700 ring-green-600/20': alumno.attendanceStatus === 'ASISTIÓ',
-          'bg-red-100 text-red-700 ring-red-600/20': alumno.attendanceStatus === 'NP'
-        }" 
-        class="inline-flex items-center rounded-md px-3 py-1 text-xs font-bold ring-1 ring-inset uppercase shadow-sm">
-        
-        {{ alumno.attendanceStatus }}
 
-        <!-- La X solo aparece si showReset es true (durante 5 min) -->
+    <ng-container *ngIf="!hasRole('ROLE_ADMIN')">
+      
+      <ng-container *ngIf="!alumno.attendanceStatus || alumno.attendanceStatus === 'PENDIENTE'">
         <button 
-          *ngIf="alumno.showReset"
-          (click)="resetearAsistencia(alumno)"
-          class="ml-2 p-0.5 rounded-full hover:bg-black/10 transition-colors text-current"
-          title="Corregir asistencia">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          (click)="marcarAsistencia(alumno, true)" 
+          class="px-4 py-1.5 bg-[#548e88] text-white text-xs font-bold rounded-full hover:bg-[#29726b] transition-all active:scale-95 shadow-sm">
+          ✓ Asistió
         </button>
-      </span>
-    </div>
+
+        <button 
+          (click)="marcarAsistencia(alumno, false)" 
+          class="px-4 py-1.5 border border-red-200 bg-red-50 text-red-600 text-xs font-bold rounded-full hover:bg-red-600 hover:text-white transition-all active:scale-95 shadow-sm">
+          ✕ No asistió
+        </button>
+      </ng-container>
+
+      <div *ngIf="alumno.attendanceStatus === 'ASISTIÓ' || alumno.attendanceStatus === 'NP'" class="flex items-center">
+        <span 
+          [ngClass]="{
+            'bg-green-100 text-green-700 ring-green-600/20': alumno.attendanceStatus === 'ASISTIÓ',
+            'bg-red-100 text-red-700 ring-red-600/20': alumno.attendanceStatus === 'NP'
+          }" 
+          class="inline-flex items-center rounded-md px-3 py-1 text-xs font-bold ring-1 ring-inset uppercase shadow-sm">
+          
+          {{ alumno.attendanceStatus }}
+
+          <button 
+            *ngIf="alumno.showReset"
+            (click)="resetearAsistencia(alumno)"
+            class="ml-2 p-0.5 rounded-full hover:bg-black/10 transition-colors text-current"
+            title="Corregir asistencia">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </span>
+      </div>
+    </ng-container>
 
   </div>
 </td>

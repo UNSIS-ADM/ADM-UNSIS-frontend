@@ -112,16 +112,39 @@ export class AlumnosComponent implements OnInit {
   /**
    * Aplica filtros activos a la lista de alumnos.
    */
+ /**
+   * Aplica filtros activos y búsqueda por texto a la lista de alumnos.
+   */
   aplicarFiltros() {
+    const busqueda = this.terminoBusqueda.toLowerCase().trim();
+
     this.filteredData = this.alumnos.filter((a) => {
+      // Filtros de Select
       const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
       const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
       const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
-      return coincideAnio && coincideCarrera && coincideStatus;
+
+      // Filtro de Buscador (Nombre, CURP o Ficha)
+      const coincideBusqueda = !busqueda || 
+        (a.fullName && a.fullName.toLowerCase().includes(busqueda)) ||
+        (a.curp && a.curp.toLowerCase().includes(busqueda)) ||
+        (a.ficha && a.ficha.toString().includes(busqueda));
+
+      return coincideAnio && coincideCarrera && coincideStatus && coincideBusqueda;
     });
 
-    this.currentPage = 1; // Reinicia paginación
-    this.cdRef.detectChanges(); // Actualiza vista
+    this.currentPage = 1; // Reinicia paginación al filtrar
+    this.cdRef.detectChanges();
+  }
+
+  // Método para el evento input del buscador
+  onSearch() {
+    this.aplicarFiltros();
+  }
+
+  limpiarBusqueda() {
+    this.terminoBusqueda = '';
+    this.aplicarFiltros();
   }
 
   filtrarPorAnio() { this.aplicarFiltros(); }
@@ -227,11 +250,12 @@ resetearAsistencia(alumno: any): void {
     alumno.timerRef = null;
   }
 
-  this.alumnosService.marcarAsistencia(alumno.id, { status: '' }).subscribe({
+  this.alumnosService.marcarAsistencia(alumno.id, { status: "PENDIENTE" }).subscribe({
     next: () => {
       alumno.attendanceStatus = '';
       alumno.showReset = false;
       this.cdRef.detectChanges();
+      console.log(alumno.status);
     },
     error: () => {
       // Si falla el servidor, igual reseteamos local para que no se trabe la UI

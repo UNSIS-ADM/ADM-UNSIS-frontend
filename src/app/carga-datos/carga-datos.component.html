@@ -22,33 +22,55 @@
       </div>
 
       <!-- 🔹 Filtros desplegables -->
-      <div class="flex flex-wrap gap-3 items-center w-full sm:w-auto">
-
-        <!-- Año -->
-        <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todos los años</option>
-          <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
-        </select>
-
-        <!-- Carrera -->
-        <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todas las carreras</option>
-          <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
-        </select>
-
-        <!-- Estatus -->
-        <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
-          class="px-3 py-2 border rounded-lg focus:outline-none focus:border-[#24645c]">
-          <option value="">Todos los estatus</option>
-          <option value="ACEPTADO">Aceptado</option>
-          <option value="RECHAZADO">Rechazado</option>
-          <option value="PENDIENTE">Pendiente</option>
-        </select>
-      </div>
+      <div class="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50/50">
+  
+  <!-- BUSCADOR POR TEXTO -->
+  <div class="relative w-full md:w-80">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
     </div>
+    <input 
+      type="text" 
+      [(ngModel)]="terminoBusqueda"
+      (input)="onSearch()"
+      placeholder="Buscar por nombre, CURP o ficha..."
+      class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] bg-white text-sm transition-all"
+    >
+    <!-- Botón para limpiar (solo se ve si hay texto) -->
+    <button *ngIf="terminoBusqueda" (click)="limpiarBusqueda()" 
+      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
 
+  <!-- SELECTORES DE FILTRADO (Tus selects actuales) -->
+  <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+    <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los años</option>
+      <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+    </select>
+
+    <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todas las carreras</option>
+      <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
+    </select>
+
+    <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los estatus</option>
+      <option value="ACEPTADO">Aceptado</option>
+      <option value="RECHAZADO">Rechazado</option>
+      <option value="PENDIENTE">Pendiente</option>
+    </select>
+  </div>
+
+</div>
 
     <!-- Mensaje cuando no hay datos -->
     <div *ngIf="filteredData.length === 0" class="p-8 text-center text-gray-500">
