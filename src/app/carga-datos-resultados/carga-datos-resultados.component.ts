@@ -290,7 +290,7 @@ export class CargaDatosResultadosComponent implements OnInit {
     this.resultadosService.editApplicantById(this.selectedApplicant.id, data)
       .subscribe({
         next: (res) => {
-          console.log('Aspirante editado correctamente', res);
+          
           this.loadResultados();
           this.closeModal();
         },

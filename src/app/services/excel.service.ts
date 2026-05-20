@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ExcelError {
   row: number;
@@ -15,7 +16,7 @@ export interface ExcelUploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceApplicants {
-  private apiUrl = 'http://132.18.44.252:1200/api/admin/upload-applicants';
+  private apiUrl = environment.uploadaplicants;
 
   constructor(private http: HttpClient) {}
 
@@ -33,7 +34,7 @@ export class ExcelServiceApplicants {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceResultados {
-  private apiUrl = 'http://132.18.44.252:1200/api/admin/upload-results';
+  private apiUrl = environment.uploadresults;
 
   constructor(private http: HttpClient) {}
 

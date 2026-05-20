@@ -75,7 +75,7 @@ export class AccessRestrictionComponent implements OnInit {
   loadRestriction() {
     this.restrictionService.getRestriction().subscribe({
       next: (res) => {
-        console.log('Respuesta del backend (getRestriction):', res);
+        
         // si el backend devuelve null por alguna razón, usar default;
         // si devuelve DTO con campos null, se asignan directamente
         this.restriction = res ?? this.defaultRestriction();
@@ -121,11 +121,6 @@ export class AccessRestrictionComponent implements OnInit {
      const newState = !this.restriction.enabled;
 
   // 👀 LOG
-  console.log(
-    'Enviando toggleEnabled al backend con:',
-    'id:', this.restriction.id,
-    'nuevo estado enabled:', newState
-  );
 
     this.restrictionService
       .toggleEnabled(this.restriction.id, !this.restriction.enabled)
@@ -167,14 +162,14 @@ export class AccessRestrictionComponent implements OnInit {
     if (!this.restriction) return;
 
     this.saving = true;
- console.log('Enviando restricción al backend (saveOrUpdate):', this.restriction);
+ 
 
     this.restrictionService.saveOrUpdate(this.restriction).subscribe({
       next: (res) => {
-        console.log('Respuesta del backend (saveOrUpdate):', res);
+        
         this.restriction = res ?? this.restriction;
         this.saving = false;
-        console.log(this.restriction);
+        
         this.alertService.showAlert(
           'Restricción guardada exitosamente',
           'success'

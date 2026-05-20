@@ -24,7 +24,6 @@ export class HomeComponent implements OnInit {
       this.roles = userInfo.roles || [];
     }
 
-    console.log('Roles en Home:', this.roles);
   }
 
   hasRole(role: string): boolean {
