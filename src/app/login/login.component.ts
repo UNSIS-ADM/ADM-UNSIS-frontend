@@ -120,7 +120,7 @@ onSubmit(): void {
         full_name: response.fullName,
       };
       localStorage.setItem('user_info', JSON.stringify(userInfo));
-      console.log('Información del usuario guardada:', JSON.stringify(userInfo));
+
 
       // Si el rol es ROLE_APPLICANT, validamos en el endpoint
       if (response.roles.includes('ROLE_APPLICANT')) {

@@ -306,7 +306,7 @@ currentRoute: string = '';
 
     // si no hay cambios, no hace falta llamar al servicio
     if (Object.keys(updatedData).length === 0) {
-      console.log('No se realizaron cambios');
+     
       this.closeModal();
       return;
     }
@@ -317,7 +317,7 @@ currentRoute: string = '';
     this.alumnosService.editApplicantById(this.selectedApplicant.id, updatedData)
       .subscribe({
         next: (res) => {
-          console.log('Aspirante editado correctamente', res);
+          
           this.loadAlumnos();
           this.closeModal();
         },

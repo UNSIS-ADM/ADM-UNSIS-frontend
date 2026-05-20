@@ -39,7 +39,7 @@ export class AlumnosComponent implements OnInit {
   terminoBusqueda = '';
   buscando = false;
   errorBusqueda = false;
-
+  isLoading = false;
   // --- Paginación ---
   currentPage = 1;
   itemsPerPage = 5;
