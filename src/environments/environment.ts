@@ -1,10 +1,10 @@
 export const environment = {
-  production: false,
+  production: true,
   // URL base del backend
 
-  apiUrl: 'http://localhost:1200', // Pon aquí el puerto real de tu backend (ej. 8080, 3000, 5000)
-
-  // Endpoints (se mantienen igual, pero asegúrate de que el servicio
+  apiUrl: '', // Pon aquí el puerto real de tu backend (ej. 8080, 3000, 5000)
+  
+  // Endpoints (se mantienen igual, pero asegúrate de que el servicio 
   // en Angular los concatene correctamente con apiUrl)
   getalumnosEndpoint: '/api/applicants',
   loginEndpoint: '/auth/login',
