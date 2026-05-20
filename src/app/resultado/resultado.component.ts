@@ -97,17 +97,19 @@ export class ResultadoComponent implements OnInit {
     );
   }
 
-  /** Carga desde backend los mensajes (aceptado / reprobado) */
   private renderPartHtml(rawHtml: string): string {
     if (!rawHtml) return '';
     let html = rawHtml;
 
-    // tokens básicos
-    html = html.replace(
-      / %EMAIL_CONTACT% /g,
-      this.emailContacto || 'admision.unsis@gmail.com'
-    );
-    html = html.replace(/ %PHONE% /g, '9515724100 Ext. 1203, 1204');
+    // Reemplazar la carrera del alumno usando la propiedad correcta
+    if (html.includes('%CARRERA_ALUMNO%')) {
+      const carreraNombre = this.alumno?.careerAtResult || 'la licenciatura seleccionada';
+      html = html.replace(/%CARRERA_ALUMNO%/g, `<strong>${this.escapeHtml(carreraNombre)}</strong>`);
+    }
+
+    // Reemplazar tokens de contacto
+    html = html.replace(/%EMAIL_CONTACT%/g, this.emailContacto || 'admision.unsis@gmail.com');
+    html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
 
     // Reemplazar lista dinámica de carreras
     if (html.includes('%CARRERAS_LIST%')) {
