@@ -75,32 +75,36 @@ currentRoute: string = '';
 
     loadAlumnos() {
       this.isLoading = true;
-      this.alumnosService.getAlumnos().subscribe({
-        next: (resultados) => {
-        this.datos = resultados;
-        this.filteredData = [...this.datos];
-          console.log(this.filteredData);
-        // 🔹 Llenar select de años
-        const yearsFromEndpoint = this.datos.map(a => a.admissionYear);
-        const currentYear = new Date().getFullYear();
-        const lastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
-        this.aniosDisponibles = [...new Set([...yearsFromEndpoint, ...lastFiveYears])].sort((a, b) => b - a);
-        this.anioSeleccionado = currentYear.toString();
+      this.alumnosService.getAlumnos(0, 1000).subscribe({
+  next: (resultados) => {
+    this.datos = resultados;
+    this.filteredData = [...this.datos];
+    console.log(this.filteredData);
+    // 🔹 Llenar select de años
+    const yearsFromEndpoint = this.datos.map((a) => a.admissionYear);
+    const currentYear = new Date().getFullYear();
+    const lastFiveYears = Array.from({ length: 5 }, (_, i) => currentYear - i);
+    this.aniosDisponibles = [
+      ...new Set([...yearsFromEndpoint, ...lastFiveYears]),
+    ].sort((a, b) => b - a);
+    this.anioSeleccionado = currentYear.toString();
 
-        // 🔹 Llenar select de carreras
-        this.carrerasDisponibles = [...new Set(this.datos.map(a => a.career).filter(Boolean))].sort();
+    // 🔹 Llenar select de carreras
+    this.carrerasDisponibles = [
+      ...new Set(this.datos.map((a) => a.career).filter(Boolean)),
+    ].sort();
 
-        this.aplicarFiltros();
+    this.aplicarFiltros();
 
-        this.isLoading = false;
-        this.cdRef.detectChanges();
-      },
-        error: () => {
-          this.alertService.showAlert('Error al cargar los datos', 'danger');
-          this.isLoading = false;
-          this.cdRef.detectChanges();
-        }
-      });
+    this.isLoading = false;
+    this.cdRef.detectChanges();
+  },
+  error: () => {
+    this.alertService.showAlert('Error al cargar los datos', 'danger');
+    this.isLoading = false;
+    this.cdRef.detectChanges();
+  },
+});
     }
 
 

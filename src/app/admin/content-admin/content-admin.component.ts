@@ -156,6 +156,7 @@ save() {
         });
     });
 }
+/*
 save() {
   if (!this.selected) {
     this.message = 'Selecciona un contenido primero.';
@@ -196,7 +197,7 @@ save() {
           if (dto) this.select(dto);
         });
     });
-}
+}*/
 }
 
 

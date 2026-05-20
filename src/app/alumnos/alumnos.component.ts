@@ -18,6 +18,7 @@ import { finalize } from 'rxjs/operators';
 import { extractFilename } from '../utils/file--utils';
 import { AlertService } from '../services/alert.service';
 
+
 @Component({
   selector: 'app-alumnos',
   standalone: true,
@@ -31,8 +32,8 @@ export class AlumnosComponent implements OnInit {
   downloadingResultados = false;
 
   // --- Listas de datos ---
-  alumnos: any[] = [];         // Lista completa de alumnos desde el backend
-  filteredData: any[] = [];    // Lista filtrada según los selects
+  alumnos: any[] = []; // Lista completa de alumnos desde el backend
+  filteredData: any[] = []; // Lista filtrada según los selects
 
   // --- Búsqueda (no implementada completamente) ---
   terminoBusqueda = '';
@@ -54,7 +55,7 @@ export class AlumnosComponent implements OnInit {
   roles: string[] = [];
   constructor(
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
-    private filtradoService: FiltradoService,
+    //private filtradoService: FiltradoService,
     private cdRef: ChangeDetectorRef,
     private templateService: TemplateService, // Servicio para descarga de XLSX
     private alertService: AlertService,
@@ -69,35 +70,67 @@ export class AlumnosComponent implements OnInit {
    * - Obtiene alumnos desde el servicio
    * - Llena listas de carreras y estatus
    */
+  totalElements = 0;
+  totalPagesBackend = 0;
+
   ngOnInit(): void {
     this.generarAnios();
+    this.cargarAlumnos();
+  }
 
-    this.alumnosService.getAlumnos().subscribe({
-      next: (data) => {
-        // Normaliza datos obtenidos
-        this.alumnos = data.map((a) => ({
-          ...a,
-          AttendanceStatus: a.attendanceStatus
-            ? a.attendanceStatus.trim().toUpperCase()
-            : '',
-        }));
+  get paginatedData() {
+    return this.filteredData;
+  }
 
-        console.log(this.alumnos);
+  siguientePagina() {
+    if (this.terminoBusqueda.trim()) {
+      return;
+    }
 
-        // Llena selects únicos de carrera y estatus
-        this.carrerasDisponibles = [
-          ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
-        ].sort();
+    if (this.currentPage < this.totalPagesBackend) {
+      this.currentPage++;
+      this.cargarAlumnos();
+    }
+  }
 
-        this.statusesDisponibles = [
-          ...new Set(this.alumnos.map((a) => a.status).filter(Boolean)),
-        ].sort();
+  paginaAnterior() {
+    if (this.terminoBusqueda.trim()) {
+      return;
+    }
 
-        // Aplica filtros iniciales
-        this.aplicarFiltros();
-      },
-      error: (err) => console.error('Error al cargar alumnos', err),
-    });
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.cargarAlumnos();
+    }
+  }
+
+  cargarAlumnos(): void {
+    this.alumnosService
+      .getAlumnos(this.currentPage - 1, this.itemsPerPage)
+      .subscribe({
+        next: (data) => {
+          this.alumnos = data.content.map((a: any) => ({
+            ...a,
+            attendanceStatus: a.attendanceStatus
+              ? a.attendanceStatus.trim().toUpperCase()
+              : '',
+          }));
+
+          this.totalElements = data.totalElements;
+          this.totalPagesBackend = data.totalPages;
+
+          this.carrerasDisponibles = [
+            ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
+          ].sort();
+
+          this.statusesDisponibles = [
+            ...new Set(this.alumnos.map((a) => a.status).filter(Boolean)),
+          ].sort();
+
+          this.aplicarFiltros();
+        },
+        error: (err) => console.error(err),
+      });
   }
 
   /**
@@ -105,94 +138,151 @@ export class AlumnosComponent implements OnInit {
    */
   generarAnios() {
     const currentYear = new Date().getFullYear();
-    this.aniosDisponibles = Array.from({ length: 5 }, (_, i) => currentYear - i);
+    this.aniosDisponibles = Array.from(
+      { length: 5 },
+      (_, i) => currentYear - i,
+    );
     this.anioSeleccionado = currentYear.toString();
   }
 
   /**
    * Aplica filtros activos a la lista de alumnos.
-   */
- /**
    * Aplica filtros activos y búsqueda por texto a la lista de alumnos.
    */
-  aplicarFiltros() {
+  aplicarFiltros(resetPage: boolean = false) {
+    if (resetPage) {
+      this.currentPage = 1;
+    }
+
     const busqueda = this.terminoBusqueda.toLowerCase().trim();
 
     this.filteredData = this.alumnos.filter((a) => {
-      // Filtros de Select
-      const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
-      const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
-      const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
+      const coincideAnio =
+        !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
 
-      // Filtro de Buscador (Nombre, CURP o Ficha)
-      const coincideBusqueda = !busqueda || 
+      const coincideCarrera =
+        !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
+
+      const coincideStatus =
+        !this.statusSeleccionado || a.status == this.statusSeleccionado;
+
+      const coincideBusqueda =
+        !busqueda ||
         (a.fullName && a.fullName.toLowerCase().includes(busqueda)) ||
         (a.curp && a.curp.toLowerCase().includes(busqueda)) ||
         (a.ficha && a.ficha.toString().includes(busqueda));
 
-      return coincideAnio && coincideCarrera && coincideStatus && coincideBusqueda;
+      return (
+        coincideAnio && coincideCarrera && coincideStatus && coincideBusqueda
+      );
     });
 
-    this.currentPage = 1; // Reinicia paginación al filtrar
     this.cdRef.detectChanges();
   }
 
   // Método para el evento input del buscador
   onSearch() {
-    this.aplicarFiltros();
+    const termino = this.terminoBusqueda.trim();
+
+    // Si está vacío, vuelve a cargar paginación normal
+    if (!termino) {
+      this.currentPage = 1;
+      this.cargarAlumnos();
+      return;
+    }
+
+    this.buscando = true;
+
+    // Construimos parámetros dinámicamente
+    const params: any = {};
+
+    // Si es número -> buscar por ficha
+    if (!isNaN(Number(termino))) {
+      params.ficha = Number(termino);
+    }
+
+    // Buscar también por texto
+    params.fullName = termino;
+    params.curp = termino;
+
+    this.alumnosService.searchAlumnos(params).subscribe({
+      next: (data) => {
+        this.alumnos = data.map((a: any) => ({
+          ...a,
+          attendanceStatus: a.attendanceStatus
+            ? a.attendanceStatus.trim().toUpperCase()
+            : '',
+        }));
+
+        this.aplicarFiltros();
+
+        // Desactiva paginación durante búsqueda
+        this.totalPagesBackend = 1;
+        this.currentPage = 1;
+
+        this.buscando = false;
+
+        this.cdRef.detectChanges();
+      },
+
+      error: (err) => {
+        console.error('Error en búsqueda:', err);
+        this.buscando = false;
+        this.errorBusqueda = true;
+      },
+    });
   }
 
   limpiarBusqueda() {
     this.terminoBusqueda = '';
-    this.aplicarFiltros();
+    this.currentPage = 1;
+    this.cargarAlumnos();
   }
 
-  filtrarPorAnio() { this.aplicarFiltros(); }
-  filtrarPorCarrera() { this.aplicarFiltros(); }
-  filtrarPorStatus() { this.aplicarFiltros(); }
-
-  // --- Métodos de paginación ---
-
-  get paginatedData() {
-    const start = (this.currentPage - 1) * this.itemsPerPage;
-    const end = start + this.itemsPerPage;
-    return this.filteredData.slice(start, end);
+  filtrarPorAnio() {
+    this.aplicarFiltros(true);
   }
 
-  siguientePagina() {
-    if (this.currentPage * this.itemsPerPage < this.filteredData.length)
-      this.currentPage++;
+  filtrarPorCarrera() {
+    this.aplicarFiltros(true);
   }
 
-  paginaAnterior() {
-    if (this.currentPage > 1) this.currentPage--;
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.filteredData.length / this.itemsPerPage);
+  filtrarPorStatus() {
+    this.aplicarFiltros(true);
   }
 
   /**
    * Genera los números de página visibles (con puntos suspensivos).
    */
   get pages(): (number | string)[] {
-    const total = this.totalPages;
+    const total = this.totalPagesBackend;
     const current = this.currentPage;
     const delta = 3;
+
     const range: (number | string)[] = [];
     const rangeWithDots: (number | string)[] = [];
+
     let last: number | undefined;
 
     for (let i = 1; i <= total; i++) {
-      if (i === 1 || i === total || (i >= current - delta && i <= current + delta))
+      if (
+        i === 1 ||
+        i === total ||
+        (i >= current - delta && i <= current + delta)
+      ) {
         range.push(i);
+      }
     }
 
     for (let i of range) {
       if (last !== undefined && typeof i === 'number') {
-        if (i - last === 2) rangeWithDots.push(last + 1);
-        else if (i - last > 2) rangeWithDots.push('...');
+        if (i - last === 2) {
+          rangeWithDots.push(last + 1);
+        } else if (i - last > 2) {
+          rangeWithDots.push('...');
+        }
       }
+
       rangeWithDots.push(i);
       last = i as number;
     }
@@ -201,7 +291,14 @@ export class AlumnosComponent implements OnInit {
   }
 
   goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages) this.currentPage = page;
+    if (this.terminoBusqueda.trim()) {
+      return;
+    }
+
+    if (page >= 1 && page <= this.totalPagesBackend) {
+      this.currentPage = page;
+      this.cargarAlumnos();
+    }
   }
 
   /**
@@ -218,53 +315,61 @@ export class AlumnosComponent implements OnInit {
    * Marca la asistencia de un alumno como "Asistió" o "NP".
    * Llama al backend y actualiza la tabla.
    */
- marcarAsistencia(alumno: any, asistio: boolean): void {
-  const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+  marcarAsistencia(alumno: any, asistio: boolean): void {
+    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
 
-  this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
-    next: () => {
-      alumno.attendanceStatus = nuevoEstado;
-      alumno.showReset = true; // Mostramos la X
+    this.alumnosService
+      .marcarAsistencia(alumno.id, { status: nuevoEstado })
+      .subscribe({
+        next: () => {
+          alumno.attendanceStatus = nuevoEstado;
+          alumno.showReset = true; // Mostramos la X
 
-      // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
-      if (alumno.timerRef) {
-        clearTimeout(alumno.timerRef);
-      }
+          // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
+          if (alumno.timerRef) {
+            clearTimeout(alumno.timerRef);
+          }
 
-      // CONFIGURACIÓN DEL TIMER: 5 minutos
-      alumno.timerRef = setTimeout(() => {
-        alumno.showReset = false;
-        this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
-      }, 300000); 
+          // CONFIGURACIÓN DEL TIMER: 5 minutos
+          alumno.timerRef = setTimeout(() => {
+            alumno.showReset = false;
+            this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
+          }, 300000);
 
-      this.cdRef.detectChanges();
-    },
-    error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
-  });
-}
-
-resetearAsistencia(alumno: any): void {
-  // Limpiamos el timer antes de hacer nada para evitar colisiones
-  if (alumno.timerRef) {
-    clearTimeout(alumno.timerRef);
-    alumno.timerRef = null;
+          this.cdRef.detectChanges();
+        },
+        error: () =>
+          this.alertService.showAlert(
+            'Error al marcar la asistencia',
+            'danger',
+          ),
+      });
   }
 
-  this.alumnosService.marcarAsistencia(alumno.id, { status: "PENDIENTE" }).subscribe({
-    next: () => {
-      alumno.attendanceStatus = '';
-      alumno.showReset = false;
-      this.cdRef.detectChanges();
-      console.log(alumno.status);
-    },
-    error: () => {
-      // Si falla el servidor, igual reseteamos local para que no se trabe la UI
-      alumno.attendanceStatus = '';
-      alumno.showReset = false;
-      this.cdRef.detectChanges();
+  resetearAsistencia(alumno: any): void {
+    // Limpiamos el timer antes de hacer nada para evitar colisiones
+    if (alumno.timerRef) {
+      clearTimeout(alumno.timerRef);
+      alumno.timerRef = null;
     }
-  });
-}
+
+    this.alumnosService
+      .marcarAsistencia(alumno.id, { status: 'PENDIENTE' })
+      .subscribe({
+        next: () => {
+          alumno.attendanceStatus = '';
+          alumno.showReset = false;
+          this.cdRef.detectChanges();
+          console.log(alumno.status);
+        },
+        error: () => {
+          // Si falla el servidor, igual reseteamos local para que no se trabe la UI
+          alumno.attendanceStatus = '';
+          alumno.showReset = false;
+          this.cdRef.detectChanges();
+        },
+      });
+  }
 
   /**
    * Descarga los formatos XLSX desde el servidor.
@@ -275,7 +380,9 @@ resetearAsistencia(alumno: any): void {
     else this.downloadingResultados = true;
 
     const defaultName =
-      key === 'aspirantes' ? 'Datos de aspirantes.xlsx' : 'Resultados de admisión.xlsx';
+      key === 'aspirantes'
+        ? 'Datos de aspirantes.xlsx'
+        : 'Resultados de admisión.xlsx';
 
     this.templateService
       .downloadTemplate(key)
@@ -283,14 +390,14 @@ resetearAsistencia(alumno: any): void {
         finalize(() => {
           this.downloadingAspirantes = false;
           this.downloadingResultados = false;
-        })
+        }),
       )
       .subscribe({
         next: (res: HttpResponse<Blob>) => {
           const blob = res.body!;
           const filename = extractFilename(
             res.headers.get('content-disposition'),
-            defaultName
+            defaultName,
           );
 
           // Crea un enlace invisible para descargar el archivo
@@ -305,16 +412,14 @@ resetearAsistencia(alumno: any): void {
         },
         error: (err) => {
           console.error('Error descargando template', err);
-          alert('Error al descargar el formato. Revisa permisos o el servidor.');
+          alert(
+            'Error al descargar el formato. Revisa permisos o el servidor.',
+          );
         },
       });
-
-
   }
   hasRole(role: string): boolean {
     return this.roles.includes(role);
-    console.log(this.roles);
   }
-  
 }
 
