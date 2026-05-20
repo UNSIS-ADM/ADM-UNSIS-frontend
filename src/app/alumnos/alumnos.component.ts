@@ -40,6 +40,7 @@ export class AlumnosComponent implements OnInit {
   buscando = false;
   errorBusqueda = false;
   isLoading = false;
+  
   // --- Paginación ---
   currentPage = 1;
   itemsPerPage = 5;
@@ -53,6 +54,10 @@ export class AlumnosComponent implements OnInit {
   carrerasDisponibles: string[] = [];
   statusesDisponibles: string[] = [];
   roles: string[] = [];
+  
+  totalElements = 0;
+  totalPagesBackend = 0;
+
   constructor(
     @Inject(AlumnosService) private readonly alumnosService: AlumnosService,
     //private filtradoService: FiltradoService,
@@ -70,37 +75,49 @@ export class AlumnosComponent implements OnInit {
    * - Obtiene alumnos desde el servicio
    * - Llena listas de carreras y estatus
    */
-  totalElements = 0;
-  totalPagesBackend = 0;
-
   ngOnInit(): void {
     this.generarAnios();
     this.cargarAlumnos();
   }
 
+  /**
+   * CORRECCIÓN: Si estás realizando una búsqueda local o aplicando un filtro sobre 
+   * el set de datos mutados, aplicamos .slice() para que la tabla conserve estrictamente 
+   * el límite de 5 registros en pantalla.
+   */
   get paginatedData() {
+    // Si la búsqueda manual o el filtrado por select dejó un arreglo grande en el cliente, lo limitamos
+    if (this.filteredData.length > this.itemsPerPage) {
+      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
+    }
     return this.filteredData;
   }
 
   siguientePagina() {
-    if (this.terminoBusqueda.trim()) {
-      return;
-    }
+    // CORRECCIÓN: Quitamos el "return;" prematuro para permitir paginar los resultados locales de la búsqueda
+    const totalPaginasEfectivas = this.terminoBusqueda.trim() 
+      ? Math.ceil(this.filteredData.length / this.itemsPerPage) 
+      : this.totalPagesBackend;
 
-    if (this.currentPage < this.totalPagesBackend) {
+    if (this.currentPage < totalPaginasEfectivas) {
       this.currentPage++;
-      this.cargarAlumnos();
+      if (!this.terminoBusqueda.trim()) {
+        this.cargarAlumnos();
+      } else {
+        this.cdRef.detectChanges();
+      }
     }
   }
 
   paginaAnterior() {
-    if (this.terminoBusqueda.trim()) {
-      return;
-    }
-
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.cargarAlumnos();
+      if (!this.terminoBusqueda.trim()) {
+        this.cargarAlumnos();
+      } else {
+        this.cdRef.detectChanges();
+      }
     }
   }
 
@@ -216,15 +233,13 @@ export class AlumnosComponent implements OnInit {
 
         this.aplicarFiltros();
 
-        // Desactiva paginación durante búsqueda
-        this.totalPagesBackend = 1;
+        // CORRECCIÓN: Calculamos las páginas efectivas basándonos en los resultados de la búsqueda
         this.currentPage = 1;
+        this.totalPagesBackend = Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
 
         this.buscando = false;
-
         this.cdRef.detectChanges();
       },
-
       error: (err) => {
         console.error('Error en búsqueda:', err);
         this.buscando = false;
@@ -291,13 +306,14 @@ export class AlumnosComponent implements OnInit {
   }
 
   goToPage(page: number) {
-    if (this.terminoBusqueda.trim()) {
-      return;
-    }
-
+    // CORRECCIÓN: Habilitamos navegación por clics numéricos en búsquedas locales
     if (page >= 1 && page <= this.totalPagesBackend) {
       this.currentPage = page;
-      this.cargarAlumnos();
+      if (!this.terminoBusqueda.trim()) {
+        this.cargarAlumnos();
+      } else {
+        this.cdRef.detectChanges();
+      }
     }
   }
 
@@ -325,7 +341,7 @@ export class AlumnosComponent implements OnInit {
           alumno.attendanceStatus = nuevoEstado;
           alumno.showReset = true; // Mostramos la X
 
-          // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
+          // LIMPIEZA DE TIMER PREVIO
           if (alumno.timerRef) {
             clearTimeout(alumno.timerRef);
           }
@@ -333,7 +349,7 @@ export class AlumnosComponent implements OnInit {
           // CONFIGURACIÓN DEL TIMER: 5 minutos
           alumno.timerRef = setTimeout(() => {
             alumno.showReset = false;
-            this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
+            this.cdRef.detectChanges();
           }, 300000);
 
           this.cdRef.detectChanges();
@@ -347,7 +363,6 @@ export class AlumnosComponent implements OnInit {
   }
 
   resetearAsistencia(alumno: any): void {
-    // Limpiamos el timer antes de hacer nada para evitar colisiones
     if (alumno.timerRef) {
       clearTimeout(alumno.timerRef);
       alumno.timerRef = null;
@@ -363,7 +378,6 @@ export class AlumnosComponent implements OnInit {
           console.log(alumno.status);
         },
         error: () => {
-          // Si falla el servidor, igual reseteamos local para que no se trabe la UI
           alumno.attendanceStatus = '';
           alumno.showReset = false;
           this.cdRef.detectChanges();
@@ -400,7 +414,6 @@ export class AlumnosComponent implements OnInit {
             defaultName,
           );
 
-          // Crea un enlace invisible para descargar el archivo
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
@@ -418,8 +431,8 @@ export class AlumnosComponent implements OnInit {
         },
       });
   }
+
   hasRole(role: string): boolean {
     return this.roles.includes(role);
   }
 }
-
