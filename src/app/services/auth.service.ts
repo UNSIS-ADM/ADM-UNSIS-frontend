@@ -28,7 +28,7 @@ export class AuthService {
     const url = environment.apiUrl + environment.loginEndpoint;
     return this.http.post<LoginResponse>(url, credentials).pipe(
       tap(response => {
-        console.log('Respuesta del servidor:', response);
+        
         if (response && response.token) {
           // guarda accessToken y refreshToken
           this.saveToken(`Bearer ${response.token}`);
@@ -115,8 +115,7 @@ export class AuthService {
     return this.http.post(url, { refreshToken }).pipe(
       tap((res: any) => {
         if (res.accessToken) {
-          console.log('AccessToken anterior:', oldAccessToken);
-          console.log('AccessToken nuevo:', res.accessToken);
+          
           // actualiza tokens
           this.saveToken(`Bearer ${res.accessToken}`);
           if (res.refreshToken) {

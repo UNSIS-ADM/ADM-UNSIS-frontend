@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 export class AlumnosService {
   private endpoint = environment.apiUrl + environment.getalumnosEndpoint;
   private endpointget = environment.apiUrl + environment.getApplicantbyid;
-  private pdfEndpoint = 'http://132.18.44.252:1200/api/admin/generate-pdf'; // Endpoint para PDF
+  private pdfEndpoint = environment.apiUrl + environment.generatePdfEndpoint; // Endpoint para PDF
 
   constructor(private http: HttpClient) { }
 

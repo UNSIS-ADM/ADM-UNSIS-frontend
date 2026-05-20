@@ -82,7 +82,7 @@ export class AlumnosComponent implements OnInit {
             : '',
         }));
 
-        console.log(this.alumnos);
+        
 
         // Llena selects únicos de carrera y estatus
         this.carrerasDisponibles = [

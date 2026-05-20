@@ -63,7 +63,7 @@ export class ModalEditApplicantComponent implements OnInit {
     });
 
     if (Object.keys(updatedData).length === 0) {
-      console.log('No se realizaron cambios');
+     
       this.onClose();
       return;
     }

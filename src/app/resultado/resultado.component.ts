@@ -100,30 +100,32 @@ export class ResultadoComponent implements OnInit {
     );
   }
 
-  /** Carga desde backend los mensajes (aceptado / reprobado) */
-  // dentro de ResultadoComponent (asegúrate imports: DomSanitizer, SafeHtml, ContentService)
-  private renderPartHtml(rawHtml: string): string {
-    if (!rawHtml) return '';
-    let html = rawHtml;
+private renderPartHtml(rawHtml: string): string {
+  if (!rawHtml) return '';
+  let html = rawHtml;
 
-    // tokens básicos
-    html = html.replace(
-      /%EMAIL_CONTACT%/g,
-      this.emailContacto || 'admision.unsis@gmail.com'
-    );
-    html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
-
-    // reemplazar lista dinámica de carreras
-    if (html.includes('%CARRERAS_LIST%')) {
-      const items = (this.carrerasDisponibles || [])
-        .map((c) => `<li>${this.escapeHtml(c)}</li>`)
-        .join('\n');
-      const ul = `<ul class="list-disc list-inside ml-4">${items}</ul>`;
-      html = html.replace(/%CARRERAS_LIST%/g, ul);
-    }
-
-    return html;
+  // Reemplazar la carrera del alumno usando la propiedad correcta
+  if (html.includes('%CARRERA_ALUMNO%')) {
+    // CAMBIO AQUÍ: Usamos careerAtResult que es el que funciona en tu HTML
+    const carreraNombre = this.alumno?.careerAtResult || 'la licenciatura seleccionada';
+    html = html.replace(/%CARRERA_ALUMNO%/g, `<strong>${this.escapeHtml(carreraNombre)}</strong>`);
   }
+
+  // Reemplazar tokens de contacto
+  html = html.replace(/%EMAIL_CONTACT%/g, this.emailContacto || 'admision.unsis@gmail.com');
+  html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
+
+  // Reemplazar lista dinámica de carreras
+  if (html.includes('%CARRERAS_LIST%')) {
+    const items = (this.carrerasDisponibles || [])
+      .map((c) => `<li>${this.escapeHtml(c)}</li>`)
+      .join('\n');
+    const ul = `<ul class="list-disc list-inside ml-4">${items}</ul>`;
+    html = html.replace(/%CARRERAS_LIST%/g, ul);
+  }
+
+  return html;
+}
 
   // escapado básico para evitar inyección en los nombres de carreras
   private escapeHtml(text: string): string {
@@ -138,7 +140,11 @@ export class ResultadoComponent implements OnInit {
   private loadContentMessages() {
     // mensaje aceptado
     if (this.esAceptado) {
+<<<<<<< HEAD
       this.contentService.getByKey('mensaje_aceptado').subscribe({
+=======
+      this.contentService.getByKey('Mensaje_aceptado').subscribe({
+>>>>>>> f5ceab5 (si 2)
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -153,7 +159,11 @@ export class ResultadoComponent implements OnInit {
     // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
+<<<<<<< HEAD
       this.contentService.getByKey('mensaje_reprobado').subscribe({
+=======
+      this.contentService.getByKey('Mensaje_reprobado').subscribe({
+>>>>>>> f5ceab5 (si 2)
         next: (dto) => {
           this.rejectedContent = dto;
           this.rejectedPartsSafe = (dto.parts || []).map((p) => {
@@ -165,4 +175,5 @@ export class ResultadoComponent implements OnInit {
       });
     }
   }
+  
 }

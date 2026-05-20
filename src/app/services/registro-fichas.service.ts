@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RegistroFichasService {
-  private baseUrl = 'http://132.18.44.252:1200/api/admin/vacancies';
+  private baseUrl = environment.vacantes;
 
   constructor(private http: HttpClient) {}
 

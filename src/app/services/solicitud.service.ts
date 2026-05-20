@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SolicitudService {
 
-  private baseUrl = 'http://132.18.44.252:1200/api/admin/change-career/requests';
+  private baseUrl = environment.cambiocarrera;
 
   constructor(private http: HttpClient) {}
 
