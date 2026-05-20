@@ -38,7 +38,7 @@ export class AlumnosComponent implements OnInit {
   terminoBusqueda = '';
   buscando = false;
   errorBusqueda = false;
-
+  isLoading = false;
   // --- Paginación ---
   currentPage = 1;
   itemsPerPage = 5;
@@ -71,10 +71,12 @@ export class AlumnosComponent implements OnInit {
    */
   ngOnInit(): void {
     this.generarAnios();
-
+    this.isLoading = true;
     this.alumnosService.getAlumnos().subscribe({
+      
       next: (data) => {
         // Normaliza datos obtenidos
+        this.isLoading = true;
         this.alumnos = data.map((a) => ({
           ...a,
           AttendanceStatus: a.attendanceStatus
@@ -82,7 +84,7 @@ export class AlumnosComponent implements OnInit {
             : '',
         }));
 
-        
+
 
         // Llena selects únicos de carrera y estatus
         this.carrerasDisponibles = [
@@ -95,9 +97,13 @@ export class AlumnosComponent implements OnInit {
 
         // Aplica filtros iniciales
         this.aplicarFiltros();
+        this.isLoading = false;
       },
+      
       error: (err) => console.error('Error al cargar alumnos', err),
-    });
+      
+    } );
+    this.isLoading = false;
   }
 
   /**
@@ -112,27 +118,28 @@ export class AlumnosComponent implements OnInit {
   /**
    * Aplica filtros activos a la lista de alumnos.
    */
- /**
-   * Aplica filtros activos y búsqueda por texto a la lista de alumnos.
-   */
+  /**
+    * Aplica filtros activos y búsqueda por texto a la lista de alumnos.
+    */
   aplicarFiltros() {
     const busqueda = this.terminoBusqueda.toLowerCase().trim();
 
     this.filteredData = this.alumnos.filter((a) => {
+      this.isLoading = true;
       // Filtros de Select
       const coincideAnio = !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
       const coincideCarrera = !this.carreraSeleccionada || a.career == this.carreraSeleccionada;
       const coincideStatus = !this.statusSeleccionado || a.status == this.statusSeleccionado;
 
       // Filtro de Buscador (Nombre, CURP o Ficha)
-      const coincideBusqueda = !busqueda || 
+      const coincideBusqueda = !busqueda ||
         (a.fullName && a.fullName.toLowerCase().includes(busqueda)) ||
         (a.curp && a.curp.toLowerCase().includes(busqueda)) ||
         (a.ficha && a.ficha.toString().includes(busqueda));
 
       return coincideAnio && coincideCarrera && coincideStatus && coincideBusqueda;
     });
-
+    this.isLoading = false;
     this.currentPage = 1; // Reinicia paginación al filtrar
     this.cdRef.detectChanges();
   }
@@ -218,53 +225,53 @@ export class AlumnosComponent implements OnInit {
    * Marca la asistencia de un alumno como "Asistió" o "NP".
    * Llama al backend y actualiza la tabla.
    */
- marcarAsistencia(alumno: any, asistio: boolean): void {
-  const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
+  marcarAsistencia(alumno: any, asistio: boolean): void {
+    const nuevoEstado = asistio ? 'ASISTIÓ' : 'NP';
 
-  this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
-    next: () => {
-      alumno.attendanceStatus = nuevoEstado;
-      alumno.showReset = true; // Mostramos la X
+    this.alumnosService.marcarAsistencia(alumno.id, { status: nuevoEstado }).subscribe({
+      next: () => {
+        alumno.attendanceStatus = nuevoEstado;
+        alumno.showReset = true; // Mostramos la X
 
-      // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
-      if (alumno.timerRef) {
-        clearTimeout(alumno.timerRef);
-      }
+        // LIMPIEZA DE TIMER PREVIO: Evita que timers viejos afecten el nuevo
+        if (alumno.timerRef) {
+          clearTimeout(alumno.timerRef);
+        }
 
-      // CONFIGURACIÓN DEL TIMER: 5 minutos
-      alumno.timerRef = setTimeout(() => {
-        alumno.showReset = false;
-        this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
-      }, 300000); 
+        // CONFIGURACIÓN DEL TIMER: 5 minutos
+        alumno.timerRef = setTimeout(() => {
+          alumno.showReset = false;
+          this.cdRef.detectChanges(); // Forzamos a Angular a ver el cambio
+        }, 300000);
 
-      this.cdRef.detectChanges();
-    },
-    error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
-  });
-}
-
-resetearAsistencia(alumno: any): void {
-  // Limpiamos el timer antes de hacer nada para evitar colisiones
-  if (alumno.timerRef) {
-    clearTimeout(alumno.timerRef);
-    alumno.timerRef = null;
+        this.cdRef.detectChanges();
+      },
+      error: () => this.alertService.showAlert('Error al marcar la asistencia', 'danger')
+    });
   }
 
-  this.alumnosService.marcarAsistencia(alumno.id, { status: "PENDIENTE" }).subscribe({
-    next: () => {
-      alumno.attendanceStatus = '';
-      alumno.showReset = false;
-      this.cdRef.detectChanges();
-      console.log(alumno.status);
-    },
-    error: () => {
-      // Si falla el servidor, igual reseteamos local para que no se trabe la UI
-      alumno.attendanceStatus = '';
-      alumno.showReset = false;
-      this.cdRef.detectChanges();
+  resetearAsistencia(alumno: any): void {
+    // Limpiamos el timer antes de hacer nada para evitar colisiones
+    if (alumno.timerRef) {
+      clearTimeout(alumno.timerRef);
+      alumno.timerRef = null;
     }
-  });
-}
+
+    this.alumnosService.marcarAsistencia(alumno.id, { status: "PENDIENTE" }).subscribe({
+      next: () => {
+        alumno.attendanceStatus = '';
+        alumno.showReset = false;
+        this.cdRef.detectChanges();
+        console.log(alumno.status);
+      },
+      error: () => {
+        // Si falla el servidor, igual reseteamos local para que no se trabe la UI
+        alumno.attendanceStatus = '';
+        alumno.showReset = false;
+        this.cdRef.detectChanges();
+      }
+    });
+  }
 
   /**
    * Descarga los formatos XLSX desde el servidor.
@@ -315,6 +322,6 @@ resetearAsistencia(alumno: any): void {
     return this.roles.includes(role);
     console.log(this.roles);
   }
-  
+
 }
 

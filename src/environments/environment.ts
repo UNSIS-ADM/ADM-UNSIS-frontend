@@ -1,7 +1,8 @@
 export const environment = {
-  production: true,
+  production: false,
   // URL base del backend
-  apiUrl: '', 
+
+  apiUrl: 'http://localhost:1200', // Pon aquí el puerto real de tu backend (ej. 8080, 3000, 5000)
   
   // Endpoints (se mantienen igual, pero asegúrate de que el servicio 
   // en Angular los concatene correctamente con apiUrl)

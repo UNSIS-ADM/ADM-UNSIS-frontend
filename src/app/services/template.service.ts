@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TemplateService {
-  private base = environment.templates;
+  private base = environment.apiUrl+ environment.templates;
 
   constructor(private http: HttpClient) {}
 

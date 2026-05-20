@@ -16,7 +16,7 @@ export interface ExcelUploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceApplicants {
-  private apiUrl = environment.uploadaplicants;
+  private apiUrl =environment.apiUrl + environment.uploadaplicants;
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +34,7 @@ export class ExcelServiceApplicants {
 
 @Injectable({ providedIn: 'root' })
 export class ExcelServiceResultados {
-  private apiUrl = environment.uploadresults;
+  private apiUrl = environment.apiUrl+ environment.uploadresults;
 
   constructor(private http: HttpClient) {}
 

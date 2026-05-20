@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class SolicitudService {
 
-  private baseUrl = environment.cambiocarrera;
+  private baseUrl = environment.apiUrl+ environment.cambiocarrera;
 
   constructor(private http: HttpClient) {}
 
