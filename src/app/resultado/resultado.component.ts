@@ -141,6 +141,7 @@ private renderPartHtml(rawHtml: string): string {
     // mensaje aceptado
     if (this.esAceptado) {
       this.contentService.getByKey('Mensaje_aceptado').subscribe({
+      this.contentService.getByKey('Mensaje_aceptado').subscribe({
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -155,6 +156,7 @@ private renderPartHtml(rawHtml: string): string {
     // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
+      this.contentService.getByKey('Mensaje_reprobado').subscribe({
       this.contentService.getByKey('Mensaje_reprobado').subscribe({
         next: (dto) => {
           this.rejectedContent = dto;
