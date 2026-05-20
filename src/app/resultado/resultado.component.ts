@@ -1,14 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { CommonModule } from '@angular/common';
-import { ResultadosMostrarService } from '../services/resultados-mostrar.service'; // Cambia la importación
 import { RouterLink } from '@angular/router';
-import { ContentService } from '../services/content.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { ContentDTO, ContentPartDTO } from '../models/content.model';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { AlertService } from '../services/alert.service';
+import { ResultadosMostrarService } from '../services/resultados-mostrar.service';
+import { ContentService } from '../services/content.service';
+import { ContentDTO } from '../models/content.model';
 
 @Component({
   selector: 'app-resultado',
@@ -25,7 +22,7 @@ export class ResultadoComponent implements OnInit {
 
   // Resultado específico para medicina
   resultado = { promedio: null };
-  // resultado.component.ts
+
   todasCarreras: string[] = [
     'Licenciatura en Administración Municipal',
     'Licenciatura en Ciencias Empresariales',
@@ -100,32 +97,31 @@ export class ResultadoComponent implements OnInit {
     );
   }
 
-private renderPartHtml(rawHtml: string): string {
-  if (!rawHtml) return '';
-  let html = rawHtml;
+  private renderPartHtml(rawHtml: string): string {
+    if (!rawHtml) return '';
+    let html = rawHtml;
 
-  // Reemplazar la carrera del alumno usando la propiedad correcta
-  if (html.includes('%CARRERA_ALUMNO%')) {
-    // CAMBIO AQUÍ: Usamos careerAtResult que es el que funciona en tu HTML
-    const carreraNombre = this.alumno?.careerAtResult || 'la licenciatura seleccionada';
-    html = html.replace(/%CARRERA_ALUMNO%/g, `<strong>${this.escapeHtml(carreraNombre)}</strong>`);
+    // Reemplazar la carrera del alumno usando la propiedad correcta
+    if (html.includes('%CARRERA_ALUMNO%')) {
+      const carreraNombre = this.alumno?.careerAtResult || 'la licenciatura seleccionada';
+      html = html.replace(/%CARRERA_ALUMNO%/g, `<strong>${this.escapeHtml(carreraNombre)}</strong>`);
+    }
+
+    // Reemplazar tokens de contacto
+    html = html.replace(/%EMAIL_CONTACT%/g, this.emailContacto || 'admision.unsis@gmail.com');
+    html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
+
+    // Reemplazar lista dinámica de carreras
+    if (html.includes('%CARRERAS_LIST%')) {
+      const items = (this.carrerasDisponibles || [])
+        .map((c) => `<li>${this.escapeHtml(c)}</li>`)
+        .join('\n');
+      const ul = `<ul class="list-disc list-inside ml-4">${items}</ul>`;
+      html = html.replace(/%CARRERAS_LIST%/g, ul);
+    }
+
+    return html;
   }
-
-  // Reemplazar tokens de contacto
-  html = html.replace(/%EMAIL_CONTACT%/g, this.emailContacto || 'admision.unsis@gmail.com');
-  html = html.replace(/%PHONE%/g, '9515724100 Ext. 1203, 1204');
-
-  // Reemplazar lista dinámica de carreras
-  if (html.includes('%CARRERAS_LIST%')) {
-    const items = (this.carrerasDisponibles || [])
-      .map((c) => `<li>${this.escapeHtml(c)}</li>`)
-      .join('\n');
-    const ul = `<ul class="list-disc list-inside ml-4">${items}</ul>`;
-    html = html.replace(/%CARRERAS_LIST%/g, ul);
-  }
-
-  return html;
-}
 
   // escapado básico para evitar inyección en los nombres de carreras
   private escapeHtml(text: string): string {
@@ -141,7 +137,6 @@ private renderPartHtml(rawHtml: string): string {
     // mensaje aceptado
     if (this.esAceptado) {
       this.contentService.getByKey('Mensaje_aceptado').subscribe({
-      this.contentService.getByKey('Mensaje_aceptado').subscribe({
         next: (dto) => {
           this.acceptedContent = dto;
           this.acceptedPartsSafe = (dto.parts || []).map((p) => {
@@ -153,10 +148,8 @@ private renderPartHtml(rawHtml: string): string {
       });
     }
 
-    // Reprobado
     // mensaje reprobado
     if (this.esReprobado) {
-      this.contentService.getByKey('Mensaje_reprobado').subscribe({
       this.contentService.getByKey('Mensaje_reprobado').subscribe({
         next: (dto) => {
           this.rejectedContent = dto;
@@ -169,5 +162,4 @@ private renderPartHtml(rawHtml: string): string {
       });
     }
   }
-  
 }
