@@ -10,20 +10,24 @@ export class AlumnosService {
   private endpointget = environment.apiUrl + environment.getApplicantbyid;
   private pdfEndpoint = environment.apiUrl + environment.generatePdfEndpoint; // Endpoint para PDF
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getAlumnos(): Observable<any[]> {
+  getAlumnos(page: number, size: number): Observable<any> {
     const token = localStorage.getItem('token');
+
     const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token.replace('Bearer ', '')}` : ''
+      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
-    return this.http.get<any[]>(this.endpoint, { headers });
+
+    return this.http.get<any>(`${this.endpoint}?page=${page}&size=${size}`, {
+      headers,
+    });
   }
 
   getApplicantById(id: number): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token.replace('Bearer ', '')}` : ''
+      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
     return this.http.get<any>(`${this.endpointget}/${id}`, { headers });
   }
@@ -31,8 +35,8 @@ export class AlumnosService {
   editApplicantById(id: number, data: any): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json'
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
     });
     return this.http.patch<any>(`${this.endpointget}/${id}`, data, { headers });
   }
@@ -40,18 +44,33 @@ export class AlumnosService {
   marcarAsistencia(id: number, data: { status: string }): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : '',
-      'Content-Type': 'application/json'
+      Authorization: token ? `Bearer ${token}` : '',
+      'Content-Type': 'application/json',
     });
-    return this.http.post<any>(`${this.endpoint}/${id}/attendance`, data, { headers });
+    return this.http.post<any>(`${this.endpoint}/${id}/attendance`, data, {
+      headers,
+    });
   }
 
   // ✅ Nuevo método para generar PDF
   generatePdfReport(): Observable<Blob> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      'Authorization': token ? `Bearer ${token}` : ''
+      Authorization: token ? `Bearer ${token}` : '',
     });
     return this.http.get(this.pdfEndpoint, { headers, responseType: 'blob' });
+  }
+
+  searchAlumnos(params: any): Observable<any[]> {
+    const token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
+    });
+
+    return this.http.get<any[]>(`${this.endpoint}/search`, {
+      headers,
+      params,
+    });
   }
 }

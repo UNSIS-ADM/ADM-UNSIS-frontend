@@ -156,7 +156,48 @@ save() {
         });
     });
 }
+/*
+save() {
+  if (!this.selected) {
+    this.message = 'Selecciona un contenido primero.';
+    return;
+  }
+  this.saving = true;
+  this.message = '';
+  const key = this.form.get('keyName')!.value;
+  const parts = this.partsArray.getRawValue() as ContentPartDTO[];
 
+  this.contentService
+    .upsertParts(key, parts)
+    .pipe(
+      catchError((err) => {
+        this.saving = false;
+        this.message = 'Error al guardar.';
+        console.error('Error upsertParts:', err);
+        return of(null);
+      })
+    )
+    .subscribe((saved) => {
+      if (saved === null) return; // hubo error, no continuar
+
+      this.saving = false;
+      this.message = 'Guardado correctamente.';
+
+      // Refrescar lista y formulario con manejo de error
+      this.loadList();
+      this.contentService
+        .getByKey(key)
+        .pipe(  
+          catchError((err) => {
+            console.error('Error al refrescar contenido:', err);
+            return of(null);
+          })
+        )
+        .subscribe((dto) => {
+          if (dto) this.select(dto);
+        });
+    });
+}*/
 }
 
 
