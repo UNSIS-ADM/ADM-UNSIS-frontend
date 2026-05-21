@@ -1,4 +1,3 @@
-// alumnos.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -8,20 +7,16 @@ import { environment } from '../../environments/environment';
 export class AlumnosService {
   private endpoint = environment.apiUrl + environment.getalumnosEndpoint;
   private endpointget = environment.apiUrl + environment.getApplicantbyid;
-  private pdfEndpoint = environment.apiUrl + environment.generatePdfEndpoint; // Endpoint para PDF
+  private pdfEndpoint = environment.apiUrl + environment.generatePdfEndpoint;
 
   constructor(private http: HttpClient) {}
 
   getAlumnos(page: number, size: number): Observable<any> {
     const token = localStorage.getItem('token');
-
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
-
-    return this.http.get<any>(`${this.endpoint}?page=${page}&size=${size}`, {
-      headers,
-    });
+    return this.http.get<any>(`${this.endpoint}?page=${page}&size=${size}`, { headers });
   }
 
   getApplicantById(id: number): Observable<any> {
@@ -47,67 +42,43 @@ export class AlumnosService {
       Authorization: token ? `Bearer ${token}` : '',
       'Content-Type': 'application/json',
     });
-    return this.http.post<any>(`${this.endpoint}/${id}/attendance`, data, {
-      headers,
-    });
+    return this.http.post<any>(`${this.endpoint}/${id}/attendance`, data, { headers });
   }
 
-  // ✅ Nuevo método para generar PDF
-  generatePdfReport(): Observable<Blob> {
+  // 🔹 Trae el JSON estructurado con el PDF y el Excel incluidos
+  generatePdfReport(): Observable<any> {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token}` : '',
+      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
-    return this.http.get(this.pdfEndpoint, { headers, responseType: 'blob' });
+    
+    if (!this.pdfEndpoint || this.pdfEndpoint.includes('undefined')) {
+      console.error("🚨 Error: 'environment.generatePdfEndpoint' no está configurado.");
+    }
+
+    return this.http.get<any>(this.pdfEndpoint, { headers });
   }
 
   searchAlumnos(params: any, page: number, size: number): Observable<any> {
     const token = localStorage.getItem('token');
-
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
 
-    let queryParams: any = {
-      page,
-      size,
-    };
+    let queryParams: any = { page, size };
+    if (params.year) queryParams.year = params.year;
+    if (params.career) queryParams.career = params.career;
+    if (params.status) queryParams.status = params.status;
+    if (params.search) queryParams.search = params.search;
 
-    // Año
-    if (params.year) {
-      queryParams.year = params.year;
-    }
-
-    // Carrera
-    if (params.career) {
-      queryParams.career = params.career;
-    }
-
-    // Status
-    if (params.status) {
-      queryParams.status = params.status;
-    }
-
-    // Texto de búsqueda
-    if (params.search) {
-      queryParams.search = params.search;
-    }
-
-    return this.http.get<any>(`${this.endpoint}/search`, {
-      headers,
-      params: queryParams,
-    });
+    return this.http.get<any>(`${this.endpoint}/search`, { headers, params: queryParams });
   }
 
   getCareers(): Observable<string[]> {
     const token = localStorage.getItem('token');
-
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
-
-    return this.http.get<string[]>(`${this.endpoint}/careers`, {
-      headers,
-    });
+    return this.http.get<string[]>(`${this.endpoint}/careers`, { headers });
   }
 }

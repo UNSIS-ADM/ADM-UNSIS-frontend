@@ -319,25 +319,49 @@ export class CargaDatosResultadosComponent implements OnInit {
         }
       });
   }
+  // --- Generación de Reportes Simultáneos (PDF + Excel) ---
   generarReportePdf() {
     this.isLoading = true;
     this.cdRef.detectChanges();
 
     this.alumnosService.generatePdfReport().subscribe({
-      next: (blob) => {
-        const fileName = 'reporte_aspirantes.pdf';
-        saveAs(blob, fileName); // Descarga el PDF
+      next: (res: any) => {
+        console.log('--- RESPUESTA EXITOSA ---', res);
+
+        if (res && res.success) {
+          // 1. Desempaquetar y descargar PDF
+          const pdfBlob = this.base64ToBlob(res.pdfBytes, 'application/pdf');
+          saveAs(pdfBlob, res.pdfFileName || 'reporte_aspirantes.pdf');
+
+          // 2. Desempaquetar y descargar Excel de inmediato
+          const excelBlob = this.base64ToBlob(res.excelBytes, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          saveAs(excelBlob, res.excelFileName || 'reporte_aspirantes.xlsx');
+
+          this.alertService.showAlert('Reportes descargados correctamente', 'success');
+        } else {
+          this.alertService.showAlert(res.message || 'Error al construir los archivos', 'danger');
+        }
         this.isLoading = false;
-        this.alertService.showAlert('Reporte generado correctamente', 'success');
         this.cdRef.detectChanges();
       },
       error: (err) => {
-        console.error(err);
+        console.error("--- ERROR DE CONEXIÓN ---", err);
         this.isLoading = false;
-        this.alertService.showAlert('Error al generar el reporte', 'danger');
+        this.alertService.showAlert('Error de conexión con el servicio de reportes', 'danger');
         this.cdRef.detectChanges();
       }
     });
+  }
+
+  // Utilidad para convertir las cadenas Base64 del JSON a archivos Blob nativos
+  private base64ToBlob(base64: string, type: string): Blob {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: type });
   }
 }
 
