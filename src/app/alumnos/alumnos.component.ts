@@ -32,7 +32,7 @@ export class AlumnosComponent implements OnInit {
   downloadingResultados = false;
 
   // --- Listas de datos ---
-  alumnos: any[] = []; // Lista completa de alumnos desde el backend
+  //  alumnos: any[] = []; // Lista completa de alumnos desde el backend
   filteredData: any[] = []; // Lista filtrada según los selects
 
   // --- Búsqueda (no implementada completamente) ---
@@ -40,7 +40,7 @@ export class AlumnosComponent implements OnInit {
   buscando = false;
   errorBusqueda = false;
   isLoading = false;
-  
+
   // --- Paginación ---
   currentPage = 1;
   itemsPerPage = 5;
@@ -54,7 +54,7 @@ export class AlumnosComponent implements OnInit {
   carrerasDisponibles: string[] = [];
   statusesDisponibles: string[] = [];
   roles: string[] = [];
-  
+
   totalElements = 0;
   totalPagesBackend = 0;
 
@@ -69,6 +69,15 @@ export class AlumnosComponent implements OnInit {
     this.roles = user.roles || [];
   }
 
+  cargarCarreras(): void {
+    this.alumnosService.getCareers().subscribe({
+      next: (data) => {
+        this.carrerasDisponibles = data;
+      },
+      error: (err) => console.error(err),
+    });
+  }
+
   /**
    * Inicializa el componente:
    * - Genera lista de años
@@ -77,35 +86,31 @@ export class AlumnosComponent implements OnInit {
    */
   ngOnInit(): void {
     this.generarAnios();
+    this.cargarCarreras();
     this.cargarAlumnos();
   }
-
   /**
-   * CORRECCIÓN: Si estás realizando una búsqueda local o aplicando un filtro sobre 
-   * el set de datos mutados, aplicamos .slice() para que la tabla conserve estrictamente 
+   * CORRECCIÓN: Si estás realizando una búsqueda local o aplicando un filtro sobre
+   * el set de datos mutados, aplicamos .slice() para que la tabla conserve estrictamente
    * el límite de 5 registros en pantalla.
    */
   get paginatedData() {
-    // Si la búsqueda manual o el filtrado por select dejó un arreglo grande en el cliente, lo limitamos
-    if (this.filteredData.length > this.itemsPerPage) {
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      return this.filteredData.slice(startIndex, startIndex + this.itemsPerPage);
-    }
     return this.filteredData;
   }
 
   siguientePagina() {
-    // CORRECCIÓN: Quitamos el "return;" prematuro para permitir paginar los resultados locales de la búsqueda
-    const totalPaginasEfectivas = this.terminoBusqueda.trim() 
-      ? Math.ceil(this.filteredData.length / this.itemsPerPage) 
-      : this.totalPagesBackend;
-
-    if (this.currentPage < totalPaginasEfectivas) {
+    if (this.currentPage < this.totalPagesBackend) {
       this.currentPage++;
-      if (!this.terminoBusqueda.trim()) {
-        this.cargarAlumnos();
+
+      if (
+        this.terminoBusqueda.trim() ||
+        this.anioSeleccionado ||
+        this.carreraSeleccionada ||
+        this.statusSeleccionado
+      ) {
+        this.onSearch();
       } else {
-        this.cdRef.detectChanges();
+        this.cargarAlumnos();
       }
     }
   }
@@ -113,10 +118,16 @@ export class AlumnosComponent implements OnInit {
   paginaAnterior() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      if (!this.terminoBusqueda.trim()) {
-        this.cargarAlumnos();
+
+      if (
+        this.terminoBusqueda.trim() ||
+        this.anioSeleccionado ||
+        this.carreraSeleccionada ||
+        this.statusSeleccionado
+      ) {
+        this.onSearch();
       } else {
-        this.cdRef.detectChanges();
+        this.cargarAlumnos();
       }
     }
   }
@@ -126,7 +137,7 @@ export class AlumnosComponent implements OnInit {
       .getAlumnos(this.currentPage - 1, this.itemsPerPage)
       .subscribe({
         next: (data) => {
-          this.alumnos = data.content.map((a: any) => ({
+          this.filteredData = data.content.map((a: any) => ({
             ...a,
             attendanceStatus: a.attendanceStatus
               ? a.attendanceStatus.trim().toUpperCase()
@@ -136,16 +147,13 @@ export class AlumnosComponent implements OnInit {
           this.totalElements = data.totalElements;
           this.totalPagesBackend = data.totalPages;
 
-          this.carrerasDisponibles = [
-            ...new Set(this.alumnos.map((a) => a.career).filter(Boolean)),
-          ].sort();
-
           this.statusesDisponibles = [
-            ...new Set(this.alumnos.map((a) => a.status).filter(Boolean)),
+            ...new Set(this.filteredData.map((a) => a.status).filter(Boolean)),
           ].sort();
 
-          this.aplicarFiltros();
+          this.cdRef.detectChanges();
         },
+
         error: (err) => console.error(err),
       });
   }
@@ -155,17 +163,21 @@ export class AlumnosComponent implements OnInit {
    */
   generarAnios() {
     const currentYear = new Date().getFullYear();
+
     this.aniosDisponibles = Array.from(
       { length: 5 },
       (_, i) => currentYear - i,
     );
-    this.anioSeleccionado = currentYear.toString();
+
+    // NO seleccionar automáticamente
+    this.anioSeleccionado = '';
   }
 
   /**
    * Aplica filtros activos a la lista de alumnos.
    * Aplica filtros activos y búsqueda por texto a la lista de alumnos.
    */
+  /*
   aplicarFiltros(resetPage: boolean = false) {
     if (resetPage) {
       this.currentPage = 1;
@@ -196,56 +208,56 @@ export class AlumnosComponent implements OnInit {
 
     this.cdRef.detectChanges();
   }
-
+*/
   // Método para el evento input del buscador
   onSearch() {
-    const termino = this.terminoBusqueda.trim();
-
-    // Si está vacío, vuelve a cargar paginación normal
-    if (!termino) {
-      this.currentPage = 1;
-      this.cargarAlumnos();
-      return;
-    }
-
     this.buscando = true;
 
-    // Construimos parámetros dinámicamente
     const params: any = {};
 
-    // Si es número -> buscar por ficha
-    if (!isNaN(Number(termino))) {
-      params.ficha = Number(termino);
+    if (this.anioSeleccionado) {
+      params.year = Number(this.anioSeleccionado);
     }
 
-    // Buscar también por texto
-    params.fullName = termino;
-    params.curp = termino;
+    if (this.carreraSeleccionada) {
+      params.career = this.carreraSeleccionada;
+    }
 
-    this.alumnosService.searchAlumnos(params).subscribe({
-      next: (data) => {
-        this.alumnos = data.map((a: any) => ({
-          ...a,
-          attendanceStatus: a.attendanceStatus
-            ? a.attendanceStatus.trim().toUpperCase()
-            : '',
-        }));
+    if (this.statusSeleccionado) {
+      params.status = this.statusSeleccionado;
+    }
 
-        this.aplicarFiltros();
+    if (this.terminoBusqueda.trim()) {
+      params.search = this.terminoBusqueda.trim();
+    }
 
-        // CORRECCIÓN: Calculamos las páginas efectivas basándonos en los resultados de la búsqueda
-        this.currentPage = 1;
-        this.totalPagesBackend = Math.ceil(this.filteredData.length / this.itemsPerPage) || 1;
+    this.alumnosService
+      .searchAlumnos(params, this.currentPage - 1, this.itemsPerPage)
+      .subscribe({
+        next: (data) => {
+          this.filteredData = data.content.map((a: any) => ({
+            ...a,
+            attendanceStatus: a.attendanceStatus
+              ? a.attendanceStatus.trim().toUpperCase()
+              : '',
+          }));
 
-        this.buscando = false;
-        this.cdRef.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error en búsqueda:', err);
-        this.buscando = false;
-        this.errorBusqueda = true;
-      },
-    });
+          // IMPORTANTE:
+          //this.alumnos = [...this.filteredData];
+
+          this.totalElements = data.totalElements;
+          this.totalPagesBackend = data.totalPages;
+
+          this.buscando = false;
+
+          this.cdRef.detectChanges();
+        },
+
+        error: (err) => {
+          console.error(err);
+          this.buscando = false;
+        },
+      });
   }
 
   limpiarBusqueda() {
@@ -255,15 +267,18 @@ export class AlumnosComponent implements OnInit {
   }
 
   filtrarPorAnio() {
-    this.aplicarFiltros(true);
+    this.currentPage = 1;
+    this.onSearch();
   }
 
   filtrarPorCarrera() {
-    this.aplicarFiltros(true);
+    this.currentPage = 1;
+    this.onSearch();
   }
 
   filtrarPorStatus() {
-    this.aplicarFiltros(true);
+    this.currentPage = 1;
+    this.onSearch();
   }
 
   /**
@@ -306,13 +321,18 @@ export class AlumnosComponent implements OnInit {
   }
 
   goToPage(page: number) {
-    // CORRECCIÓN: Habilitamos navegación por clics numéricos en búsquedas locales
     if (page >= 1 && page <= this.totalPagesBackend) {
       this.currentPage = page;
-      if (!this.terminoBusqueda.trim()) {
-        this.cargarAlumnos();
+
+      if (
+        this.terminoBusqueda.trim() ||
+        this.anioSeleccionado ||
+        this.carreraSeleccionada ||
+        this.statusSeleccionado
+      ) {
+        this.onSearch();
       } else {
-        this.cdRef.detectChanges();
+        this.cargarAlumnos();
       }
     }
   }

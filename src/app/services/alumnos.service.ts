@@ -61,16 +61,53 @@ export class AlumnosService {
     return this.http.get(this.pdfEndpoint, { headers, responseType: 'blob' });
   }
 
-  searchAlumnos(params: any): Observable<any[]> {
+  searchAlumnos(params: any, page: number, size: number): Observable<any> {
     const token = localStorage.getItem('token');
 
     const headers = new HttpHeaders({
       Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
     });
 
-    return this.http.get<any[]>(`${this.endpoint}/search`, {
+    let queryParams: any = {
+      page,
+      size,
+    };
+
+    // Año
+    if (params.year) {
+      queryParams.year = params.year;
+    }
+
+    // Carrera
+    if (params.career) {
+      queryParams.career = params.career;
+    }
+
+    // Status
+    if (params.status) {
+      queryParams.status = params.status;
+    }
+
+    // Texto de búsqueda
+    if (params.search) {
+      queryParams.search = params.search;
+    }
+
+    return this.http.get<any>(`${this.endpoint}/search`, {
       headers,
-      params,
+      params: queryParams,
+    });
+  }
+
+  getCareers(): Observable<string[]> {
+    const token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
+    });
+
+    return this.http.get<string[]>(`${this.endpoint}/careers`, {
+      headers,
     });
   }
 }
