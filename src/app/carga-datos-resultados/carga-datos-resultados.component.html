@@ -1,107 +1,102 @@
 <!-- Contenedor principal relativo para overlay del loader -->
 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center relative">
 
-  <div class="w-full max-w-7xl bg-white rounded-lg shadow-md overflow-hiddenMy">
+  <div class="w-full max-w-7xl bg-white rounded-lg shadow-md overflow-hidden">
 
-    <!-- Encabezado -->
-    <div class="p-6 bg-[#24645c] text-white rounded-t-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <h2 class="text-2xl font-semibold">Resultados de aspirantes</h2>
-        <p class="text-xs text-teal-100/80 mt-1">Gestione, edite y exporte los registros del sistema</p>
-      </div>
-      
-      <!-- Botón para generar Reportes (PDF y Excel) -->
-      <button 
-        (click)="generarReportePdf()" 
-        [disabled]="isLoading"
-        class="flex items-center gap-2 px-4 py-2 border border-teal-500/30 bg-[#14645c] text-white rounded-lg hover:bg-[#0f4f49] disabled:opacity-50 text-sm font-medium transition-all shadow-sm active:scale-[0.98]">
-        
-        <!-- Icono normal (Descarga de Documento) -->
-        <svg *ngIf="!isLoading" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
+<!-- Encabezado -->
+<div class="p-6 bg-[#24645c] text-white rounded-t-lg flex justify-between items-center">
+  <h2 class="text-2xl font-semibold">Resultados de aspirantes</h2>
+  
+  <!-- Botón para generar PDF -->
+  <div class="flex flex-col items-center">
+  <button (click)="generarReportePdf()" [disabled]="isLoading"
+    class="flex items-center gap-1 px-2 py-1 border bg-[#14645c] text-white rounded hover:bg-[#0f4f49] disabled:opacity-50 text-sm">
+    
+    <!-- Icono normal -->
+    <svg *ngIf="!isLoading" class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M12 4v12m0 0l4-4m-4 4l-4-4M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6" />
+    </svg>
 
-        <!-- Icono animado mientras procesa los bytes Base64 -->
-        <svg *ngIf="isLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-        </svg>
+    <!-- Icono animado mientras carga -->
+    <svg *ngIf="isLoading" class="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>
 
-        <span>{{ isLoading ? 'Preparando archivos...' : 'Descargar PDF y Excel' }}</span>
-      </button>
-    </div>
+    Generar Reporte PDF
+  </button>
+</div>
 
-    <!-- Filtros y Barra de Herramientas Superior -->
-    <div class="p-4 border-b flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-gray-50/50">
+</div>
 
-      <!-- Botón de nueva carga -->
-      <div class="flex items-center unique-button-container">
+    <!-- Filtros superiores -->
+    <div class="p-4 border-b flex flex-col sm:flex-row flex-wrap justify-between items-start sm:items-center gap-4">
+
+      <!-- Botón de carga -->
+      <div class="flex gap-2 w-full sm:w-auto">
         <label for="fileInput"
-          class="px-4 py-2 bg-[#548e88] text-white rounded-lg hover:bg-[#29726b] transition-colors cursor-pointer text-sm font-medium text-center shadow-sm w-full sm:w-auto">
-          Nueva Carga (.xlsx)
+          class="px-3 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b] transition-colors cursor-pointer">
+          Nueva Carga
         </label>
         <input type="file" id="fileInput" accept=".xlsx" (change)="onFileSelected($event)" class="hidden">
       </div>
 
-      <!-- Buscador y selectores combinados -->
-      <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-1 lg:justify-end">
-        
-        <!-- BUSCADOR POR TEXTO -->
-        <div class="relative w-full md:w-80">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <input 
-            type="text" 
-            [(ngModel)]="terminoBusqueda"
-            (input)="onSearch()"
-            placeholder="Buscar por nombre, CURP o ficha..."
-            class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] bg-white text-sm transition-all focus:outline-none"
-          >
-          <!-- Botón para limpiar buscador -->
-          <button *ngIf="terminoBusqueda" (click)="limpiarBusqueda()" 
-            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <!-- SELECTORES DE FILTRADO -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
-          <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
-            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] text-sm bg-white cursor-pointer">
-            <option value="">Todos los años</option>
-            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
-          </select>
-
-          <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
-            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] text-sm bg-white cursor-pointer">
-            <option value="">Todas las carreras</option>
-            <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
-          </select>
-
-          <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
-            class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] text-sm bg-white cursor-pointer">
-            <option value="">Todos los estatus</option>
-            <option value="ACEPTADO">Aceptado</option>
-            <option value="RECHAZADO">Rechazado</option>
-            <option value="PENDIENTE">Pendiente</option>
-          </select>
-        </div>
-
-      </div>
+      <!-- 🔹 Filtros desplegables -->
+      <div class="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gray-50/50">
+  
+  <!-- BUSCADOR POR TEXTO -->
+  <div class="relative w-full md:w-80">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
     </div>
+    <input 
+      type="text" 
+      [(ngModel)]="terminoBusqueda"
+      (input)="onSearch()"
+      placeholder="Buscar por nombre, CURP o ficha..."
+      class="block w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#24645c] focus:border-[#24645c] bg-white text-sm transition-all"
+    >
+    <!-- Botón para limpiar (solo se ve si hay texto) -->
+    <button *ngIf="terminoBusqueda" (click)="limpiarBusqueda()" 
+      class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-red-500">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- SELECTORES DE FILTRADO (Tus selects actuales) -->
+  <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+    <select [(ngModel)]="anioSeleccionado" (change)="filtrarPorAnio()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los años</option>
+      <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+    </select>
+
+    <select [(ngModel)]="carreraSeleccionada" (change)="filtrarPorCarrera()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todas las carreras</option>
+      <option *ngFor="let carrera of carrerasDisponibles" [value]="carrera">{{ carrera }}</option>
+    </select>
+
+    <select [(ngModel)]="statusSeleccionado" (change)="filtrarPorStatus()"
+      class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-[#24645c] text-sm bg-white">
+      <option value="">Todos los estatus</option>
+      <option value="ACEPTADO">Aceptado</option>
+      <option value="RECHAZADO">Rechazado</option>
+      <option value="PENDIENTE">Pendiente</option>
+    </select>
+  </div>
+
+</div>
 
     <!-- Mensaje cuando no hay datos -->
-    <div *ngIf="filteredData.length === 0" class="p-12 text-center text-gray-500 flex flex-col items-center justify-center gap-2">
-      <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span class="text-base font-medium">No se encontraron resultados con los filtros aplicados</span>
+    <div *ngIf="filteredData.length === 0" class="p-8 text-center text-gray-500">
+      No se encontraron resultados
     </div>
 
     <!-- Tabla de resultados -->
@@ -109,148 +104,143 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#14645c]">
           <tr>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">ID</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Ficha</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Nombre</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Carrera</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Promedio</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Calificación Final</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Comentarios</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Último Acceso</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider">Estatus</th>
-            <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-white uppercase tracking-wider text-center">Acciones</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Ficha</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Carrera</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Promedio</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Calificación Final</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Comentarios</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Último Acceso</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Estatus</th>
+            <th class="px-3 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let alumno of paginatedData" class="hover:bg-gray-50/80 transition-colors">
-            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ alumno.id }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{{ alumno.ficha }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ alumno.fullName }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600">{{ alumno.careerAtResult }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 text-center sm:text-left">{{ alumno.score }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-600 text-center sm:text-left">{{ alumno.finalGrade }}</td>
-            <td class="px-4 py-4 text-sm text-gray-500 max-w-xs truncate" [title]="alumno.comment">{{ alumno.comment || 'Sin comentarios' }}</td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{{ alumno.lastLogin | tiempoRelativo }}</td>
-            <td class="px-4 py-4 whitespace-nowrap">
+          <tr *ngFor="let alumno of paginatedData">
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.id }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.ficha }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.fullName }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.careerAtResult }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.score }}</td>
+             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.finalGrade }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.comment }}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">{{ alumno.lastLogin | tiempoRelativo }}</td>
+            <td class="px-3 py-4 whitespace-nowrap">
               <span [ngClass]="{
-                'bg-green-100 text-green-800 border border-green-200': alumno.status === 'ACEPTADO',
-                'bg-red-100 text-red-800 border border-red-200': alumno.status === 'RECHAZADO',
-                'bg-yellow-100 text-yellow-800 border border-yellow-200': alumno.status === 'PENDIENTE'
+                'bg-green-100 text-green-800': alumno.status === 'ACEPTADO',
+                'bg-red-100 text-red-800': alumno.status === 'RECHAZADO',
+                'bg-yellow-100 text-yellow-800': alumno.status === 'PENDIENTE'
               }"
-                class="px-2.5 py-1 inline-flex text-xs leading-4 font-semibold rounded-full uppercase tracking-wider">
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
                 {{ alumno.status || 'Cargado' }}
               </span>
             </td>
-            <td class="px-4 py-4 whitespace-nowrap text-sm text-center">
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">
               <button (click)="openModal(alumno.id)"
-                class="px-3 py-1.5 bg-[#548e88] text-white rounded-md hover:bg-[#29726b] font-medium transition-colors shadow-sm text-xs">
+                class="px-4 py-2 bg-[#548e88] text-white rounded hover:bg-[#29726b]">
                 Editar datos
               </button>
             </td>
           </tr>
 
-          <!-- Filas vacías para mantener consistencia de altura en la paginación -->
+          <!-- Filas vacías si faltan -->
           <tr *ngFor="let _ of emptyRows">
-            <td colspan="10" class="px-4 py-5">&nbsp;</td>
+            <td colspan="9" class="px-3 py-5">&nbsp;</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Paginación Footer -->
-    <div *ngIf="filteredData.length > 0" class="px-4 py-4 border-t border-gray-200 bg-gray-50/50">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-        
-        <!-- Texto Informativo -->
-        <div class="text-sm text-gray-600 font-medium">
-          Mostrando 
-          <span class="text-gray-900 font-semibold">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
-          a 
-          <span class="text-gray-900 font-semibold">{{ Math.min(currentPage * itemsPerPage, filteredData.length) }}</span>
-          de 
-          <span class="text-gray-900 font-semibold">{{ filteredData.length }}</span> resultados
-        </div>
-
-        <!-- Controles de Navegación -->
-        <nav class="flex items-center -space-x-px shadow-sm rounded-md" aria-label="Pagination">
-          
-          <!-- Botón Anterior -->
-          <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
-            class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-            <span class="sr-only">Anterior</span>
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
-          </button>
-
-          <!-- Números de Páginas Dinámicas -->
-          <ng-container *ngFor="let page of pages">
-            <!-- Botón Numérico Activo / Inactivo -->
-            <button *ngIf="page !== '...'; else dots" 
-              (click)="goToPage(+page)"
-              [class.z-20]="page === currentPage"
-              [class.bg-[#14645c]]="page === currentPage"
-              [class.text-white]="page === currentPage"
-              [class.border-[#14645c]]="page === currentPage"
-              [class.bg-white]="page !== currentPage"
-              [class.text-gray-600]="page !== currentPage"
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-semibold hover:bg-gray-100 focus:z-10 transition-colors min-w-[40px] justify-center cursor-pointer">
-              {{ page }}
-            </button>
-
-            <!-- Separador de puntos suspensivos -->
-            <ng-template #dots>
-              <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-400 select-none">
-                ...
-              </span>
-            </ng-template>
-          </ng-container>
-
-          <!-- Botón Siguiente -->
-          <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
-            class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-            <span class="sr-only">Siguiente</span>
-            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-            </svg>
-          </button>
-
-        </nav>
-      </div>
+    <!-- Paginación -->
+<div *ngIf="filteredData.length > 0" class="px-4 py-4 border-t border-gray-100 bg-gray-50/50">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- Info Text: Alineado a la izquierda en pantallas grandes -->
+    <div class="text-sm text-gray-600 font-medium">
+      Mostrando 
+      <span class="text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span>
+      a 
+      <span class="text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredData.length) }}</span>
+      de 
+      <span class="text-gray-900">{{ filteredData.length }}</span> resultados
     </div>
 
-    <!-- Loader de procesamiento absoluto en pantalla -->
-    <div *ngIf="isLoading" class="absolute inset-0 z-50 flex items-center justify-center bg-gray-600/10 backdrop-blur-[1px]">
-      <div class="bg-white p-6 rounded-xl shadow-2xl border border-gray-100 flex items-center gap-4 max-w-sm dynamic-loader">
-        <svg class="animate-spin h-8 w-8 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <!-- Controles de Paginación -->
+    <nav class="flex items-center -space-x-px shadow-sm rounded-md" aria-label="Pagination">
+      
+      <!-- Botón Anterior -->
+      <button (click)="paginaAnterior()" [disabled]="currentPage === 1"
+        class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+        <span class="sr-only">Anterior</span>
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+      <!-- Números de Página -->
+      <ng-container *ngFor="let page of pages">
+        <!-- Botón Numérico -->
+        <button *ngIf="page !== '...'; else dots" 
+          (click)="goToPage(+page)"
+          [class.z-20]="page === currentPage"
+          [class.bg-[#14645c]]="page === currentPage"
+          [class.text-white]="page === currentPage"
+          [class.border-[#14645c]]="page === currentPage"
+          [class.bg-white]="page !== currentPage"
+          [class.text-gray-600]="page !== currentPage"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-semibold hover:bg-gray-100 focus:z-10 transition-colors min-w-[40px] justify-center">
+          {{ page }}
+        </button>
+
+        <!-- Puntos Suspensivos -->
+        <ng-template #dots>
+          <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+            ...
+          </span>
+        </ng-template>
+      </ng-container>
+
+      <!-- Botón Siguiente -->
+      <button (click)="siguientePagina()" [disabled]="currentPage === totalPages"
+        class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-10 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+        <span class="sr-only">Siguiente</span>
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+        </svg>
+      </button>
+
+    </nav>
+  </div>
+</div>
+    <!-- Loader sobrepuesto -->
+    <div *ngIf="isLoading" class="absolute inset-0 z-50 flex items-center justify-center">
+      <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200 flex items-center gap-3">
+        <svg class="animate-spin h-8 w-8 text-[#24645c]" xmlns="http://www.w3.org/2000/svg" fill="none"
+          viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
         </svg>
-        <div>
-          <p class="text-sm font-semibold text-gray-900">Procesando solicitud</p>
-          <p class="text-xs text-gray-500 mt-0.5">Por favor, no cierre esta ventana...</p>
-        </div>
+        <span class="text-gray-700">Cargando...</span>
       </div>
     </div>
 
-    <!-- Componente Modal de Confirmación para Excel -->
-    <app-confirm-dialog
-      *ngIf="showConfirm"
-      [title]="'Confirmar subida'"
-      [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
-      (confirm)="onConfirm(true)"
-      (cancel)="showConfirm = false">
-    </app-confirm-dialog>
+   <!-- Modal de confirmación -->
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  [title]="'Confirmar subida'"
+  [message]="'¿Estás seguro de subir el archivo ' + fileToConfirm?.name + '?'"
+  (confirm)="onConfirm(true)"
+  (cancel)="showConfirm = false">
+</app-confirm-dialog>
 
-    <!-- Componente Modal de Edición de Aspirantes -->
-    <app-modal-edit-applicant
-      *ngIf="showModal"
-      [showModal]="showModal"
-      [selectedApplicant]="selectedApplicant"
-      [currentRoute]="currentRoute"
-      (close)="closeModal()"
-      (save)="saveApplicant()">
-    </app-modal-edit-applicant>
 
-  </div>
+<app-modal-edit-applicant
+  [showModal]="showModal"
+  [selectedApplicant]="selectedApplicant"
+  [currentRoute]="currentRoute"
+  (close)="closeModal()"
+  (save)="saveApplicant()">
+</app-modal-edit-applicant>
+
 </div>

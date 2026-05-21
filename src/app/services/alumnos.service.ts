@@ -46,18 +46,22 @@ export class AlumnosService {
   }
 
   // 🔹 Trae el JSON estructurado con el PDF y el Excel incluidos
-  generatePdfReport(): Observable<any> {
-    const token = localStorage.getItem('token');
-    const headers = new HttpHeaders({
-      Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
-    });
-    
-    if (!this.pdfEndpoint || this.pdfEndpoint.includes('undefined')) {
-      console.error("🚨 Error: 'environment.generatePdfEndpoint' no está configurado.");
-    }
-
-    return this.http.get<any>(this.pdfEndpoint, { headers });
+generatePdfReport(): Observable<Blob> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders({
+    Authorization: token ? `Bearer ${token.replace('Bearer ', '')}` : '',
+  });
+  
+  if (!this.pdfEndpoint || this.pdfEndpoint.includes('undefined')) {
+    console.error("🚨 Error: 'environment.generatePdfEndpoint' no está configurado.");
   }
+
+  // Retornamos un Blob (Binary Large Object) que representa nuestro ZIP
+  return this.http.get(this.pdfEndpoint, { 
+    headers, 
+    responseType: 'blob' 
+  });
+}
 
   searchAlumnos(params: any, page: number, size: number): Observable<any> {
     const token = localStorage.getItem('token');

@@ -319,49 +319,32 @@ export class CargaDatosResultadosComponent implements OnInit {
         }
       });
   }
-  // --- Generación de Reportes Simultáneos (PDF + Excel) ---
+ // --- Generación de Reportes Simultáneos en un ZIP ---
   generarReportePdf() {
     this.isLoading = true;
     this.cdRef.detectChanges();
 
     this.alumnosService.generatePdfReport().subscribe({
-      next: (res: any) => {
-        console.log('--- RESPUESTA EXITOSA ---', res);
+      next: (zipBlob: Blob) => {
+        console.log('--- ZIP RECIBIDO CON ÉXITO ---', zipBlob);
 
-        if (res && res.success) {
-          // 1. Desempaquetar y descargar PDF
-          const pdfBlob = this.base64ToBlob(res.pdfBytes, 'application/pdf');
-          saveAs(pdfBlob, res.pdfFileName || 'reporte_aspirantes.pdf');
+        // Forzamos el tipo MIME correcto para un archivo ZIP
+        const blob = new Blob([zipBlob], { type: 'application/zip' });
+        
+        // Descargamos el paquete unificado usando file-saver
+        saveAs(blob, 'reportes_admision.zip');
 
-          // 2. Desempaquetar y descargar Excel de inmediato
-          const excelBlob = this.base64ToBlob(res.excelBytes, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          saveAs(excelBlob, res.excelFileName || 'reporte_aspirantes.xlsx');
-
-          this.alertService.showAlert('Reportes descargados correctamente', 'success');
-        } else {
-          this.alertService.showAlert(res.message || 'Error al construir los archivos', 'danger');
-        }
+        this.alertService.showAlert('Archivo ZIP descargado con éxito', 'success');
         this.isLoading = false;
         this.cdRef.detectChanges();
       },
       error: (err) => {
-        console.error("--- ERROR DE CONEXIÓN ---", err);
+        console.error("--- ERROR DE CONEXIÓN O PARSEO ---", err);
         this.isLoading = false;
-        this.alertService.showAlert('Error de conexión con el servicio de reportes', 'danger');
+        this.alertService.showAlert('Error al conectar con el servidor de reportes', 'danger');
         this.cdRef.detectChanges();
       }
     });
-  }
-
-  // Utilidad para convertir las cadenas Base64 del JSON a archivos Blob nativos
-  private base64ToBlob(base64: string, type: string): Blob {
-    const binaryString = window.atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    return new Blob([bytes], { type: type });
   }
 }
 
