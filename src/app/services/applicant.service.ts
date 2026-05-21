@@ -38,7 +38,7 @@ export class ApplicantService {
 
   // ✅ Obtener vacantes disponibles con token
   getVacantesDisponibles(): Observable<any[]> {
-    const url = environment.avaliable ;
+    const url = environment.available; ;
     return this.http.get<any[]>(url, {
       headers: this.getAuthHeaders(),
     });
