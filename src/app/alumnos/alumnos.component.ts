@@ -143,7 +143,7 @@ export class AlumnosComponent implements OnInit {
               ? a.attendanceStatus.trim().toUpperCase()
               : '',
           }));
-
+          console.log('Alumnos cargados:', this.filteredData);
           this.totalElements = data.totalElements;
           this.totalPagesBackend = data.totalPages;
 
@@ -212,7 +212,7 @@ export class AlumnosComponent implements OnInit {
   // Método para el evento input del buscador
   onSearch() {
     this.buscando = true;
-
+    
     const params: any = {};
 
     if (this.anioSeleccionado) {
