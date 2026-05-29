@@ -9,7 +9,7 @@
 
 <div class="w-full px-4 sm:px-6 lg:px-8 flex justify-center relative mt-6">
     <div class="w-full max-w-7xl bg-white rounded-lg shadow-md overflow-hidden">
-        
+
         <div class="p-6 bg-[#24645c] text-white rounded-t-lg flex justify-between items-center">
             <h2 class="text-2xl font-semibold">Administración de Usuarios</h2>
             <button (click)="newUser()"
@@ -21,7 +21,8 @@
             </button>
         </div>
 
-        <div class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50">
+        <div
+            class="p-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50">
             <span class="text-sm text-gray-500">Gestiona las cuentas y permisos del personal.</span>
         </div>
 
@@ -29,11 +30,16 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-[#14645c]">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Usuario</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Roles</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Acciones</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Usuario
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Nombre
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Roles
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">Estado
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-white uppercase tracking-wider">
+                            Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -56,8 +62,8 @@
                             <button class="text-[#24645c] hover:text-[#14645c] mr-3" (click)="edit(u)">
                                 <span class="hover:underline">Editar</span>
                             </button>
-                            <button [class.text-red-600]="u.active" [class.text-blue-600]="!u.active" 
-                                    class="hover:underline" (click)="toggle(u)">
+                            <button [class.text-red-600]="u.active" [class.text-blue-600]="!u.active"
+                                class="hover:underline" (click)="toggle(u)">
                                 {{ u.active ? 'Desactivar' : 'Activar' }}
                             </button>
                         </td>
@@ -76,32 +82,76 @@
             <div class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre de Usuario</label>
-                    <input class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none" [(ngModel)]="form.username">
+                    <input class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none"
+                        [(ngModel)]="form.username">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre Completo</label>
-                    <input class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none" [(ngModel)]="form.fullName">
+                    <input class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none"
+                        [(ngModel)]="form.fullName">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div>
+                    <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contraseña</label>
-                        <input type="password" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none" [(ngModel)]="form.password">
+                        <input [type]="showPassword ? 'text' : 'password'"
+                            class="w-full border rounded-lg p-2.5 pr-10 focus:ring-2 focus:ring-[#24645c] outline-none"
+                            [(ngModel)]="form.password">
+
+                        <button type="button" (click)="toggleShowPassword()"
+                            class="absolute right-2 top-[34px] p-1 text-gray-500 hover:text-[#24645c] focus:outline-none">
+                            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.122-3.333" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6.1 6.1L17.9 17.9" />
+                            </svg>
+                        </button>
                     </div>
-                    <div>
+
+                    <div class="relative">
                         <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Confirmar</label>
-                        <input type="password" class="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-[#24645c] outline-none" [(ngModel)]="confirmPassword">
+                        <input [type]="showConfirmPassword ? 'text' : 'password'"
+                            class="w-full border rounded-lg p-2.5 pr-10 focus:ring-2 focus:ring-[#24645c] outline-none"
+                            [(ngModel)]="confirmPassword">
+
+                        <button type="button" (click)="toggleShowConfirmPassword()"
+                            class="absolute right-2 top-[34px] p-1 text-gray-500 hover:text-[#24645c] focus:outline-none">
+                            <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                                viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.122-3.333" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6.1 6.1L17.9 17.9" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
-
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <p class="text-xs font-bold text-gray-500 uppercase mb-3">Asignación de Roles</p>
                     <div class="flex gap-6">
                         <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" class="w-4 h-4 accent-[#24645c]" (change)="toggleRole('ROLE_ADMIN')" [checked]="hasRole('ROLE_ADMIN')">
+                            <input type="checkbox" class="w-4 h-4 accent-[#24645c]" (change)="toggleRole('ROLE_ADMIN')"
+                                [checked]="hasRole('ROLE_ADMIN')">
                             <span class="text-sm group-hover:text-[#24645c]">Administrador</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" class="w-4 h-4 accent-[#24645c]" (change)="toggleRole('ROLE_USER')" [checked]="hasRole('ROLE_USER')">
+                            <input type="checkbox" class="w-4 h-4 accent-[#24645c]" (change)="toggleRole('ROLE_USER')"
+                                [checked]="hasRole('ROLE_USER')">
                             <span class="text-sm group-hover:text-[#24645c]">Secretaria</span>
                         </label>
                     </div>
@@ -109,10 +159,14 @@
             </div>
 
             <div class="flex justify-end gap-3 mt-8">
-                <button class="px-6 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors" (click)="showForm = false">
+                <button
+                    class="px-6 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors"
+                    (click)="showForm = false">
                     Cancelar
                 </button>
-                <button class="px-6 py-2 rounded-lg bg-[#24645c] text-white hover:bg-[#1a4b45] shadow-lg transition-transform active:scale-95" (click)="save()">
+                <button
+                    class="px-6 py-2 rounded-lg bg-[#24645c] text-white hover:bg-[#1a4b45] shadow-lg transition-transform active:scale-95"
+                    (click)="save()">
                     Guardar Cambios
                 </button>
             </div>

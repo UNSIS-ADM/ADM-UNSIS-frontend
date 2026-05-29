@@ -1,10 +1,24 @@
-<div class="overlay">
-  <div class="modal">
-    <h2>Extender sesión</h2>
-    <p>Tu sesión está por expirar. ¿Quieres extenderla?</p>
-    <div class="actions">
-      <button (click)="cancel.emit()">Salir</button>
-      <button class="primary" (click)="extend.emit()">Extender</button>
+<div class="fixed inset-0 flex items-center justify-center z-[100]"
+     style="background-color: rgba(0, 0, 0, 0.471); backdrop-filter: blur(2px);">
+     
+  <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 slide-down border border-gray-100">
+    
+    <h3 class="text-lg font-bold mb-3 text-gray-800">Extender sesión</h3>
+    
+    <p class="mb-6 text-gray-600 text-sm leading-relaxed">
+      Tu sesión está por expirar. ¿Quieres extenderla?
+    </p>
+    
+    <div class="flex justify-end gap-3">
+      <button (click)="cancel.emit()" 
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium text-sm">
+        Salir
+      </button>
+      
+      <button (click)="extend.emit()" 
+              class="px-4 py-2 bg-[#24645c] text-white rounded-md hover:bg-[#1a4b45] transition-shadow shadow-md font-medium text-sm">
+        Extender
+      </button>
     </div>
   </div>
 </div>

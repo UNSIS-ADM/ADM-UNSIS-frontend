@@ -31,7 +31,7 @@ export class RegistrarUsuarioComponent {
   showConfirmModal = false;
   confirmMessage = '';
   confirmCallback: (() => void) | null = null;
-
+  showPassword = false;
   formSubmitted: boolean = false;
 
   constructor(
@@ -79,4 +79,10 @@ export class RegistrarUsuarioComponent {
     this.confirmCallback();
   }
 }
+
+  // show/hide password y onSubmit (mantener tu lógica)
+  toggleShowPassword() {
+    this.showPassword = !this.showPassword;
+  }
+
 }
