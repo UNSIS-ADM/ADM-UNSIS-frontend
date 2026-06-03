@@ -17,7 +17,7 @@ import { HttpResponse } from '@angular/common/http';
 import { finalize } from 'rxjs/operators';
 import { extractFilename } from '../utils/file--utils';
 import { AlertService } from '../services/alert.service';
-
+import { saveAs } from 'file-saver'; // Para descargar el PDF (npm install file-saver)
 
 @Component({
   selector: 'app-alumnos',
@@ -455,4 +455,48 @@ export class AlumnosComponent implements OnInit {
   hasRole(role: string): boolean {
     return this.roles.includes(role);
   }
+
+   generarReportePdf() {
+    this.isLoading = true;
+    this.cdRef.detectChanges();
+
+    this.alumnosService.generatePdfReport().subscribe({
+      next: (zipBlob: Blob) => {
+        console.log('--- ZIP RECIBIDO CON ÉXITO ---', zipBlob);
+
+        // Forzamos el tipo MIME correcto para un archivo ZIP
+        const blob = new Blob([zipBlob], { type: 'application/zip' });
+        
+        // Descargamos el paquete unificado usando file-saver
+        saveAs(blob, 'reportes_admision.zip');
+
+        this.alertService.showAlert('Archivo ZIP descargado con éxito', 'success');
+        this.isLoading = false;
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error("--- ERROR DE CONEXIÓN O PARSEO ---", err);
+        this.isLoading = false;
+        this.alertService.showAlert('Error al conectar con el servidor de reportes', 'danger');
+        this.cdRef.detectChanges();
+      }
+    });
+  }
+  // Retorna el número inicial del rango actual (ej. 1, 11, 21...)
+// Obtiene el número (ficha) del primer elemento visible en la tabla actual
+getPrimerElementoPagina(): string | number {
+  if (this.paginatedData && this.paginatedData.length > 0) {
+    return this.paginatedData[0].ficha; // Si usas 'id', cambia .ficha por .id
+  }
+  return 0;
+}
+
+// Obtiene el número (ficha) del último elemento visible en la tabla actual
+getUltimoElementoPagina(): string | number {
+  if (this.paginatedData && this.paginatedData.length > 0) {
+    const ultimoIndex = this.paginatedData.length - 1;
+    return this.paginatedData[ultimoIndex].ficha; // Si usas 'id', cambia .ficha por .id
+  }
+  return 0;
+}
 }

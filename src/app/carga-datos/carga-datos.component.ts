@@ -43,12 +43,10 @@ export class CargaDatosComponent implements OnInit {
   totalElements = 0;
   Math = Math;
   showModal: boolean = false;
-  selectedApplicant: any = null; // aquí guardamos el aspirante que se va a editar
+  selectedApplicant: any = null; 
 
-  // 👇 Nuevas propiedades para años
   aniosDisponibles: number[] = [];
   originalApplicant: any;
-  // 🔹 Filtros
   anioSeleccionado: string = '';
   carreraSeleccionada: string = '';
   statusSeleccionado: string = '';
@@ -90,9 +88,7 @@ export class CargaDatosComponent implements OnInit {
 
         // años
         const yearsFromEndpoint = this.datos.map((a) => a.admissionYear);
-
         const currentYear = new Date().getFullYear();
-
         const lastFiveYears = Array.from(
           { length: 5 },
           (_, i) => currentYear - i,
@@ -110,70 +106,15 @@ export class CargaDatosComponent implements OnInit {
         ].sort();
 
         this.isLoading = false;
-
         this.cdRef.detectChanges();
       },
-
       error: () => {
         this.alertService.showAlert('Error al cargar los datos', 'danger');
-
         this.isLoading = false;
-
         this.cdRef.detectChanges();
       },
     });
   }
-  /*
-    loadAlumnos() {
-      this.alumnosService.getAlumnos(0, 1000).subscribe({
-        next: (resultados) => {
-          // ✅ Obtener SOLO el arreglo
-          this.datos = resultados.content.map((a: any) => ({
-            ...a,
-            attendanceStatus: a.attendanceStatus
-              ? a.attendanceStatus.trim().toUpperCase()
-              : '',
-          }));
-
-          this.filteredData = [...this.datos];
-
-          console.log(this.filteredData);
-
-          // 🔹 Llenar select de años
-          const yearsFromEndpoint = this.datos.map((a) => a.admissionYear);
-
-          const currentYear = new Date().getFullYear();
-
-          const lastFiveYears = Array.from(
-            { length: 5 },
-            (_, i) => currentYear - i,
-          );
-
-          this.aniosDisponibles = [
-            ...new Set([...yearsFromEndpoint, ...lastFiveYears]),
-          ].sort((a, b) => b - a);
-
-          this.anioSeleccionado = currentYear.toString();
-
-          // 🔹 Llenar select de carreras
-          this.carrerasDisponibles = [
-            ...new Set(this.datos.map((a) => a.career).filter(Boolean)),
-          ].sort();
-
-          this.aplicarFiltros();
-
-          this.isLoading = false;
-          this.cdRef.detectChanges();
-        },
-
-        error: () => {
-          this.alertService.showAlert('Error al cargar los datos', 'danger');
-
-          this.isLoading = false;
-          this.cdRef.detectChanges();
-        },
-      });
-    }*/
 
   // --- Filtros ---
   generarAnios() {
@@ -188,7 +129,6 @@ export class CargaDatosComponent implements OnInit {
     const busqueda = this.terminoBusqueda.toLowerCase().trim();
 
     this.filteredData = this.datos.filter((a) => {
-      // Filtros de Select
       const coincideAnio =
         !this.anioSeleccionado || a.admissionYear == this.anioSeleccionado;
       const coincideCarrera =
@@ -196,7 +136,6 @@ export class CargaDatosComponent implements OnInit {
       const coincideStatus =
         !this.statusSeleccionado || a.status == this.statusSeleccionado;
 
-      // Filtro de Buscador (Nombre, CURP o Ficha)
       const coincideBusqueda =
         !busqueda ||
         (a.fullName && a.fullName.toLowerCase().includes(busqueda)) ||
@@ -208,11 +147,10 @@ export class CargaDatosComponent implements OnInit {
       );
     });
 
-    this.currentPage = 1; // Reinicia paginación al filtrar
+    this.currentPage = 1; 
     this.cdRef.detectChanges();
   }
 
-  // Método para el evento input del buscador
   onSearch() {
     this.aplicarFiltros();
   }
@@ -256,7 +194,6 @@ export class CargaDatosComponent implements OnInit {
       );
       this.uploadExcel();
     }
-
     this.fileToConfirm = null;
   }
 
@@ -302,13 +239,6 @@ export class CargaDatosComponent implements OnInit {
   }
 
   // --- Paginación ---
-  /*
-    get paginatedData() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredData.slice(start, end);
-    }*/
-
   siguientePagina() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -316,34 +246,16 @@ export class CargaDatosComponent implements OnInit {
     }
   }
 
-  /*
-    siguientePagina() {
-      if (this.currentPage * this.itemsPerPage < this.filteredData.length)
-        this.currentPage++;
-    }
-    */
-
   paginaAnterior() {
     if (this.currentPage > 1) {
       this.currentPage--;
-
       this.loadAlumnos(this.currentPage - 1);
     }
   }
 
-  /*
-  paginaAnterior() {
-    if (this.currentPage > 1) this.currentPage--;
-  }
-    */
-
   get totalPages(): number {
     return Math.ceil(this.totalElements / this.itemsPerPage);
   }
-  /*
-  get totalPages(): number {
-    return Math.ceil(this.filteredData.length / this.itemsPerPage);
-  }*/
 
   get pages(): (number | string)[] {
     const total = this.totalPages;
@@ -380,12 +292,6 @@ export class CargaDatosComponent implements OnInit {
     this.loadAlumnos(page - 1);
   }
 
-  /*
-    goToPage(page: number) {
-      if (page >= 1 && page <= this.totalPages) this.currentPage = page;
-    }
-    */
-
   get emptyRows(): any[] {
     const rowsOnPage = this.filteredData.length;
     if (rowsOnPage > 0 && rowsOnPage < this.itemsPerPage)
@@ -393,12 +299,12 @@ export class CargaDatosComponent implements OnInit {
     return [];
   }
 
-  //editar alumnos modal
+  // Modales y Edición
   openModal(id: number) {
     this.alumnosService.getApplicantById(id).subscribe({
       next: (data) => {
-        this.selectedApplicant = { ...data }; // datos actuales para editar
-        this.originalApplicant = { ...data }; // 👈 guardamos SOLO ese alumno
+        this.selectedApplicant = { ...data }; 
+        this.originalApplicant = { ...data }; 
         this.showModal = true;
       },
       error: (err) => {
@@ -410,14 +316,13 @@ export class CargaDatosComponent implements OnInit {
   closeModal() {
     this.showModal = false;
   }
-  // componente.ts
+
   saveApplicant() {
     if (!this.selectedApplicant?.id) {
       console.error('No hay aspirante seleccionado');
       return;
     }
 
-    // compara campo por campo con el original:
     const updatedData: any = {};
 
     Object.keys(this.selectedApplicant).forEach((key) => {
@@ -426,23 +331,37 @@ export class CargaDatosComponent implements OnInit {
       }
     });
 
-    // si no hay cambios, no hace falta llamar al servicio
     if (Object.keys(updatedData).length === 0) {
       this.closeModal();
       return;
     }
 
-    // agrega id si tu API lo necesita
     updatedData.id = this.selectedApplicant.id;
 
     this.alumnosService
       .editApplicantById(this.selectedApplicant.id, updatedData)
       .subscribe({
         next: (res) => {
-          this.loadAlumnos();
+          this.loadAlumnos(this.currentPage - 1);
           this.closeModal();
         },
         error: (err) => console.error('Error al editar aspirante', err),
       });
+  }
+
+  // 👇 MÉTODOS DE RANGO ACTUALIZADOS BASADOS EN FILTERS DEL BACKEND
+  getPrimerElementoPagina(): string | number {
+    if (this.filteredData && this.filteredData.length > 0) {
+      return this.filteredData[0].ficha;
+    }
+    return 0;
+  }
+
+  getUltimoElementoPagina(): string | number {
+    if (this.filteredData && this.filteredData.length > 0) {
+      const ultimoIndex = this.filteredData.length - 1;
+      return this.filteredData[ultimoIndex].ficha;
+    }
+    return 0;
   }
 }
