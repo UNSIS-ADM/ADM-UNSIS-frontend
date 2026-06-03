@@ -19,7 +19,7 @@ export const environment = {
   getUsuariosEndpoint: '/api/admin/users',
   generatePdfEndpoint: '/api/admin/generate-pdf',
   uploadaplicants: '/api/admin/upload-applicants',
-  available: 'http://localhost:1200/api/admin/vacancies/available',
+  available: '/api/admin/vacancies/available',
   uploadresults: '/api/admin/upload-results',
   vacantes: '/api/admin/vacancies',
   cambiocarrera: '/api/admin/change-career/requests',
