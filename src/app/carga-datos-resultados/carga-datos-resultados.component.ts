@@ -319,32 +319,21 @@ export class CargaDatosResultadosComponent implements OnInit {
         }
       });
   }
- // --- Generación de Reportes Simultáneos en un ZIP ---
-  generarReportePdf() {
-    this.isLoading = true;
-    this.cdRef.detectChanges();
-
-    this.alumnosService.generatePdfReport().subscribe({
-      next: (zipBlob: Blob) => {
-        console.log('--- ZIP RECIBIDO CON ÉXITO ---', zipBlob);
-
-        // Forzamos el tipo MIME correcto para un archivo ZIP
-        const blob = new Blob([zipBlob], { type: 'application/zip' });
-        
-        // Descargamos el paquete unificado usando file-saver
-        saveAs(blob, 'reportes_admision.zip');
-
-        this.alertService.showAlert('Archivo ZIP descargado con éxito', 'success');
-        this.isLoading = false;
-        this.cdRef.detectChanges();
-      },
-      error: (err) => {
-        console.error("--- ERROR DE CONEXIÓN O PARSEO ---", err);
-        this.isLoading = false;
-        this.alertService.showAlert('Error al conectar con el servidor de reportes', 'danger');
-        this.cdRef.detectChanges();
-      }
-    });
+ getPrimerElementoPagina(): string | number {
+  if (this.paginatedData && this.paginatedData.length > 0) {
+    return this.paginatedData[0].ficha; // Si usas 'id', cambia .ficha por .id
   }
+  return 0;
+}
+
+// Obtiene el número (ficha) del último elemento visible en la tabla actual
+getUltimoElementoPagina(): string | number {
+  if (this.paginatedData && this.paginatedData.length > 0) {
+    const ultimoIndex = this.paginatedData.length - 1;
+    return this.paginatedData[ultimoIndex].ficha; // Si usas 'id', cambia .ficha por .id
+  }
+  return 0;
+}
+ 
 }
 
