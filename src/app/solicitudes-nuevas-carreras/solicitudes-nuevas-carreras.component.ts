@@ -46,7 +46,8 @@ export class SolicitudesNuevasCarrerasComponent implements OnInit {
           nuevaCarrera: item.newCareer,
           antiguacarrera: item.oldCareer,
           comentario: item.requestComment,
-          estado: item.estado || 'Pendiente'
+          estado: item.estado || 'Pendiente',
+          nombre: item.fullName
         }));
         // Inicializamos filteredData
         this.filteredData = [...this.solicitudes];
