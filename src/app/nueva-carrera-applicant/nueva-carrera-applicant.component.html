@@ -19,19 +19,27 @@
       </label>
 
       <textarea [(ngModel)]="formData.comentario" name="comentario" id="comentario" required rows="4" maxlength="200"
-        class="block w-full p-2.5 border border-gray-300 rounded-lg
-           focus:ring-[#6a1b1b] focus:border-[#6a1b1b] text-gray-600"
+        class="block w-full p-2.5 border border-gray-300 rounded-lg focus:ring-[#6a1b1b] focus:border-[#6a1b1b] text-gray-600"
         placeholder="Explica brevemente por qué deseas cambiarte de carrera...">
-  </textarea>
+      </textarea>
 
       <p class="text-xs text-gray-500 mt-1">
         Máximo 200 caracteres
       </p>
     </div>
 
-
     <!-- Botón -->
-    <button type="submit" class="w-full bg-[#548e88] text-white py-2 px-4  shadow-md hover:bg-[#2a815c] transition">
+    <button type="submit" class="w-full bg-[#548e88] text-white py-2 px-4 shadow-md hover:bg-[#2a815c] transition rounded-lg">
       Enviar solicitud      
     </button>
+
+    <!-- Separador visual opcional para aislar la nota informativa -->
+    <hr class="border-gray-200" />
+
+    <!-- Aviso institucional (Estilizado y opaco) -->
+    <p class="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-200 leading-relaxed text-justify">
+      <strong class="text-gray-600 font-semibold">Atención aspirantes:</strong> En caso de que la carrera que desea cursar no aparezca disponible en el sistema, favor de presentarse en las ventanillas de <span class="font-medium text-gray-600">Servicios Escolares</span> para la revisión y resolución de su caso.
+    </p>
+
   </form>
+</div>
